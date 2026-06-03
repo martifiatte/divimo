@@ -441,7 +441,7 @@ document.querySelectorAll('.faq-q').forEach(q=>{
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 // Mobile menu (simple scroll to)
-document.getElementById('menuBtn').addEventListener('click',()=>{document.getElementById('offres').scrollIntoView({behavior:'smooth'})});
+document.querySelector('.nav-toggle')?.addEventListener('click',()=>{document.getElementById('offres').scrollIntoView({behavior:'smooth'})});
 </script>
 </body>
 </html>
