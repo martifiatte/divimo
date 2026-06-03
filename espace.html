@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -102,49 +104,12 @@ a{color:inherit;text-decoration:none}
 .map-legend .it:hover{color:var(--bleu-roi)}
 .map-legend .pin{width:14px;height:14px;border-radius:50% 50% 50% 0;background:var(--bleu-violet);transform:rotate(-45deg);flex-shrink:0}
 
-/* ===== AUTH GATE ===== */
-#gate{position:fixed;inset:0;z-index:300;background:linear-gradient(150deg,#1A237E,#5C6BC0);display:flex;align-items:center;justify-content:center;padding:24px}
-#gate.hide{display:none}
-.gate-card{background:#fff;border-radius:24px;box-shadow:0 30px 70px rgba(0,0,0,.3);width:100%;max-width:420px;padding:38px;text-align:center;animation:fade .4s ease}
-.gate-card .logo{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:800;font-size:1.4rem;color:var(--bleu-roi);margin-bottom:18px}
-.gate-card h1{font-size:1.5rem;font-weight:800}
-.gate-card p{color:var(--texte-doux);font-size:.94rem;margin:.5rem 0 22px}
-.gate-card p b{color:var(--bleu-roi)}
-.code-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px}
-.code-row input{width:48px;height:58px;text-align:center;font-family:'Montserrat';font-weight:800;font-size:1.5rem;border:1.8px solid var(--gris-bord);border-radius:13px;color:var(--bleu-roi);transition:.2s}
-.code-row input:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.15)}
-.code-row input.filled{border-color:var(--bleu-violet);background:rgba(92,107,192,.05)}
-.gate-hint{font-size:.82rem;color:var(--texte-doux);background:var(--gris-clair);border-radius:10px;padding:10px;margin:6px 0 18px}
-.gate-hint b{color:var(--bleu-roi);font-family:'Montserrat';letter-spacing:2px}
-.gate-err{color:#eb5757;font-size:.85rem;min-height:20px;margin-bottom:8px}
-.gate-card .btn{width:100%;justify-content:center;padding:.85rem}
-.resend{margin-top:16px;font-size:.86rem;color:var(--texte-doux)}
-.resend a{color:var(--bleu-violet);font-weight:600;cursor:pointer}
-.gate-back{display:inline-block;margin-top:18px;font-size:.85rem;color:var(--texte-doux)}
 
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bleu-roi);color:#fff;padding:.85rem 1.3rem;border-radius:12px;font-family:'Montserrat';font-weight:600;font-size:.92rem;box-shadow:0 12px 30px rgba(26,35,126,.3);opacity:0;pointer-events:none;transition:.3s;z-index:400}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-
-<!-- ============ AUTH GATE (code de vérification) ============ -->
-<div id="gate">
-  <div class="gate-card">
-    <div class="logo"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1A237E" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#5C6BC0"/><circle cx="17" cy="17" r="4.5" fill="#1A237E"/></svg> Divimo</div>
-    <h1>Vérification</h1>
-    <p>Pour sécuriser votre connexion, saisissez le code à 6 chiffres envoyé à <b id="gateEmail">marti@email.com</b>.</p>
-    <div class="code-row" id="codeRow">
-      <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
-      <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
-    </div>
-    <div class="gate-hint">📩 Démo — votre code de vérification est : <b id="demoCode">000000</b></div>
-    <div class="gate-err" id="gateErr"></div>
-    <button class="btn" onclick="checkCode()">Valider et accéder à mon espace</button>
-    <div class="resend">Pas reçu ? <a onclick="genCode(true)">Renvoyer un code</a></div>
-    <a href="index.html" class="gate-back">← Retour au site</a>
-  </div>
-</div>
 
 <!-- ============ HEADER (cohérent avec le site) ============ -->
 <header class="site-header" id="siteHeader">
@@ -158,7 +123,7 @@ a{color:inherit;text-decoration:none}
       <a href="espace.html" class="active">Mon espace</a>
     </nav>
     <div class="header-actions">
-      <span class="user-chip"><span class="av">MF</span> Marti</span>
+      <span class="user-chip"><span class="av" id="chipAv">MF</span> <span id="chipName">Marti</span></span>
       <button class="logout-btn" onclick="logout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Déconnexion</button>
     </div>
     <button class="nav-toggle" aria-label="Menu" onclick="this.closest('.site-header').classList.toggle('open')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
@@ -300,55 +265,40 @@ a{color:inherit;text-decoration:none}
 <div id="toast"></div>
 
 <script>
-/* ===================== AUTH (code de vérification + session) ===================== */
-const AUTH_KEY='divimo_auth', STATE_KEY='divimo_state';
-let demoCode='';
-/* Stockage robuste : essaie localStorage, sinon sessionStorage, sinon cookie.
-   (utile car en mode fichier local "file://" certains navigateurs ne gardent pas localStorage) */
-function ssGet(k){
-  try{let v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}
-  try{let v=sessionStorage.getItem(k);if(v!==null)return v;}catch(e){}
-  const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)');return m?decodeURIComponent(m[1]):null;
-}
-function ssSet(k,v){
-  try{localStorage.setItem(k,v);}catch(e){}
-  try{sessionStorage.setItem(k,v);}catch(e){}
-  try{document.cookie=k+'='+encodeURIComponent(v)+';path=/;max-age=31536000';}catch(e){}
-}
-function ssDel(k){
-  try{localStorage.removeItem(k);}catch(e){}
-  try{sessionStorage.removeItem(k);}catch(e){}
-  try{document.cookie=k+'=;path=/;max-age=0';}catch(e){}
-}
-function genCode(resend){
-  demoCode=String(Math.floor(100000+Math.random()*900000));
-  document.getElementById('demoCode').textContent=demoCode;
-  if(resend){document.getElementById('gateErr').textContent='';clearCode();toast('📩 Nouveau code envoyé');}
-}
-function clearCode(){document.querySelectorAll('#codeRow input').forEach(i=>{i.value='';i.classList.remove('filled');});document.querySelector('#codeRow input').focus();}
-function checkCode(){
-  const val=[...document.querySelectorAll('#codeRow input')].map(i=>i.value).join('');
-  if(val.length<6){document.getElementById('gateErr').textContent='Entrez les 6 chiffres.';return;}
-  if(val===demoCode){
-    ssSet(AUTH_KEY,'1');
-    document.getElementById('gate').classList.add('hide');
-    toast('✅ Connecté ! Bienvenue Marti');
-  }else{
-    document.getElementById('gateErr').textContent='Code incorrect, réessayez.';
-    clearCode();
+/* ===================== AUTH (Supabase) ===================== */
+const STATE_KEY='divimo_state';
+function ssGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function ssSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+async function logout(){await sb.auth.signOut();window.location.href='connexion.html';}
+
+function applyUser(user){
+  const meta=user.user_metadata||{};
+  const prenom=(meta.prenom||'').trim();
+  const nom=(meta.nom||'').trim();
+  const displayName=prenom||(user.email||'').split('@')[0];
+  const initials=((prenom[0]||'')+(nom[0]||'')).toUpperCase()||displayName.slice(0,2).toUpperCase();
+  const el=id=>document.getElementById(id);
+  if(el('chipAv'))el('chipAv').textContent=initials;
+  if(el('chipName'))el('chipName').textContent=displayName;
+  const greet=document.querySelector('#v-dash .h-row h1');
+  if(greet)greet.textContent='Bonjour '+displayName+' 👋';
+  const profAv=document.querySelector('#v-abo .pro-av');
+  if(profAv){
+    profAv.textContent=initials;
+    const sib=profAv.nextElementSibling;
+    const nameEl=sib?.querySelector('b');
+    const emailEl=sib?.querySelector('span');
+    if(nameEl)nameEl.textContent=[prenom,nom].filter(Boolean).join(' ')||displayName;
+    if(emailEl)emailEl.textContent=user.email||'';
   }
 }
-function logout(){ssDel(AUTH_KEY);window.location.href='connexion.html';}
-// code inputs UX
-const codeInputs=[...document.querySelectorAll('#codeRow input')];
-codeInputs.forEach((inp,idx)=>{
-  inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'');inp.classList.toggle('filled',!!inp.value);if(inp.value&&idx<5)codeInputs[idx+1].focus();});
-  inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&idx>0)codeInputs[idx-1].focus();if(e.key==='Enter')checkCode();});
-  inp.addEventListener('paste',e=>{e.preventDefault();const d=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);d.split('').forEach((c,i)=>{if(codeInputs[i]){codeInputs[i].value=c;codeInputs[i].classList.add('filled');}});if(d.length)codeInputs[Math.min(d.length,5)].focus();});
-});
-// au chargement : déjà connecté ? -> direct au compte (pas de redemande de code)
-if(ssGet(AUTH_KEY)==='1'){document.getElementById('gate').classList.add('hide');}
-else{genCode();setTimeout(()=>codeInputs[0].focus(),200);}
+
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='connexion.html';return;}
+  applyUser(session.user);
+})();
 
 /* ===================== TOAST ===================== */
 let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}

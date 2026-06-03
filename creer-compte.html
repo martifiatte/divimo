@@ -95,11 +95,13 @@ input.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
     <div class="success" id="success">
       <div class="circle">✅</div>
       <h1>Bienvenue chez Divimo !</h1>
-      <p class="sub" style="margin-top:.6rem">Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.</p>
-      <a href="espace.html" class="btn" style="text-decoration:none">Accéder à mon espace →</a>
+      <p class="sub" id="successMsg" style="margin-top:.6rem">Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.</p>
+      <a href="espace.html" class="btn" id="successBtn" style="text-decoration:none">Accéder à mon espace →</a>
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 <script>
 function togglePwd(id,b){const i=document.getElementById(id);const s=i.type==='password';i.type=s?'text':'password';b.textContent=s?'🙈':'👁';}
 function scorePwd(p){let s=0;if(p.length>=8)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return s;}
@@ -112,12 +114,48 @@ function checkStrength(){
 const f=document.getElementById('signupForm');
 const validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 function setErr(el,bad){el.classList.toggle('err',bad);const m=el.closest('.field').querySelector('.err-msg');m.classList.toggle('show',bad);}
-f.addEventListener('submit',e=>{
+
+f.addEventListener('submit',async e=>{
   e.preventDefault();let ok=true;
-  const prenom=document.getElementById('prenom'),nom=document.getElementById('nom'),email=document.getElementById('email'),pwd=document.getElementById('pwd'),pwd2=document.getElementById('pwd2'),cgu=document.getElementById('cgu');
-  [[prenom,!prenom.value.trim()],[nom,!nom.value.trim()],[email,!validEmail(email.value)],[pwd,pwd.value.length<8],[pwd2,pwd2.value!==pwd.value||!pwd2.value]].forEach(([el,bad])=>{setErr(el,bad);if(bad)ok=false;});
+  const prenom=document.getElementById('prenom'),nom=document.getElementById('nom'),
+    email=document.getElementById('email'),pwd=document.getElementById('pwd'),
+    pwd2=document.getElementById('pwd2'),cgu=document.getElementById('cgu');
+  [[prenom,!prenom.value.trim()],[nom,!nom.value.trim()],[email,!validEmail(email.value)],
+   [pwd,pwd.value.length<8],[pwd2,pwd2.value!==pwd.value||!pwd2.value]].forEach(([el,bad])=>{setErr(el,bad);if(bad)ok=false;});
   if(!cgu.checked){ok=false;cgu.parentElement.style.color='#eb5757';}else{cgu.parentElement.style.color='';}
-  if(ok){document.getElementById('formWrap').style.display='none';document.getElementById('success').style.display='block';}
+  if(!ok)return;
+
+  const btn=f.querySelector('.btn');
+  btn.textContent='Création…';btn.disabled=true;
+
+  const {data,error}=await sb.auth.signUp({
+    email:email.value.trim(),
+    password:pwd.value,
+    options:{data:{prenom:prenom.value.trim(),nom:nom.value.trim()}}
+  });
+
+  btn.textContent='Créer mon compte';btn.disabled=false;
+
+  if(error){
+    setErr(email,true);
+    email.closest('.field').querySelector('.err-msg').textContent=
+      error.message.includes('already registered')||error.message.includes('already been registered')
+        ? 'Cet email est déjà utilisé.'
+        : error.message;
+    return;
+  }
+
+  document.getElementById('formWrap').style.display='none';
+  const s=document.getElementById('success');
+  // Si confirmation d'email requise, Supabase renvoie user mais pas de session
+  if(data.session){
+    document.getElementById('successMsg').textContent='Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.';
+    document.getElementById('successBtn').style.display='inline-flex';
+  } else {
+    document.getElementById('successMsg').textContent='Votre compte a bien été créé ! Un email de confirmation vous a été envoyé. Cliquez sur le lien dans cet email pour activer votre compte.';
+    document.getElementById('successBtn').style.display='none';
+  }
+  s.style.display='block';
 });
 document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{if(el.type!=='checkbox')setErr(el,false);}));
 </script>

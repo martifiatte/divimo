@@ -75,7 +75,7 @@ input.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
     <span class="eyebrow">Espace membre</span>
     <h1>Connexion à votre espace</h1>
     <p class="sub">Heureux de vous revoir ! Connectez-vous pour continuer.</p>
-    <div class="alert" id="alert">Identifiants incorrects. Vérifiez votre email et votre mot de passe.</div>
+    <div class="alert" id="alert"></div>
     <form id="loginForm" novalidate>
       <div class="field"><label>Email</label><div class="inp"><input type="text" id="email" placeholder="vous@email.com"></div><div class="err-msg">Email invalide</div></div>
       <div class="field"><label>Mot de passe</label><div class="inp"><input type="password" id="pwd" placeholder="••••••••"><button type="button" class="eye" onclick="togglePwd('pwd',this)">👁</button></div><div class="err-msg">Mot de passe requis</div></div>
@@ -88,19 +88,54 @@ input.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
     <p class="alt-link">Pas encore de compte ? <a href="creer-compte.html">Découvrez Divimo et inscrivez-vous</a></p>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 <script>
 function togglePwd(id,b){const i=document.getElementById(id);const s=i.type==='password';i.type=s?'text':'password';b.textContent=s?'🙈':'👁';}
 const f=document.getElementById('loginForm');
 const validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-f.addEventListener('submit',e=>{
-  e.preventDefault();let ok=true;
-  const email=document.getElementById('email'),pwd=document.getElementById('pwd');
-  [[email,validEmail(email.value)],[pwd,pwd.value.trim().length>0]].forEach(([el,good])=>{
-    el.classList.toggle('err',!good);el.parentElement.parentElement.querySelector('.err-msg').classList.toggle('show',!good);if(!good)ok=false;
+const alertEl=document.getElementById('alert');
+function showAlert(msg){alertEl.textContent=msg;alertEl.classList.add('show');}
+
+f.addEventListener('submit',async e=>{
+  e.preventDefault();
+  alertEl.classList.remove('show');
+  let ok=true;
+  const emailEl=document.getElementById('email'),pwdEl=document.getElementById('pwd');
+  [[emailEl,validEmail(emailEl.value)],[pwdEl,pwdEl.value.trim().length>0]].forEach(([el,good])=>{
+    el.classList.toggle('err',!good);
+    el.parentElement.parentElement.querySelector('.err-msg').classList.toggle('show',!good);
+    if(!good)ok=false;
   });
-  if(ok){window.location.href='espace.html';}
+  if(!ok)return;
+
+  const btn=f.querySelector('.btn');
+  btn.textContent='Connexion…';btn.disabled=true;
+
+  const {error}=await sb.auth.signInWithPassword({
+    email:emailEl.value.trim(),
+    password:pwdEl.value
+  });
+
+  btn.textContent='Se connecter';btn.disabled=false;
+
+  if(error){
+    const msg=error.message.includes('Invalid login')||error.message.includes('invalid_credentials')
+      ? 'Email ou mot de passe incorrect.'
+      : error.message.includes('Email not confirmed')
+      ? 'Veuillez d\'abord confirmer votre email (vérifiez votre boîte mail).'
+      : error.message;
+    showAlert(msg);
+  } else {
+    window.location.href='espace.html';
+  }
 });
-document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{el.classList.remove('err');const m=el.parentElement.parentElement.querySelector('.err-msg');m&&m.classList.remove('show');}));
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{
+  el.classList.remove('err');
+  const m=el.parentElement.parentElement.querySelector('.err-msg');
+  m&&m.classList.remove('show');
+  alertEl.classList.remove('show');
+}));
 </script>
 </body>
 </html>
