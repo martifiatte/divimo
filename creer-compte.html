@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer mon compte — Divimo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.2}
+a{color:inherit;text-decoration:none}
+@media(max-width:860px){body{grid-template-columns:1fr}.brand{display:none!important}}
+.brand{background:linear-gradient(150deg,#1A237E,#5C6BC0);color:#fff;padding:54px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.brand .dotgrid{position:absolute;width:280px;height:280px;background-image:radial-gradient(rgba(255,255,255,.5) 1.5px,transparent 1.5px);background-size:18px 18px;opacity:.15;bottom:-50px;right:-50px}
+.brand .logo{display:flex;align-items:center;gap:.6rem;font-family:'Montserrat';font-weight:800;font-size:1.5rem;color:#fff;position:relative}
+.brand .slogan{position:relative}
+.brand .slogan h2{font-size:2rem;font-weight:800;line-height:1.25;margin-bottom:1rem}
+.brand .slogan p{color:rgba(255,255,255,.85);font-size:1.05rem;max-width:380px}
+.brand .pts{position:relative;display:flex;flex-direction:column;gap:.8rem;margin-top:1.4rem}
+.brand .pts div{display:flex;gap:.7rem;align-items:center;font-size:.96rem;color:rgba(255,255,255,.92)}
+.brand .pts .c{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.back{position:absolute;top:24px;left:24px;font-size:.9rem;color:rgba(255,255,255,.8);display:flex;gap:.4rem;align-items:center}
+.form-side{display:flex;align-items:center;justify-content:center;padding:42px 24px;background:#F7F8FE}
+.form-box{width:100%;max-width:420px}
+.back-m{display:none}@media(max-width:860px){.back-m{display:inline-flex;color:var(--texte-doux);margin-bottom:16px;font-size:.9rem;gap:.4rem;align-items:center}}
+.form-box .eyebrow{font-family:'Montserrat';font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.74rem;color:var(--bleu-violet)}
+.form-box h1{font-size:1.75rem;font-weight:800;color:var(--bleu-roi);margin:.4rem 0 .3rem}
+.form-box .sub{color:var(--texte-doux);font-size:.95rem;margin-bottom:24px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:420px){.row2{grid-template-columns:1fr}}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.85rem;color:var(--bleu-roi);margin-bottom:.4rem}
+.field label .req{color:#eb5757}
+.inp{position:relative}
+input{width:100%;padding:.8rem .95rem;border:1.6px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans';font-size:.97rem;background:#fff;transition:.2s}
+input:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.13)}
+input.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--texte-doux);background:none;border:none;font-size:1.05rem}
+.err-msg{color:#eb5757;font-size:.78rem;margin-top:.3rem;display:none}.err-msg.show{display:block}
+.strength{height:6px;border-radius:99px;background:var(--gris-bord);margin-top:8px;overflow:hidden}
+.strength i{display:block;height:100%;width:0;transition:.3s;border-radius:99px}
+.strength-lbl{font-size:.76rem;margin-top:5px;color:var(--texte-doux)}
+.cgu{display:flex;gap:.5rem;align-items:flex-start;font-size:.84rem;color:var(--texte-doux);margin:6px 0 20px}
+.cgu input{width:auto;margin-top:3px}
+.cgu a{color:var(--bleu-violet);font-weight:600}
+.btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:1rem;padding:.9rem;border-radius:12px;cursor:pointer;border:none;background:var(--bleu-violet);color:#fff;transition:.25s;box-shadow:0 8px 22px rgba(92,107,192,.32)}
+.btn:hover{background:var(--bleu-roi);transform:translateY(-2px)}
+.alt-link{text-align:center;margin-top:22px;font-size:.94rem;color:var(--texte-doux)}.alt-link a{color:var(--bleu-violet);font-weight:600}
+.success{display:none;text-align:center;padding:20px 0}
+.success .circle{width:74px;height:74px;border-radius:50%;background:rgba(165,196,189,.25);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 18px}
+.success h1{color:var(--bleu-roi)}
+</style>
+</head>
+<body>
+<div class="brand">
+  <a href="index.html" class="back">← Retour au site</a>
+  <a href="index.html" class="logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#A5C4BD"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
+  <div class="slogan">
+    <h2>Rejoignez Divimo dès aujourd'hui.</h2>
+    <p>Une nouvelle façon de gérer vos biens en indivision, en toute confiance.</p>
+    <div class="pts">
+      <div><span class="c">✓</span> Inscription gratuite et sans engagement</div>
+      <div><span class="c">✓</span> Accès immédiat aux simulateurs</div>
+      <div><span class="c">✓</span> Données hébergées et sécurisées en France</div>
+    </div>
+  </div>
+  <div class="dotgrid"></div>
+</div>
+
+<div class="form-side">
+  <div class="form-box">
+    <a href="index.html" class="back-m">← Retour au site</a>
+    <div id="formWrap">
+      <span class="eyebrow">Créer un compte</span>
+      <h1>Créez votre compte Divimo</h1>
+      <p class="sub">Quelques secondes suffisent. Aucun paiement requis pour s'inscrire.</p>
+      <form id="signupForm" novalidate>
+        <div class="row2">
+          <div class="field"><label>Prénom <span class="req">*</span></label><input type="text" id="prenom"><div class="err-msg">Requis</div></div>
+          <div class="field"><label>Nom <span class="req">*</span></label><input type="text" id="nom"><div class="err-msg">Requis</div></div>
+        </div>
+        <div class="field"><label>Email <span class="req">*</span></label><div class="inp"><input type="text" id="email" placeholder="vous@email.com"></div><div class="err-msg">Email invalide</div></div>
+        <div class="field"><label>Mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd" placeholder="8 caractères minimum" oninput="checkStrength()"><button type="button" class="eye" onclick="togglePwd('pwd',this)">👁</button></div>
+          <div class="strength"><i id="sBar"></i></div><div class="strength-lbl" id="sLbl">Utilisez 8+ caractères, avec majuscule et chiffre.</div>
+          <div class="err-msg">8 caractères minimum</div></div>
+        <div class="field"><label>Confirmer le mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd2" placeholder="••••••••"><button type="button" class="eye" onclick="togglePwd('pwd2',this)">👁</button></div><div class="err-msg">Les mots de passe ne correspondent pas</div></div>
+        <label class="cgu"><input type="checkbox" id="cgu"> J'accepte les <a href="#">Conditions Générales d'Utilisation</a> et la <a href="#">Politique de confidentialité</a> de Divimo.</label>
+        <button type="submit" class="btn">Créer mon compte</button>
+      </form>
+      <p class="alt-link">Déjà inscrit ? <a href="connexion.html">Se connecter</a></p>
+    </div>
+    <div class="success" id="success">
+      <div class="circle">✅</div>
+      <h1>Bienvenue chez Divimo !</h1>
+      <p class="sub" style="margin-top:.6rem">Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.</p>
+      <a href="espace.html" class="btn" style="text-decoration:none">Accéder à mon espace →</a>
+    </div>
+  </div>
+</div>
+<script>
+function togglePwd(id,b){const i=document.getElementById(id);const s=i.type==='password';i.type=s?'text':'password';b.textContent=s?'🙈':'👁';}
+function scorePwd(p){let s=0;if(p.length>=8)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return s;}
+function checkStrength(){
+  const p=document.getElementById('pwd').value,s=scorePwd(p);
+  const bar=document.getElementById('sBar'),lbl=document.getElementById('sLbl');
+  const cfg=[['0%','',''],['33%','#eb5757','Faible'],['60%','#F2994A','Moyen'],['80%','#5C6BC0','Bon'],['100%','#19a974','Excellent']][p?s:0]||['0%','',''];
+  bar.style.width=cfg[0];bar.style.background=cfg[1];lbl.textContent=p?('Force : '+cfg[2]):'Utilisez 8+ caractères, avec majuscule et chiffre.';
+}
+const f=document.getElementById('signupForm');
+const validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+function setErr(el,bad){el.classList.toggle('err',bad);const m=el.closest('.field').querySelector('.err-msg');m.classList.toggle('show',bad);}
+f.addEventListener('submit',e=>{
+  e.preventDefault();let ok=true;
+  const prenom=document.getElementById('prenom'),nom=document.getElementById('nom'),email=document.getElementById('email'),pwd=document.getElementById('pwd'),pwd2=document.getElementById('pwd2'),cgu=document.getElementById('cgu');
+  [[prenom,!prenom.value.trim()],[nom,!nom.value.trim()],[email,!validEmail(email.value)],[pwd,pwd.value.length<8],[pwd2,pwd2.value!==pwd.value||!pwd2.value]].forEach(([el,bad])=>{setErr(el,bad);if(bad)ok=false;});
+  if(!cgu.checked){ok=false;cgu.parentElement.style.color='#eb5757';}else{cgu.parentElement.style.color='';}
+  if(ok){document.getElementById('formWrap').style.display='none';document.getElementById('success').style.display='block';}
+});
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{if(el.type!=='checkbox')setErr(el,false);}));
+</script>
+</body>
+</html>

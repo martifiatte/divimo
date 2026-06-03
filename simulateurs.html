@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateurs — Divimo</title>
+<meta name="description" content="Simulateurs Divimo : estimez votre bien, calculez les parts entre co-indivisaires et organisez une vente ou un rachat en indivision.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F7F8FE;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--bleu-roi);line-height:1.2}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* Header */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--gris-bord)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.logo{display:flex;align-items:center;gap:.6rem;font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.35rem;color:var(--bleu-roi)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-weight:600;font-size:.94rem;transition:.2s}
+.nav-links a:hover{color:var(--bleu-violet)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.96rem;padding:.8rem 1.5rem;border-radius:999px;cursor:pointer;border:none;transition:.25s;white-space:nowrap}
+.btn-primary{background:var(--bleu-violet);color:#fff;box-shadow:0 8px 22px rgba(92,107,192,.32)}
+.btn-primary:hover{background:var(--bleu-roi);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--bleu-roi);border:1.6px solid var(--gris-bord)}
+.btn-ghost:hover{border-color:var(--bleu-violet);color:var(--bleu-violet)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+@media(max-width:780px){.nav-links{display:none}}
+
+/* Intro */
+.intro{text-align:center;padding:54px 0 14px}
+.eyebrow{font-family:'Montserrat';font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.76rem;color:var(--bleu-violet)}
+.intro h1{font-size:clamp(2rem,4vw,2.8rem);font-weight:800;margin:.5rem 0}
+.intro p{color:var(--texte-doux);max-width:560px;margin:0 auto;font-size:1.05rem}
+
+/* Tabs */
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px 0 30px}
+.tab{background:#fff;border:1.6px solid var(--gris-bord);border-radius:999px;padding:.7rem 1.3rem;font-family:'Montserrat';font-weight:600;font-size:.94rem;color:var(--texte-doux);cursor:pointer;transition:.22s;display:flex;align-items:center;gap:.5rem}
+.tab:hover{border-color:var(--bleu-violet-clair);color:var(--bleu-roi)}
+.tab.active{background:var(--bleu-roi);color:#fff;border-color:var(--bleu-roi);box-shadow:0 8px 22px rgba(26,35,126,.25)}
+.tab .n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);align-items:center;justify-content:center;font-size:.78rem}
+.tab:not(.active) .n{background:var(--gris-clair);color:var(--bleu-violet)}
+
+/* Card / panel */
+.panel{display:none;background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:60px}
+.panel.active{display:block;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.panel-head{padding:30px 38px 0}
+.panel-head h2{font-size:1.5rem;font-weight:800}
+.panel-head p{color:var(--texte-doux);font-size:.96rem;margin-top:.3rem}
+
+/* Stepper */
+.stepper{display:flex;gap:8px;padding:24px 38px 6px}
+.step-dot{flex:1;display:flex;flex-direction:column;gap:8px}
+.step-dot .bar{height:5px;border-radius:99px;background:var(--gris-bord);transition:.35s}
+.step-dot.done .bar,.step-dot.current .bar{background:var(--bleu-violet)}
+.step-dot .lbl{font-size:.78rem;font-weight:600;color:var(--texte-doux);font-family:'Montserrat'}
+.step-dot.current .lbl,.step-dot.done .lbl{color:var(--bleu-roi)}
+
+/* Body grid: form + live result */
+.sim-body{display:grid;grid-template-columns:1.15fr .85fr;gap:0}
+.form-col{padding:26px 38px 34px}
+.result-col{background:linear-gradient(170deg,#EEF0FB,#F7F8FE);padding:30px 32px;border-left:1px solid var(--gris-bord)}
+@media(max-width:820px){.sim-body{grid-template-columns:1fr}.result-col{border-left:none;border-top:1px solid var(--gris-bord)}}
+
+.step{display:none}.step.active{display:block;animation:fade .35s ease}
+.field{margin-bottom:20px}
+.field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.9rem;color:var(--bleu-roi);margin-bottom:.5rem}
+.field .hint{font-weight:400;color:var(--texte-doux);font-size:.8rem}
+input[type=text],input[type=number],select{width:100%;padding:.8rem .95rem;border:1.6px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans';font-size:.98rem;background:#fff;transition:.2s;color:var(--texte)}
+input:focus,select:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.13)}
+.input-suffix{position:relative}
+.input-suffix .sfx{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.9rem;font-weight:600}
+
+/* choice chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:1.6px solid var(--gris-bord);border-radius:12px;padding:.65rem 1rem;font-size:.92rem;font-weight:600;cursor:pointer;transition:.2s;background:#fff;color:var(--texte-doux);display:flex;align-items:center;gap:.5rem}
+.chip:hover{border-color:var(--bleu-violet-clair)}
+.chip.sel{border-color:var(--bleu-violet);background:rgba(92,107,192,.08);color:var(--bleu-roi)}
+.toggle-row{display:flex;gap:10px}
+.toggle-row .chip{flex:1;justify-content:center}
+
+/* nav buttons */
+.step-nav{display:flex;justify-content:space-between;margin-top:8px;gap:10px}
+
+/* co-indivisaires rows */
+.coi-row{display:grid;grid-template-columns:1fr 110px 38px;gap:10px;margin-bottom:10px;align-items:center}
+.coi-row input{margin:0}
+.del-btn{background:rgba(231,76,60,.1);border:none;border-radius:10px;height:42px;cursor:pointer;color:#e74c3c;font-size:1.1rem;transition:.2s}
+.del-btn:hover{background:rgba(231,76,60,.2)}
+.add-btn{background:rgba(92,107,192,.08);border:1.5px dashed var(--bleu-violet-clair);color:var(--bleu-violet);border-radius:12px;padding:.7rem;width:100%;font-family:'Montserrat';font-weight:600;cursor:pointer;transition:.2s;margin-top:4px}
+.add-btn:hover{background:rgba(92,107,192,.15)}
+.sum-pill{font-size:.82rem;font-weight:600;font-family:'Montserrat';padding:.3rem .7rem;border-radius:99px;display:inline-block;margin-top:8px}
+.sum-ok{background:rgba(165,196,189,.25);color:#3a7d6b}
+.sum-bad{background:rgba(231,76,60,.12);color:#c0392b}
+
+/* Result panel */
+.res-empty{text-align:center;color:var(--texte-doux);padding-top:40px}
+.res-empty .ic{width:70px;height:70px;margin:0 auto 16px;border-radius:50%;background:rgba(92,107,192,.1);display:flex;align-items:center;justify-content:center}
+.res-title{font-family:'Montserrat';font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--bleu-violet);margin-bottom:6px}
+.res-big{font-family:'Montserrat';font-weight:800;font-size:2.5rem;color:var(--bleu-roi);line-height:1.1}
+.res-range{color:var(--texte-doux);font-size:.92rem;margin-top:4px}
+.res-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 4px 16px rgba(26,35,126,.06);margin-top:16px}
+.res-line{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;font-size:.94rem;border-top:1px solid var(--gris-bord)}
+.res-line:first-child{border-top:none}
+.res-line b{font-family:'Montserrat';color:var(--bleu-roi)}
+.res-line .nm{display:flex;align-items:center;gap:.5rem}
+.dotc{width:11px;height:11px;border-radius:3px;display:inline-block}
+.note{font-size:.78rem;color:var(--texte-doux);margin-top:14px;line-height:1.5}
+.pdf-btn{margin-top:18px;width:100%;justify-content:center}
+
+/* rachat block */
+.rachat-box{background:var(--gris-clair);border-radius:14px;padding:18px;margin-top:8px}
+.muted-link{color:var(--bleu-violet);font-weight:600;font-size:.85rem}
+
+footer{background:var(--bleu-roi);color:rgba(255,255,255,.7);text-align:center;padding:30px;font-size:.85rem}
+
+/* print */
+@media print{
+  header,.tabs,.intro,.step-nav,.tab,footer,.add-btn,.del-btn,.pdf-btn,.stepper{display:none!important}
+  body{background:#fff}
+  .panel:not(.active){display:none}
+  .sim-body{grid-template-columns:1fr}
+  .form-col{display:none}
+  .result-col{border:none;background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand-logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1A237E" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#5C6BC0"/><circle cx="17" cy="17" r="4.5" fill="#1A237E"/></svg> Divimo</a>
+    <nav class="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="simulateurs.html" class="active">Simulateurs</a>
+      <a href="offres.html">Nos offres</a>
+      <a href="apropos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="connexion.html" class="hbtn hbtn-ghost">Se connecter</a>
+      <a href="creer-compte.html" class="hbtn hbtn-primary">Créer mon compte</a>
+    </div>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" onclick="this.closest('.site-header').classList.toggle('open')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</header>
+
+<div class="intro">
+  <span class="eyebrow">Nos simulations</span>
+  <h1>Simulateurs d'indivision</h1>
+  <p>Estimez votre bien, répartissez les parts et anticipez une vente ou un rachat. Vos données restent confidentielles et ne sont jamais enregistrées.</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="estimer"><span class="n">1</span> Estimer son bien</button>
+    <button class="tab" data-tab="parts"><span class="n">2</span> Calculer les parts</button>
+    <button class="tab" data-tab="vente"><span class="n">3</span> Vente / rachat</button>
+  </div>
+
+  <!-- ============ ESTIMER ============ -->
+  <div class="panel active" id="estimer">
+    <div class="panel-head">
+      <h2>Estimer son bien</h2>
+      <p>Une estimation indicative selon les caractéristiques du bien et le contexte d'indivision.</p>
+    </div>
+    <div class="stepper" id="step-estimer">
+      <div class="step-dot current"><div class="bar"></div><span class="lbl">Le bien</span></div>
+      <div class="step-dot"><div class="bar"></div><span class="lbl">Le marché</span></div>
+      <div class="step-dot"><div class="bar"></div><span class="lbl">Indivision</span></div>
+    </div>
+    <div class="sim-body">
+      <div class="form-col">
+        <!-- step 1 -->
+        <div class="step active" data-s="0">
+          <div class="field">
+            <label>Type de bien</label>
+            <div class="chips" id="e-type">
+              <div class="chip sel" data-v="appartement" data-pm="3500">🏢 Appartement</div>
+              <div class="chip" data-v="maison" data-pm="2800">🏡 Maison</div>
+              <div class="chip" data-v="terrain" data-pm="350">🌳 Terrain</div>
+              <div class="chip" data-v="local" data-pm="2200">🏬 Local commercial</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Surface <span class="hint">(en m²)</span></label>
+            <div class="input-suffix"><input type="number" id="e-surface" min="1" placeholder="Ex : 75" value="75"><span class="sfx">m²</span></div>
+          </div>
+          <div class="field">
+            <label>État du bien</label>
+            <div class="chips" id="e-etat">
+              <div class="chip sel" data-v="Très bon état" data-k="1.07">Très bon état</div>
+              <div class="chip" data-v="Bon état" data-k="1">Bon état</div>
+              <div class="chip" data-v="À rafraîchir" data-k="0.9">À rafraîchir</div>
+              <div class="chip" data-v="À rénover" data-k="0.78">À rénover</div>
+            </div>
+          </div>
+          <div class="step-nav"><span></span><button class="btn btn-primary" onclick="estNext(1)">Continuer →</button></div>
+        </div>
+        <!-- step 2 -->
+        <div class="step" data-s="1">
+          <div class="field">
+            <label>Prix moyen du marché <span class="hint">(€/m² dans votre secteur — pré-rempli, ajustable)</span></label>
+            <div class="input-suffix"><input type="number" id="e-pm" min="1" value="3500"><span class="sfx">€/m²</span></div>
+          </div>
+          <p class="note">💡 Ce prix est une base indicative selon le type de bien. Affinez-le avec les annonces de votre quartier ou les chiffres notariaux locaux pour une estimation plus juste.</p>
+          <div class="step-nav"><button class="btn btn-ghost" onclick="estNext(0)">← Retour</button><button class="btn btn-primary" onclick="estNext(2)">Continuer →</button></div>
+        </div>
+        <!-- step 3 -->
+        <div class="step" data-s="2">
+          <div class="field">
+            <label>Le bien est-il issu d'une succession (hérité) ?</label>
+            <div class="toggle-row" id="e-herite">
+              <div class="chip sel" data-v="oui">Oui</div>
+              <div class="chip" data-v="non">Non</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Existe-t-il des conflits entre co-indivisaires ?</label>
+            <div class="toggle-row" id="e-conflit">
+              <div class="chip" data-v="oui">Oui</div>
+              <div class="chip sel" data-v="non">Non</div>
+            </div>
+            <p class="note">Un contexte conflictuel peut réduire la valeur de marché réelle du bien (décote d'indivision).</p>
+          </div>
+          <div class="step-nav"><button class="btn btn-ghost" onclick="estNext(1)">← Retour</button><button class="btn btn-primary" onclick="estCompute()">Voir mon estimation</button></div>
+        </div>
+      </div>
+      <!-- result -->
+      <div class="result-col" id="e-result">
+        <div class="res-empty">
+          <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5C6BC0" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+          Remplissez les champs pour voir votre estimation apparaître ici.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PARTS ============ -->
+  <div class="panel" id="parts">
+    <div class="panel-head">
+      <h2>Calculer les parts</h2>
+      <p>Répartissez la valeur du bien entre les co-indivisaires selon la quote-part de chacun.</p>
+    </div>
+    <div class="sim-body">
+      <div class="form-col">
+        <div class="field">
+          <label>Valeur totale du bien</label>
+          <div class="input-suffix"><input type="number" id="p-val" min="0" placeholder="Ex : 320000" value="320000" oninput="partsCompute()"><span class="sfx">€</span></div>
+          <p class="note">Vous ne connaissez pas la valeur ? <a class="muted-link" href="#" onclick="goTab('estimer');return false">Estimez votre bien ici.</a></p>
+        </div>
+        <div class="field">
+          <label>Co-indivisaires <span class="hint">(nom et % de propriété)</span></label>
+          <div id="p-rows"></div>
+          <button class="add-btn" onclick="addCoi()">➕ Ajouter un co-indivisaire</button>
+          <div id="p-sum"></div>
+        </div>
+      </div>
+      <div class="result-col" id="p-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ VENTE / RACHAT ============ -->
+  <div class="panel" id="vente">
+    <div class="panel-head">
+      <h2>Organiser une vente ou un rachat</h2>
+      <p>Anticipez le partage financier : montant net par indivisaire, ou soulte d'un rachat de parts.</p>
+    </div>
+    <div class="stepper" id="step-vente">
+      <div class="step-dot current"><div class="bar"></div><span class="lbl">Prix & frais</span></div>
+      <div class="step-dot"><div class="bar"></div><span class="lbl">Co-indivisaires</span></div>
+      <div class="step-dot"><div class="bar"></div><span class="lbl">Résultat</span></div>
+    </div>
+    <div class="sim-body">
+      <div class="form-col">
+        <!-- step 1 -->
+        <div class="step active" data-s="0">
+          <div class="field">
+            <label>Prix de vente prévu</label>
+            <div class="input-suffix"><input type="number" id="v-prix" min="0" value="320000"><span class="sfx">€</span></div>
+          </div>
+          <div class="field">
+            <label>Frais de notaire & frais divers</label>
+            <div class="input-suffix"><input type="number" id="v-frais" min="0" value="8000"><span class="sfx">€</span></div>
+          </div>
+          <div class="field">
+            <label>Dettes à rembourser <span class="hint">(crédit restant, etc.)</span></label>
+            <div class="input-suffix"><input type="number" id="v-dettes" min="0" value="0"><span class="sfx">€</span></div>
+          </div>
+          <div class="step-nav"><span></span><button class="btn btn-primary" onclick="vNext(1)">Continuer →</button></div>
+        </div>
+        <!-- step 2 -->
+        <div class="step" data-s="1">
+          <div class="field">
+            <label>Répartition entre co-indivisaires <span class="hint">(nom et %)</span></label>
+            <div id="v-rows"></div>
+            <button class="add-btn" onclick="addVcoi()">➕ Ajouter un co-indivisaire</button>
+            <div id="v-sum"></div>
+          </div>
+          <div class="step-nav"><button class="btn btn-ghost" onclick="vNext(0)">← Retour</button><button class="btn btn-primary" id="v-go" onclick="vCompute()">Voir le partage</button></div>
+        </div>
+        <!-- step 3 -->
+        <div class="step" data-s="2">
+          <div class="rachat-box">
+            <label style="font-family:'Montserrat';font-weight:700;color:var(--bleu-roi);display:block;margin-bottom:12px">Simuler un rachat de parts (optionnel)</label>
+            <div class="field">
+              <label>Qui rachète les parts ?</label>
+              <select id="r-acheteur" onchange="rachatCompute()"></select>
+            </div>
+            <div class="field">
+              <label>Valeur retenue pour le rachat <span class="hint">(souvent la valeur estimée du bien)</span></label>
+              <div class="input-suffix"><input type="number" id="r-val" min="0" value="320000" oninput="rachatCompute()"><span class="sfx">€</span></div>
+            </div>
+          </div>
+          <div class="step-nav"><button class="btn btn-ghost" onclick="vNext(1)">← Retour</button><span></span></div>
+        </div>
+      </div>
+      <div class="result-col" id="v-result"></div>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Divimo · Les résultats sont indicatifs et ne remplacent pas l'avis d'un notaire ou d'un expert.</footer>
+
+<script>
+const euro=n=>isFinite(n)?n.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €':'—';
+const PAL=['#1A237E','#5C6BC0','#19A974','#F2994A','#EB5757','#9B51E0','#56CCF2','#F2C94C'];
+
+/* ---- Tabs ---- */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>goTab(t.dataset.tab));
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+if(location.hash){const h=location.hash.slice(1);if(document.getElementById(h))goTab(h);}
+
+/* chip selectors */
+function chipGroup(containerId,cb){
+  document.querySelectorAll('#'+containerId+' .chip').forEach(c=>{
+    c.onclick=()=>{c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');cb&&cb(c);};
+  });
+}
+const getSel=id=>document.querySelector('#'+id+' .chip.sel');
+
+/* ===== ESTIMER ===== */
+chipGroup('e-type',c=>{document.getElementById('e-pm').value=c.dataset.pm;});
+chipGroup('e-etat');chipGroup('e-herite');chipGroup('e-conflit');
+function setStepper(stepperId,i){
+  const dots=document.querySelectorAll('#'+stepperId+' .step-dot');
+  dots.forEach((d,idx)=>{d.classList.remove('current','done');if(idx<i)d.classList.add('done');else if(idx===i)d.classList.add('current');});
+}
+function showStep(panelId,i){
+  document.querySelectorAll('#'+panelId+' .step').forEach(s=>s.classList.toggle('active',+s.dataset.s===i));
+}
+function estNext(i){showStep('estimer',i);setStepper('step-estimer',i);}
+function estCompute(){
+  const surface=+document.getElementById('e-surface').value||0;
+  const pm=+document.getElementById('e-pm').value||0;
+  const k=+getSel('e-etat').dataset.k;
+  const etat=getSel('e-etat').dataset.v;
+  const type=getSel('e-type').dataset.v;
+  const conflit=getSel('e-conflit').dataset.v==='oui';
+  const herite=getSel('e-herite').dataset.v==='oui';
+  let val=surface*pm*k;
+  if(conflit)val*=0.92;
+  const low=Math.round(val*0.93/1000)*1000, high=Math.round(val*1.07/1000)*1000, mid=Math.round(val/1000)*1000;
+  document.getElementById('e-result').innerHTML=`
+    <div class="res-title">Estimation indicative</div>
+    <div class="res-big">${euro(mid)}</div>
+    <div class="res-range">Fourchette : ${euro(low)} – ${euro(high)}</div>
+    <div class="res-card">
+      <div class="res-line"><span>Bien</span><b>${type.charAt(0).toUpperCase()+type.slice(1)}</b></div>
+      <div class="res-line"><span>Surface</span><b>${surface} m²</b></div>
+      <div class="res-line"><span>Prix au m²</span><b>${euro(pm)}</b></div>
+      <div class="res-line"><span>État</span><b>${etat}</b></div>
+      <div class="res-line"><span>Hérité</span><b>${herite?'Oui':'Non'}</b></div>
+      ${conflit?'<div class="res-line"><span>Décote conflit</span><b>−8 %</b></div>':''}
+    </div>
+    <p class="note">Résultat 100 % confidentiel et indicatif. Une expertise réelle reste nécessaire pour toute démarche concrète.</p>
+    <button class="btn btn-primary pdf-btn" onclick="window.print()">⬇︎ Télécharger en PDF</button>`;
+}
+
+/* ===== PARTS ===== */
+let coi=[{n:'Marie',p:45},{n:'Paul',p:30},{n:'Léa',p:25}];
+function renderCoi(){
+  const c=document.getElementById('p-rows');
+  c.innerHTML=coi.map((m,i)=>`<div class="coi-row">
+    <input type="text" placeholder="Nom" value="${m.n}" oninput="coi[${i}].n=this.value;partsCompute()">
+    <div class="input-suffix"><input type="number" min="0" max="100" value="${m.p}" oninput="coi[${i}].p=+this.value;partsCompute()"><span class="sfx">%</span></div>
+    <button class="del-btn" onclick="coi.splice(${i},1);renderCoi();partsCompute()">×</button></div>`).join('');
+  partsCompute();
+}
+function addCoi(){coi.push({n:'',p:0});renderCoi();}
+function partsCompute(){
+  const val=+document.getElementById('p-val').value||0;
+  const sum=coi.reduce((a,b)=>a+(+b.p||0),0);
+  document.getElementById('p-sum').innerHTML=`<span class="sum-pill ${sum===100?'sum-ok':'sum-bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  const res=document.getElementById('p-result');
+  if(val<=0||sum===0){res.innerHTML='<div class="res-empty" style="padding-top:30px">Renseignez la valeur et les parts.</div>';return;}
+  // donut
+  let off=0;const circ=2*Math.PI*15.9;
+  const segs=coi.map((m,i)=>{const frac=(+m.p||0)/sum;const dash=frac*circ;const s=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${PAL[i%PAL.length]}" stroke-width="6" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-off}"/>`;off+=dash;return s;}).join('');
+  res.innerHTML=`
+    <div class="res-title">Répartition de la valeur</div>
+    <div style="display:flex;justify-content:center;margin:6px 0 14px"><svg width="150" height="150" viewBox="0 0 42 42" style="transform:rotate(-90deg)"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF0FB" stroke-width="6"/>${segs}</svg></div>
+    <div class="res-card">${coi.map((m,i)=>`<div class="res-line"><span class="nm"><span class="dotc" style="background:${PAL[i%PAL.length]}"></span>${m.n||'—'} (${(+m.p||0)}%)</span><b>${euro(val*(+m.p||0)/sum)}</b></div>`).join('')}</div>
+    <p class="note">Base utile pour un rachat de parts, une sortie d'indivision ou informer chaque indivisaire.</p>
+    <button class="btn btn-primary pdf-btn" onclick="window.print()">⬇︎ Télécharger en PDF</button>`;
+}
+
+/* ===== VENTE / RACHAT ===== */
+let vcoi=[{n:'Marie',p:50},{n:'Paul',p:50}];
+function vNext(i){showStep('vente',i);setStepper('step-vente',i);if(i===1)renderVcoi();}
+function renderVcoi(){
+  const c=document.getElementById('v-rows');
+  c.innerHTML=vcoi.map((m,i)=>`<div class="coi-row">
+    <input type="text" placeholder="Nom" value="${m.n}" oninput="vcoi[${i}].n=this.value;vSum()">
+    <div class="input-suffix"><input type="number" min="0" max="100" value="${m.p}" oninput="vcoi[${i}].p=+this.value;vSum()"><span class="sfx">%</span></div>
+    <button class="del-btn" onclick="vcoi.splice(${i},1);renderVcoi()">×</button></div>`).join('');
+  vSum();
+}
+function addVcoi(){vcoi.push({n:'',p:0});renderVcoi();}
+function vSum(){
+  const sum=vcoi.reduce((a,b)=>a+(+b.p||0),0);
+  document.getElementById('v-sum').innerHTML=`<span class="sum-pill ${sum===100?'sum-ok':'sum-bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  document.getElementById('v-go').disabled=(sum!==100);
+}
+function vCompute(){
+  vNext(2);
+  const prix=+document.getElementById('v-prix').value||0;
+  const frais=+document.getElementById('v-frais').value||0;
+  const dettes=+document.getElementById('v-dettes').value||0;
+  const net=prix-frais-dettes;
+  const sum=vcoi.reduce((a,b)=>a+(+b.p||0),0)||1;
+  // fill rachat select
+  const sel=document.getElementById('r-acheteur');
+  sel.innerHTML=vcoi.map((m,i)=>`<option value="${i}">${m.n||'Co-indivisaire '+(i+1)}</option>`).join('');
+  document.getElementById('r-val').value=prix;
+  renderVresult(net,sum);
+  rachatCompute();
+}
+function renderVresult(net,sum){
+  document.getElementById('v-result').innerHTML=`
+    <div class="res-title">Produit net de la vente</div>
+    <div class="res-big">${euro(net)}</div>
+    <div class="res-range">après frais et dettes déduits</div>
+    <div class="res-card">${vcoi.map((m,i)=>`<div class="res-line"><span class="nm"><span class="dotc" style="background:${PAL[i%PAL.length]}"></span>${m.n||'—'} (${(+m.p||0)}%)</span><b>${euro(net*(+m.p||0)/sum)}</b></div>`).join('')}</div>
+    <div id="r-out"></div>
+    <button class="btn btn-primary pdf-btn" onclick="window.print()">⬇︎ Télécharger les résultats en PDF</button>`;
+}
+function rachatCompute(){
+  const out=document.getElementById('r-out');if(!out)return;
+  const ai=+document.getElementById('r-acheteur').value;
+  const val=+document.getElementById('r-val').value||0;
+  const sum=vcoi.reduce((a,b)=>a+(+b.p||0),0)||1;
+  // soulte = total value of parts bought (everyone except buyer)
+  let soulte=0;const lignes=[];
+  vcoi.forEach((m,i)=>{if(i!==ai){const montant=val*(+m.p||0)/sum;soulte+=montant;lignes.push(`<div class="res-line"><span class="nm">${m.n||'—'} cède ${(+m.p||0)}%</span><b>${euro(montant)}</b></div>`);}});
+  const acheteur=vcoi[ai]?.n||'L\'acheteur';
+  out.innerHTML=`
+    <div class="res-title" style="margin-top:22px">Rachat de parts</div>
+    <div class="res-card">
+      <div class="res-line"><span>${acheteur} verse une soulte de</span><b>${euro(soulte)}</b></div>
+      ${lignes.join('')}
+      <div class="res-line"><span class="nm"><span class="dotc" style="background:${PAL[ai%PAL.length]}"></span>${acheteur} après rachat</span><b>100%</b></div>
+    </div>`;
+}
+
+/* init */
+renderCoi();
+</script>
+</body>
+</html>

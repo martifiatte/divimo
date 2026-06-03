@@ -1,0 +1,67 @@
+/* =====================================================================
+   DIVIMO — Feuille de style partagée (design system)
+   ---------------------------------------------------------------------
+   Ce fichier contient les VARIABLES communes à toutes les pages :
+   couleurs, polices, arrondis et ombres.
+   👉 Modifie une valeur ICI et elle change sur TOUT le site.
+   (Chaque page garde sa mise en page spécifique dans sa propre balise
+    <style>, mais toutes les couleurs/polices viennent d'ici.)
+   ===================================================================== */
+
+:root{
+  /* ---- COULEURS (charte Divimo) ---- */
+  --bleu-roi:        #1A237E;   /* couleur principale : titres, logo */
+  --bleu-violet:     #5C6BC0;   /* accent : boutons, liens, éléments actifs */
+  --bleu-violet-clair:#7986CB;  /* variante claire de l'accent */
+  --vert:            #A5C4BD;    /* vert pistache : validations, douceur */
+  --gris-clair:      #F5F5F5;    /* fonds de sections */
+  --gris-bord:       #E4E6F0;    /* bordures discrètes */
+  --texte:           #1F2233;    /* texte courant */
+  --texte-doux:      #5A5E72;    /* texte secondaire / descriptions */
+  --blanc:           #ffffff;
+
+  /* ---- FORMES & OMBRES ---- */
+  --radius:    18px;            /* arrondi standard */
+  --radius-lg: 26px;            /* arrondi des grandes cartes */
+  --shadow:       0 10px 40px rgba(26,35,126,.08);
+  --shadow-hover: 0 18px 50px rgba(26,35,126,.16);
+
+  /* ---- LARGEUR MAX du contenu ---- */
+  --maxw: 1100px;
+}
+
+/* ---------------------------------------------------------------------
+   POLICES
+   Titres  : Montserrat   |   Texte courant : Open Sans
+   (les polices sont chargées via Google Fonts dans le <head> de chaque page)
+   --------------------------------------------------------------------- */
+
+/* =====================================================================
+   HEADER COMMUN — identique sur toutes les pages
+   Pour le modifier (couleur, liens), c'est ICI : il change partout.
+   ===================================================================== */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--gris-bord)}
+.site-header-inner{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:72px;display:flex;align-items:center;justify-content:space-between;gap:1.2rem}
+.brand-logo{display:flex;align-items:center;gap:.55rem;font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.38rem;color:var(--bleu-roi);letter-spacing:-.02em}
+.brand-logo svg{display:block}
+.main-nav{display:flex;gap:.25rem;align-items:center}
+.main-nav a{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.92rem;color:var(--texte);padding:.5rem .85rem;border-radius:10px;transition:.18s;display:inline-flex;align-items:center;gap:.4rem}
+.main-nav a:hover{background:var(--gris-clair);color:var(--bleu-roi)}
+.main-nav a.active{color:var(--bleu-violet);background:rgba(92,107,192,.1)}
+.header-actions{display:flex;gap:.55rem;align-items:center}
+.site-header .hbtn{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.9rem;padding:.6rem 1.15rem;border-radius:999px;transition:.22s;white-space:nowrap;cursor:pointer;border:1.6px solid transparent;display:inline-flex;align-items:center;gap:.4rem}
+.site-header .hbtn-ghost{color:var(--bleu-roi);border-color:var(--gris-bord);background:#fff}
+.site-header .hbtn-ghost:hover{border-color:var(--bleu-violet);color:var(--bleu-violet)}
+.site-header .hbtn-primary{background:var(--bleu-violet);color:#fff;box-shadow:0 8px 20px rgba(92,107,192,.3)}
+.site-header .hbtn-primary:hover{background:var(--bleu-roi);transform:translateY(-2px)}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;color:var(--bleu-roi);padding:6px}
+@media(max-width:920px){
+  .nav-toggle{display:block}
+  .main-nav,.header-actions{display:none}
+  .site-header.open .site-header-inner{flex-wrap:wrap;height:auto;padding-bottom:16px}
+  .site-header.open .main-nav,.site-header.open .header-actions{display:flex;flex-direction:column;width:100%;align-items:stretch;gap:.35rem}
+  .site-header.open .main-nav{order:3;margin-top:10px;border-top:1px solid var(--gris-bord);padding-top:10px}
+  .site-header.open .header-actions{order:4;margin-top:6px}
+  .main-nav a{padding:.75rem .6rem}
+  .site-header .hbtn{justify-content:center;padding:.8rem}
+}

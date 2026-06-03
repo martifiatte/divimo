@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon espace — Divimo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F4F5FB;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--bleu-roi);line-height:1.2}
+a{color:inherit;text-decoration:none}
+
+/* ===== header actions (logged-in) ===== */
+.site-header .user-chip{display:flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.88rem;color:var(--bleu-roi);background:#fff;border:1.5px solid var(--gris-bord);padding:.35rem .5rem .35rem .8rem;border-radius:999px}
+.user-chip .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem}
+.logout-btn{border:none;background:none;cursor:pointer;color:var(--texte-doux);font-family:'Montserrat';font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:.35rem}
+.logout-btn:hover{color:#eb5757}
+
+/* ===== app layout ===== */
+.app{max-width:1180px;margin:0 auto;padding:26px 24px 70px;display:grid;grid-template-columns:236px 1fr;gap:26px;align-items:start}
+@media(max-width:860px){.app{grid-template-columns:1fr;padding-top:16px}}
+.side-nav{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:14px;position:sticky;top:88px;display:flex;flex-direction:column;gap:4px}
+@media(max-width:860px){.side-nav{position:static;flex-direction:row;overflow-x:auto;gap:6px}}
+.nav-i{display:flex;align-items:center;gap:.7rem;padding:.7rem .85rem;border-radius:11px;font-family:'Montserrat';font-weight:600;font-size:.92rem;color:var(--texte-doux);cursor:pointer;transition:.18s;white-space:nowrap}
+.nav-i:hover{background:var(--gris-clair);color:var(--bleu-roi)}
+.nav-i.active{background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff}
+.nav-i svg{flex-shrink:0}
+.nav-sep{height:1px;background:var(--gris-bord);margin:8px 4px}
+@media(max-width:860px){.nav-sep{display:none}}
+
+.view{display:none;animation:fade .35s ease}.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.h-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.h-row h1{font-size:1.55rem;font-weight:800}.h-row p{color:var(--texte-doux);font-size:.95rem;margin-top:.2rem}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.9rem;padding:.65rem 1.15rem;border-radius:10px;cursor:pointer;border:none;background:var(--bleu-violet);color:#fff;transition:.22s;box-shadow:0 6px 16px rgba(92,107,192,.28)}
+.btn:hover{background:var(--bleu-roi);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--bleu-roi);border:1.5px solid var(--gris-bord);box-shadow:none}
+.btn-ghost:hover{border-color:var(--bleu-violet);color:var(--bleu-violet)}
+.btn-sm{padding:.5rem .9rem;font-size:.84rem}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:#fff;border:1px solid var(--gris-bord);border-radius:16px;padding:18px}
+.stat .ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:10px}
+.stat .v{font-family:'Montserrat';font-weight:800;font-size:1.45rem;color:var(--bleu-roi)}
+.stat .l{font-size:.82rem;color:var(--texte-doux)}
+
+.card{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:22px;margin-bottom:18px}
+.card h3{font-size:1.08rem;margin-bottom:3px}.card .csub{color:var(--texte-doux);font-size:.86rem;margin-bottom:14px}
+.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+
+.row-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-top:1px solid var(--gris-bord)}
+.row-item:first-child{border-top:none}
+.r-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
+.row-item b{font-family:'Open Sans';font-weight:600;font-size:.93rem;display:block}
+.row-item span{font-size:.8rem;color:var(--texte-doux)}
+.row-act{margin-left:auto;display:flex;gap:8px;align-items:center}
+.mini-link{color:var(--bleu-violet);font-weight:600;font-size:.84rem;cursor:pointer;font-family:'Montserrat'}
+.del{color:#cbd0e0;cursor:pointer;font-size:1.15rem;transition:.2s}.del:hover{color:#eb5757}
+.pill{font-size:.72rem;font-weight:700;padding:.22rem .6rem;border-radius:99px;font-family:'Montserrat'}
+.pill.soon{background:rgba(242,153,74,.15);color:#c97a23}.pill.ok{background:rgba(165,196,189,.25);color:#2c6e5b}
+.pill.full{background:rgba(92,107,192,.14);color:var(--bleu-violet)}
+
+/* feature/tool cards */
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:760px){.tool-grid{grid-template-columns:1fr}}
+.tool{display:block;background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:22px;transition:.25s;cursor:pointer}
+.tool:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:transparent}
+.tool .ic{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--bleu-violet),var(--bleu-roi));display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:13px}
+.tool h4{font-size:1.04rem;margin-bottom:.3rem}.tool p{color:var(--texte-doux);font-size:.88rem}
+
+.drop{border:2px dashed var(--bleu-violet-clair);border-radius:14px;padding:22px;text-align:center;color:var(--texte-doux);cursor:pointer;transition:.2s;background:rgba(92,107,192,.04);margin-bottom:8px}
+.drop:hover,.drop.over{background:rgba(92,107,192,.1);border-color:var(--bleu-violet)}
+.drop .big{font-size:1.5rem}.drop b{color:var(--bleu-roi);font-family:'Montserrat'}
+
+.pro-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-top:1px solid var(--gris-bord)}
+.pro-row:first-child{border-top:none}
+.pro-av{width:44px;height:44px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat';font-weight:700;flex-shrink:0}
+.donut-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.legend{display:flex;flex-direction:column;gap:.5rem;font-size:.9rem}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:.5rem}
+.legend b{font-family:'Montserrat';color:var(--bleu-roi);margin-left:6px}
+.empty{text-align:center;color:var(--texte-doux);padding:26px;font-size:.92rem}
+
+.banner{background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff;border-radius:18px;padding:22px 24px;display:flex;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.banner b{font-family:'Montserrat'}
+.banner .btn-light{background:#fff;color:var(--bleu-roi);margin-left:auto}
+
+/* ===== carte ===== */
+#map{height:460px;width:100%;border-radius:16px;border:1px solid var(--gris-bord);z-index:1}
+.map-hint{display:flex;align-items:center;gap:.5rem;background:rgba(92,107,192,.08);color:var(--bleu-roi);border-radius:10px;padding:10px 14px;font-size:.86rem;margin-bottom:14px;font-family:'Montserrat';font-weight:600}
+.leaflet-popup-content{font-family:'Open Sans';margin:12px 14px}
+.leaflet-popup-content b{font-family:'Montserrat';color:var(--bleu-roi)}
+.map-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.map-legend .it{display:flex;align-items:center;gap:.5rem;font-size:.86rem;color:var(--texte-doux);cursor:pointer}
+.map-legend .it:hover{color:var(--bleu-roi)}
+.map-legend .pin{width:14px;height:14px;border-radius:50% 50% 50% 0;background:var(--bleu-violet);transform:rotate(-45deg);flex-shrink:0}
+
+/* ===== AUTH GATE ===== */
+#gate{position:fixed;inset:0;z-index:300;background:linear-gradient(150deg,#1A237E,#5C6BC0);display:flex;align-items:center;justify-content:center;padding:24px}
+#gate.hide{display:none}
+.gate-card{background:#fff;border-radius:24px;box-shadow:0 30px 70px rgba(0,0,0,.3);width:100%;max-width:420px;padding:38px;text-align:center;animation:fade .4s ease}
+.gate-card .logo{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:800;font-size:1.4rem;color:var(--bleu-roi);margin-bottom:18px}
+.gate-card h1{font-size:1.5rem;font-weight:800}
+.gate-card p{color:var(--texte-doux);font-size:.94rem;margin:.5rem 0 22px}
+.gate-card p b{color:var(--bleu-roi)}
+.code-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px}
+.code-row input{width:48px;height:58px;text-align:center;font-family:'Montserrat';font-weight:800;font-size:1.5rem;border:1.8px solid var(--gris-bord);border-radius:13px;color:var(--bleu-roi);transition:.2s}
+.code-row input:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.15)}
+.code-row input.filled{border-color:var(--bleu-violet);background:rgba(92,107,192,.05)}
+.gate-hint{font-size:.82rem;color:var(--texte-doux);background:var(--gris-clair);border-radius:10px;padding:10px;margin:6px 0 18px}
+.gate-hint b{color:var(--bleu-roi);font-family:'Montserrat';letter-spacing:2px}
+.gate-err{color:#eb5757;font-size:.85rem;min-height:20px;margin-bottom:8px}
+.gate-card .btn{width:100%;justify-content:center;padding:.85rem}
+.resend{margin-top:16px;font-size:.86rem;color:var(--texte-doux)}
+.resend a{color:var(--bleu-violet);font-weight:600;cursor:pointer}
+.gate-back{display:inline-block;margin-top:18px;font-size:.85rem;color:var(--texte-doux)}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bleu-roi);color:#fff;padding:.85rem 1.3rem;border-radius:12px;font-family:'Montserrat';font-weight:600;font-size:.92rem;box-shadow:0 12px 30px rgba(26,35,126,.3);opacity:0;pointer-events:none;transition:.3s;z-index:400}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH GATE (code de vérification) ============ -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="logo"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1A237E" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#5C6BC0"/><circle cx="17" cy="17" r="4.5" fill="#1A237E"/></svg> Divimo</div>
+    <h1>Vérification</h1>
+    <p>Pour sécuriser votre connexion, saisissez le code à 6 chiffres envoyé à <b id="gateEmail">marti@email.com</b>.</p>
+    <div class="code-row" id="codeRow">
+      <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+    </div>
+    <div class="gate-hint">📩 Démo — votre code de vérification est : <b id="demoCode">000000</b></div>
+    <div class="gate-err" id="gateErr"></div>
+    <button class="btn" onclick="checkCode()">Valider et accéder à mon espace</button>
+    <div class="resend">Pas reçu ? <a onclick="genCode(true)">Renvoyer un code</a></div>
+    <a href="index.html" class="gate-back">← Retour au site</a>
+  </div>
+</div>
+
+<!-- ============ HEADER (cohérent avec le site) ============ -->
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand-logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1A237E" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#5C6BC0"/><circle cx="17" cy="17" r="4.5" fill="#1A237E"/></svg> Divimo</a>
+    <nav class="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="simulateurs.html">Simulateurs</a>
+      <a href="documents.html">Documents</a>
+      <a href="services-juridiques.html">Juridique</a>
+      <a href="espace.html" class="active">Mon espace</a>
+    </nav>
+    <div class="header-actions">
+      <span class="user-chip"><span class="av">MF</span> Marti</span>
+      <button class="logout-btn" onclick="logout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Déconnexion</button>
+    </div>
+    <button class="nav-toggle" aria-label="Menu" onclick="this.closest('.site-header').classList.toggle('open')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</header>
+
+<!-- ============ APP ============ -->
+<div class="app">
+  <aside class="side-nav">
+    <div class="nav-i active" data-v="dash"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord</div>
+    <div class="nav-i" data-v="biens"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg> Mes biens</div>
+    <div class="nav-i" data-v="carte"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg> Carte des biens</div>
+    <div class="nav-i" data-v="estim"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg> Mes estimations</div>
+    <div class="nav-i" data-v="docs"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Documents</div>
+    <div class="nav-i" data-v="coi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg> Co-indivisaires</div>
+    <div class="nav-i" data-v="juri"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7l14 0M7 7l-3 7a4 4 0 0 0 6 0L7 7zM17 7l-3 7a4 4 0 0 0 6 0L17 7z"/></svg> Conseil juridique</div>
+    <div class="nav-sep"></div>
+    <div class="nav-i" data-v="abo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Abonnement</div>
+  </aside>
+
+  <main>
+    <!-- ===== DASHBOARD ===== -->
+    <div class="view active" id="v-dash">
+      <div class="banner">
+        <span style="font-size:1.6rem">✨</span>
+        <div><b>Accès complet activé</b><div style="font-size:.88rem;color:rgba(255,255,255,.9)">Toutes les fonctionnalités Divimo sont débloquées sur votre compte.</div></div>
+        <a class="btn btn-light" onclick="go('estim')">Faire une estimation</a>
+      </div>
+      <div class="h-row"><div><h1>Bonjour Marti 👋</h1><p>Voici un aperçu de votre indivision.</p></div></div>
+      <div class="stats">
+        <div class="stat"><div class="ic" style="background:rgba(26,35,126,.1)">🏠</div><div class="v" id="kBiens">1</div><div class="l">Bien(s)</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(92,107,192,.12)">👥</div><div class="v" id="kCoi">3</div><div class="l">Co-indivisaires</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(165,196,189,.25)">📄</div><div class="v" id="kDocs">3</div><div class="l">Documents</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(242,153,74,.15)">📊</div><div class="v" id="kEstim">0</div><div class="l">Estimations</div></div>
+      </div>
+      <div class="cols">
+        <div class="card">
+          <h3>Maison familiale — Annecy</h3><p class="csub">Valeur estimée : 320 000 € · Indivision successorale</p>
+          <div class="donut-wrap">
+            <svg width="140" height="140" viewBox="0 0 42 42" style="transform:rotate(-90deg)"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF0FB" stroke-width="6"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1A237E" stroke-width="6" stroke-dasharray="44.9 55.1" stroke-dashoffset="0"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#5C6BC0" stroke-width="6" stroke-dasharray="30 70" stroke-dashoffset="-44.9"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#19a974" stroke-width="6" stroke-dasharray="25.1 74.9" stroke-dashoffset="-74.9"/>
+            </svg>
+            <div class="legend">
+              <span><i style="background:#1A237E"></i>Marti (45%)<b>144 000 €</b></span>
+              <span><i style="background:#5C6BC0"></i>Paul (30%)<b>96 000 €</b></span>
+              <span><i style="background:#19a974"></i>Léa (25%)<b>80 000 €</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Raccourcis</h3><p class="csub">Tout ce dont vous avez besoin, en un clic.</p>
+          <div class="row-item" onclick="go('estim')" style="cursor:pointer"><div class="r-ic" style="background:rgba(92,107,192,.12)">📊</div><div><b>Faire une estimation</b><span>Valeur, parts, vente/rachat</span></div><span class="mini-link">Ouvrir →</span></div>
+          <div class="row-item" onclick="go('juri')" style="cursor:pointer"><div class="r-ic" style="background:rgba(165,196,189,.25)">⚖️</div><div><b>Parler à un notaire / avocat</b><span>Prenez rendez-vous</span></div><span class="mini-link">Ouvrir →</span></div>
+          <div class="row-item" onclick="go('docs')" style="cursor:pointer"><div class="r-ic" style="background:rgba(26,35,126,.1)">📄</div><div><b>Déposer un document</b><span>Coffre-fort sécurisé</span></div><span class="mini-link">Ouvrir →</span></div>
+          <div class="row-item" onclick="go('coi')" style="cursor:pointer"><div class="r-ic" style="background:rgba(242,153,74,.15)">✉️</div><div><b>Inviter un co-indivisaire</b><span>Partagez l'accès</span></div><span class="mini-link">Ouvrir →</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BIENS ===== -->
+    <div class="view" id="v-biens">
+      <div class="h-row"><div><h1>Mes biens</h1><p>Les biens que vous gérez en indivision.</p></div><button class="btn" onclick="addBien()">+ Ajouter un bien</button></div>
+      <div class="card"><div id="biensList"></div></div>
+    </div>
+
+    <!-- ===== CARTE ===== -->
+    <div class="view" id="v-carte">
+      <div class="h-row"><div><h1>Carte des biens</h1><p>Visualisez tous vos biens en indivision sur la carte.</p></div><button class="btn" onclick="addBienOnMap()">📍 Ajouter un bien sur la carte</button></div>
+      <div class="card">
+        <div class="map-hint">🗺️ Carte interactive — zoomez, déplacez, cliquez un repère pour les détails. Cliquez « Ajouter un bien sur la carte » puis sur la carte pour placer un nouveau bien.</div>
+        <div id="map"></div>
+        <div class="map-legend" id="mapLegend"></div>
+      </div>
+    </div>
+
+    <!-- ===== ESTIMATIONS ===== -->
+    <div class="view" id="v-estim">
+      <div class="h-row"><div><h1>Mes estimations</h1><p>Lancez un simulateur ou retrouvez vos résultats.</p></div></div>
+      <div class="tool-grid" style="margin-bottom:22px">
+        <a class="tool" href="simulateurs.html#estimer"><div class="ic">🏠</div><h4>Estimer son bien</h4><p>Évaluez la valeur de votre bien.</p></a>
+        <a class="tool" href="simulateurs.html#parts"><div class="ic">📊</div><h4>Calculer les parts</h4><p>Répartissez la valeur entre indivisaires.</p></a>
+        <a class="tool" href="simulateurs.html#vente"><div class="ic">🔑</div><h4>Vente / rachat</h4><p>Anticipez un partage ou une soulte.</p></a>
+      </div>
+      <div class="card">
+        <div class="h-row" style="margin-bottom:14px"><div><h3>Estimations enregistrées</h3></div><button class="btn btn-ghost btn-sm" onclick="addEstim()">+ Enregistrer une estimation</button></div>
+        <div id="estimList"></div>
+      </div>
+    </div>
+
+    <!-- ===== DOCUMENTS ===== -->
+    <div class="view" id="v-docs">
+      <div class="h-row"><div><h1>Documents</h1><p>Votre coffre-fort, centralisé et sécurisé.</p></div></div>
+      <div class="card">
+        <div class="drop" id="drop"><div class="big">⬆️</div><b>Glissez un fichier ici</b><br>ou cliquez pour déposer un document</div>
+        <div id="docsList"></div>
+      </div>
+    </div>
+
+    <!-- ===== CO-INDIVISAIRES ===== -->
+    <div class="view" id="v-coi">
+      <div class="h-row"><div><h1>Co-indivisaires</h1><p>Les membres de votre indivision.</p></div><button class="btn" onclick="inviteCoi()">+ Inviter</button></div>
+      <div class="card"><div id="coiList"></div></div>
+    </div>
+
+    <!-- ===== JURIDIQUE ===== -->
+    <div class="view" id="v-juri">
+      <div class="h-row"><div><h1>Conseil juridique</h1><p>Échangez avec un notaire ou un avocat spécialisé.</p></div></div>
+      <div class="card">
+        <h3>Nos experts disponibles</h3><p class="csub">Un premier échange sans engagement.</p>
+        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#1A237E,#5C6BC0)">MD</div><div><b>Maître Dubois</b><span>Notaire · Indivision &amp; successions</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Dubois')">Rendez-vous</button></div></div>
+        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#5C6BC0,#A5C4BD)">ML</div><div><b>Maître Lambert</b><span>Avocate · Droit immobilier &amp; médiation</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Lambert')">Rendez-vous</button></div></div>
+        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#19a974,#A5C4BD)">MR</div><div><b>Maître Roux</b><span>Notaire · Rachat de parts</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Roux')">Rendez-vous</button></div></div>
+      </div>
+      <div class="card">
+        <h3>Mes rendez-vous</h3><p class="csub">Vos demandes de consultation.</p>
+        <div id="rdvList"></div>
+      </div>
+    </div>
+
+    <!-- ===== ABONNEMENT ===== -->
+    <div class="view" id="v-abo">
+      <div class="h-row"><div><h1>Abonnement &amp; profil</h1><p>Votre compte Divimo.</p></div></div>
+      <div class="card" style="max-width:600px">
+        <h3>Profil</h3><p class="csub">Vos informations personnelles.</p>
+        <div class="row-item"><div class="pro-av" style="background:linear-gradient(135deg,#1A237E,#5C6BC0)">MF</div><div><b>Marti Fiatte</b><span>marti@email.com</span></div><span class="row-act"><span class="mini-link" onclick="toast('✏️ Édition du profil — démo')">Modifier</span></span></div>
+      </div>
+      <div class="card" style="max-width:600px">
+        <h3>Votre formule</h3><p class="csub">Accès complet (projet étudiant).</p>
+        <div class="row-item"><div class="r-ic" style="background:rgba(92,107,192,.12)">⭐</div><div><b>Accès complet — démo</b><span>Toutes les fonctionnalités débloquées</span></div><span class="pill full">Tout inclus</span></div>
+        <p style="font-size:.82rem;color:var(--texte-doux);margin-top:12px">ℹ️ Dans la version finale, certaines fonctionnalités passeront en accès payant (offres Particuliers / Professionnels).</p>
+        <a href="offres.html" class="btn btn-ghost btn-sm" style="margin-top:10px">Voir les offres</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ===================== AUTH (code de vérification + session) ===================== */
+const AUTH_KEY='divimo_auth', STATE_KEY='divimo_state';
+let demoCode='';
+/* Stockage robuste : essaie localStorage, sinon sessionStorage, sinon cookie.
+   (utile car en mode fichier local "file://" certains navigateurs ne gardent pas localStorage) */
+function ssGet(k){
+  try{let v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}
+  try{let v=sessionStorage.getItem(k);if(v!==null)return v;}catch(e){}
+  const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)');return m?decodeURIComponent(m[1]):null;
+}
+function ssSet(k,v){
+  try{localStorage.setItem(k,v);}catch(e){}
+  try{sessionStorage.setItem(k,v);}catch(e){}
+  try{document.cookie=k+'='+encodeURIComponent(v)+';path=/;max-age=31536000';}catch(e){}
+}
+function ssDel(k){
+  try{localStorage.removeItem(k);}catch(e){}
+  try{sessionStorage.removeItem(k);}catch(e){}
+  try{document.cookie=k+'=;path=/;max-age=0';}catch(e){}
+}
+function genCode(resend){
+  demoCode=String(Math.floor(100000+Math.random()*900000));
+  document.getElementById('demoCode').textContent=demoCode;
+  if(resend){document.getElementById('gateErr').textContent='';clearCode();toast('📩 Nouveau code envoyé');}
+}
+function clearCode(){document.querySelectorAll('#codeRow input').forEach(i=>{i.value='';i.classList.remove('filled');});document.querySelector('#codeRow input').focus();}
+function checkCode(){
+  const val=[...document.querySelectorAll('#codeRow input')].map(i=>i.value).join('');
+  if(val.length<6){document.getElementById('gateErr').textContent='Entrez les 6 chiffres.';return;}
+  if(val===demoCode){
+    ssSet(AUTH_KEY,'1');
+    document.getElementById('gate').classList.add('hide');
+    toast('✅ Connecté ! Bienvenue Marti');
+  }else{
+    document.getElementById('gateErr').textContent='Code incorrect, réessayez.';
+    clearCode();
+  }
+}
+function logout(){ssDel(AUTH_KEY);window.location.href='connexion.html';}
+// code inputs UX
+const codeInputs=[...document.querySelectorAll('#codeRow input')];
+codeInputs.forEach((inp,idx)=>{
+  inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'');inp.classList.toggle('filled',!!inp.value);if(inp.value&&idx<5)codeInputs[idx+1].focus();});
+  inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&idx>0)codeInputs[idx-1].focus();if(e.key==='Enter')checkCode();});
+  inp.addEventListener('paste',e=>{e.preventDefault();const d=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);d.split('').forEach((c,i)=>{if(codeInputs[i]){codeInputs[i].value=c;codeInputs[i].classList.add('filled');}});if(d.length)codeInputs[Math.min(d.length,5)].focus();});
+});
+// au chargement : déjà connecté ? -> direct au compte (pas de redemande de code)
+if(ssGet(AUTH_KEY)==='1'){document.getElementById('gate').classList.add('hide');}
+else{genCode();setTimeout(()=>codeInputs[0].focus(),200);}
+
+/* ===================== TOAST ===================== */
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ===================== NAV ===================== */
+function go(v){
+  document.querySelectorAll('.nav-i').forEach(n=>n.classList.toggle('active',n.dataset.v===v));
+  document.querySelectorAll('.view').forEach(w=>w.classList.toggle('active',w.id==='v-'+v));
+  document.getElementById('siteHeader').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='carte')setTimeout(initMap,80);
+}
+document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
+
+/* ===================== DONNÉES PERSISTANTES ===================== */
+const DEFAULT={
+  biens:[{nom:'Maison familiale — Annecy',info:'74000 Annecy · 120 m² · Indivision successorale',val:'320 000 €',lat:45.8992,lng:6.1294}],
+  docs:[{name:'Acte notarié.pdf',meta:'Ajouté par Marti · 2,4 Mo',ic:'📄'},{name:'Factures travaux 2025.zip',meta:'Partagé · 8 fichiers',ic:'🧾'},{name:'Relevé de charges.xlsx',meta:'Mis à jour hier',ic:'📊'}],
+  coi:[{n:'Marti Fiatte (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'soon'}],
+  estim:[],
+  rdv:[]
+};
+let S=load();
+function load(){try{return Object.assign(JSON.parse(JSON.stringify(DEFAULT)),JSON.parse(ssGet(STATE_KEY)||'{}'));}catch(e){return JSON.parse(JSON.stringify(DEFAULT));}}
+function save(){ssSet(STATE_KEY,JSON.stringify(S));renderAll();}
+const ICONS=['📄','🧾','📊','📑','🖼️'];const TINTS=['rgba(26,35,126,.1)','rgba(92,107,192,.12)','rgba(165,196,189,.22)','rgba(242,153,74,.15)'];
+
+/* ===================== RENDERERS ===================== */
+function renderAll(){renderBiens();renderDocs();renderCoi();renderEstim();renderRdv();renderKpis();if(typeof renderMap==='function'&&map)renderMap();}
+function renderKpis(){
+  document.getElementById('kBiens').textContent=S.biens.length;
+  document.getElementById('kCoi').textContent=S.coi.length;
+  document.getElementById('kDocs').textContent=S.docs.length;
+  document.getElementById('kEstim').textContent=S.estim.length;
+}
+function renderBiens(){
+  document.getElementById('biensList').innerHTML=S.biens.map((b,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(26,35,126,.08)">🏡</div><div><b>${b.nom}</b><span>${b.info}</span></div><div class="row-act"><span class="pill ok">${b.val}</span>${i>0?`<span class="del" onclick="rm('biens',${i})">×</span>`:''}</div></div>`).join('')
+    || '<div class="empty">Aucun bien pour l\'instant.</div>';
+}
+function renderDocs(){
+  document.getElementById('docsList').innerHTML=S.docs.map((d,i)=>`<div class="row-item"><div class="r-ic" style="background:${TINTS[i%TINTS.length]}">${d.ic||'📄'}</div><div><b>${d.name}</b><span>${d.meta}</span></div><div class="row-act"><span class="mini-link" onclick="toast('📥 Téléchargement (démo)')">Télécharger</span><span class="del" onclick="rm('docs',${i})">×</span></div></div>`).join('')
+    || '<div class="empty">Aucun document. Déposez votre premier fichier ci-dessus.</div>';
+}
+function renderCoi(){
+  document.getElementById('coiList').innerHTML=S.coi.map((c,i)=>`<div class="row-item"><div class="pro-av" style="background:linear-gradient(135deg,#5C6BC0,#7986CB)">${c.ini}</div><div><b>${c.n}</b><span>${c.r}</span></div><div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="rm('coi',${i})">×</span>`:''}</div></div>`).join('');
+}
+function renderEstim(){
+  document.getElementById('estimList').innerHTML=S.estim.map((e,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(92,107,192,.12)">📊</div><div><b>${e.titre}</b><span>${e.detail}</span></div><div class="row-act"><span class="del" onclick="rm('estim',${i})">×</span></div></div>`).join('')
+    || '<div class="empty">Aucune estimation enregistrée. Lancez un simulateur ci-dessus.</div>';
+}
+function renderRdv(){
+  document.getElementById('rdvList').innerHTML=S.rdv.map((r,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(165,196,189,.25)">⚖️</div><div><b>${r.pro}</b><span>${r.when}</span></div><div class="row-act"><span class="pill soon">En attente</span><span class="del" onclick="rm('rdv',${i})">×</span></div></div>`).join('')
+    || '<div class="empty">Aucun rendez-vous. Demandez une consultation ci-dessus.</div>';
+}
+function rm(key,i){S[key].splice(i,1);save();}
+
+/* ===================== ACTIONS ===================== */
+// Petit annuaire de villes (lat,lng) pour situer un bien sans service externe
+const VILLES={paris:[48.8566,2.3522],lyon:[45.7640,4.8357],marseille:[43.2965,5.3698],annecy:[45.8992,6.1294],bordeaux:[44.8378,-0.5792],lille:[50.6292,3.0573],toulouse:[43.6047,1.4442],nantes:[47.2184,-1.5536],nice:[43.7102,7.2620],strasbourg:[48.5734,7.7521],rennes:[48.1173,-1.6778],montpellier:[43.6108,3.8767],grenoble:[45.1885,5.7245],dijon:[47.3220,5.0415],chambery:[45.5646,5.9178],aix:[43.5297,5.4474]};
+function geocodeVille(txt){
+  const k=(txt||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  for(const v in VILLES){if(k.includes(v))return VILLES[v];}
+  // sinon, un point au centre de la France avec léger décalage aléatoire
+  return [46.6+(Math.random()-.5)*2,2.4+(Math.random()-.5)*3];
+}
+function addBien(){
+  const nom=prompt('Nom du bien :','Appartement — Lyon');if(!nom)return;
+  const ville=prompt('Ville du bien (pour la carte) :','Lyon')||'';
+  const val=prompt('Valeur estimée :','250 000 €')||'—';
+  const c=geocodeVille(ville+' '+nom);
+  S.biens.push({nom,info:(ville?ville+' · ':'')+'Ajouté à l\'instant',val,lat:c[0],lng:c[1]});
+  save();toast('🏠 Bien ajouté');
+}
+function addEstim(){
+  const titre=prompt('Titre de l\'estimation :','Estimation Maison Annecy');if(!titre)return;
+  const detail=prompt('Résultat / détail :','Valeur estimée ~ 320 000 €')||'—';
+  S.estim.unshift({titre,detail});save();toast('✅ Estimation enregistrée');
+}
+function inviteCoi(){
+  const n=prompt('Nom du co-indivisaire à inviter :','');if(!n)return;
+  const part=prompt('Sa quote-part (%) :','0')||'0';
+  const ini=n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';
+  S.coi.push({n,r:part+'% · Co-indivisaire',ini,st:'Invité',cls:'soon'});save();toast('✉️ Invitation envoyée à '+n);
+}
+function book(pro){
+  const when=prompt('Créneau souhaité pour '+pro+' :','Mercredi après-midi');if(!when)return;
+  S.rdv.unshift({pro,when});save();toast('📅 Demande envoyée à '+pro);go('juri');
+}
+/* documents drop */
+let di=0;
+function addDocFile(name){S.docs.unshift({name,meta:'Ajouté à l\'instant · '+(Math.random()*4+0.3).toFixed(1)+' Mo',ic:ICONS[di++%ICONS.length]});save();}
+function pickFile(){const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.onchange=()=>{[...inp.files].forEach(f=>addDocFile(f.name));toast('✅ Document(s) déposé(s)');};inp.click();}
+const drop=document.getElementById('drop');
+drop.addEventListener('click',pickFile);
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files.length){[...e.dataTransfer.files].forEach(f=>addDocFile(f.name));}else{addDocFile('Document '+(S.docs.length+1)+'.pdf');}toast('✅ Document déposé');});
+
+/* ===================== CARTE INTERACTIVE (Leaflet) ===================== */
+let map=null, markersLayer=null, placing=false;
+function pinIcon(){
+  return L.divIcon({className:'',html:'<div style="width:26px;height:26px;border-radius:50% 50% 50% 0;background:#5C6BC0;border:2px solid #fff;box-shadow:0 3px 8px rgba(26,35,126,.4);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px">🏠</span></div>',iconSize:[26,26],iconAnchor:[13,26],popupAnchor:[0,-26]});
+}
+function initMap(){
+  if(typeof L==='undefined'){document.getElementById('map').innerHTML='<div class="empty">Carte indisponible hors connexion.</div>';return;}
+  if(!map){
+    map=L.map('map',{scrollWheelZoom:true}).setView([46.6,2.4],5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    markersLayer=L.layerGroup().addTo(map);
+    map.on('click',e=>{ if(!placing)return; placing=false; map.getContainer().style.cursor='';
+      const nom=prompt('Nom du bien :','Nouveau bien');if(!nom){renderMap();return;}
+      const val=prompt('Valeur estimée :','250 000 €')||'—';
+      S.biens.push({nom,info:'Placé sur la carte',val,lat:e.latlng.lat,lng:e.latlng.lng});
+      save();toast('📍 Bien ajouté sur la carte');
+    });
+  }
+  map.invalidateSize();
+  renderMap();
+}
+function renderMap(){
+  if(!map||!markersLayer)return;
+  markersLayer.clearLayers();
+  const pts=[];
+  S.biens.forEach((b,i)=>{
+    if(typeof b.lat!=='number')return;
+    const m=L.marker([b.lat,b.lng],{icon:pinIcon()}).addTo(markersLayer);
+    m.bindPopup('<b>'+b.nom+'</b><br>'+(b.info||'')+'<br><b>'+(b.val||'')+'</b>');
+    pts.push([b.lat,b.lng]);
+  });
+  if(pts.length===1){map.setView(pts[0],11);}
+  else if(pts.length>1){map.fitBounds(pts,{padding:[40,40],maxZoom:11});}
+  // légende cliquable
+  document.getElementById('mapLegend').innerHTML=S.biens.filter(b=>typeof b.lat==='number').map((b,i)=>
+    `<div class="it" onclick="flyTo(${b.lat},${b.lng})"><span class="pin"></span>${b.nom} — ${b.val||''}</div>`).join('');
+}
+function flyTo(lat,lng){if(map){map.flyTo([lat,lng],13);document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'});}}
+function addBienOnMap(){
+  go('carte');setTimeout(()=>{placing=true;if(map)map.getContainer().style.cursor='crosshair';toast('🖱️ Cliquez sur la carte pour placer le bien');},150);
+}
+
+renderAll();
+</script>
+</body>
+</html>
