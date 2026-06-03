@@ -227,6 +227,5 @@ drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
 drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files.length){[...e.dataTransfer.files].forEach(f=>addDoc(f.name));}else{addDoc('Document '+(i+1)+'.pdf');}});
 docs.addEventListener('click',e=>{if(e.target.classList.contains('del'))e.target.closest('.doc-row').remove();});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-client.js"></script><script src="header-auth.js"></script>
 </body>
 </html>
