@@ -147,14 +147,10 @@ f.addEventListener('submit',async e=>{
 
   document.getElementById('formWrap').style.display='none';
   const s=document.getElementById('success');
-  // Si confirmation d'email requise, Supabase renvoie user mais pas de session
-  if(data.session){
-    document.getElementById('successMsg').textContent='Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.';
-    document.getElementById('successBtn').style.display='inline-flex';
-  } else {
-    document.getElementById('successMsg').textContent='Votre compte a bien été créé ! Un email de confirmation vous a été envoyé. Cliquez sur le lien dans cet email pour activer votre compte.';
-    document.getElementById('successBtn').style.display='none';
-  }
+  document.getElementById('successMsg').textContent='Votre compte a bien été créé. Vous pouvez maintenant vous connecter.';
+  document.getElementById('successBtn').style.display='inline-flex';
+  document.getElementById('successBtn').href='connexion.html';
+  document.getElementById('successBtn').textContent='Se connecter →';
   s.style.display='block';
 });
 document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{if(el.type!=='checkbox')setErr(el,false);}));
