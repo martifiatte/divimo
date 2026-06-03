@@ -152,6 +152,21 @@ footer{background:var(--bleu-roi);color:rgba(255,255,255,.7);text-align:center;p
   </div>
 </header>
 
+<!-- Auth gate — affiché si non connecté -->
+<div id="auth-gate" style="display:none;min-height:70vh;display:flex;align-items:center;justify-content:center;padding:60px 24px;background:#F7F8FE">
+  <div style="text-align:center;max-width:440px">
+    <div style="width:72px;height:72px;border-radius:50%;background:rgba(92,107,192,.12);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 20px">🔒</div>
+    <h2 style="font-family:'Montserrat';font-weight:800;font-size:1.7rem;color:var(--bleu-roi);margin-bottom:.8rem">Accès réservé aux membres</h2>
+    <p style="color:var(--texte-doux);font-size:1rem;margin-bottom:28px;line-height:1.65">Créez un compte gratuit pour accéder aux simulateurs d'indivision. Aucun paiement requis.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="creer-compte.html" style="display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.96rem;padding:.85rem 1.6rem;border-radius:999px;background:var(--bleu-violet);color:#fff;box-shadow:0 8px 22px rgba(92,107,192,.32);text-decoration:none">Créer mon compte gratuit →</a>
+      <a href="connexion.html" style="display:inline-flex;align-items:center;font-family:'Montserrat';font-weight:600;font-size:.96rem;padding:.85rem 1.6rem;border-radius:999px;background:transparent;color:var(--bleu-roi);border:1.6px solid var(--gris-bord);text-decoration:none">Se connecter</a>
+    </div>
+  </div>
+</div>
+
+<!-- Contenu simulateurs — masqué si non connecté -->
+<div id="sim-content">
 <div class="intro">
   <span class="eyebrow">Nos simulations</span>
   <h1>Simulateurs d'indivision</h1>
@@ -327,6 +342,8 @@ footer{background:var(--bleu-roi);color:rgba(255,255,255,.7);text-align:center;p
   </div>
 </div>
 
+</div><!-- /sim-content -->
+
 <footer>© 2026 Divimo · Les résultats sont indicatifs et ne remplacent pas l'avis d'un notaire ou d'un expert.</footer>
 
 <script>
@@ -477,5 +494,38 @@ function rachatCompute(){
 /* init */
 renderCoi();
 </script>
+<script>
+/* Auth gate simulateurs */
+(function(){
+  const PROJECT='anrwoxsibhabivtkepqt';
+  const raw=localStorage.getItem('sb-'+PROJECT+'-auth-token');
+  let loggedIn=false;
+  try{
+    const p=JSON.parse(raw||'');
+    const exp=p?.expires_at||p?.currentSession?.expires_at;
+    loggedIn=!!(p?.user||p?.currentSession?.user)&&(!exp||Date.now()/1000<exp);
+  }catch(e){}
+  if(!loggedIn){
+    document.getElementById('auth-gate').style.display='flex';
+    document.getElementById('sim-content').style.display='none';
+  } else {
+    document.getElementById('auth-gate').style.display='none';
+    document.getElementById('sim-content').style.display='block';
+  }
+  /* Vérification Supabase réelle après chargement */
+  window.addEventListener('load',async()=>{
+    if(typeof sb==='undefined')return;
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){
+      document.getElementById('auth-gate').style.display='none';
+      document.getElementById('sim-content').style.display='block';
+    } else {
+      document.getElementById('auth-gate').style.display='flex';
+      document.getElementById('sim-content').style.display='none';
+    }
+  });
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-client.js"></script><script src="header-auth.js"></script>
 </body>
 </html>
