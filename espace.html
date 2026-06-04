@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mon espace — Divimo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,109 +13,212 @@
 <script src="supabase-client.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F4F5FB;-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--bleu-roi);line-height:1.2}
-a{color:inherit;text-decoration:none}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Open Sans', sans-serif; color: var(--texte); background: #F4F6FA; -webkit-font-smoothing: antialiased; }
+h1,h2,h3,h4 { font-family: 'Montserrat', sans-serif; color: var(--navy); line-height: 1.2; }
+a { color: inherit; text-decoration: none; }
 
-/* ===== header actions (logged-in) ===== */
-.site-header .user-chip{display:flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.88rem;color:var(--bleu-roi);background:#fff;border:1.5px solid var(--gris-bord);padding:.35rem .5rem .35rem .8rem;border-radius:999px}
-.user-chip .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem}
-.logout-btn{border:none;background:none;cursor:pointer;color:var(--texte-doux);font-family:'Montserrat';font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:.35rem}
-.logout-btn:hover{color:#eb5757}
+/* ── HEADER CONNECTÉ ── */
+.user-chip { display: flex; align-items: center; gap: .5rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .85rem; color: var(--navy); background: #fff; border: 1.5px solid var(--gris-bord); padding: .3rem .5rem .3rem .75rem; border-radius: 999px; }
+.user-chip .av { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; }
+.logout-btn { border: none; background: none; cursor: pointer; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; display: flex; align-items: center; gap: .3rem; transition: .15s; }
+.logout-btn:hover { color: #C0392B; }
 
-/* ===== app layout ===== */
-.app{max-width:1180px;margin:0 auto;padding:26px 24px 70px;display:grid;grid-template-columns:236px 1fr;gap:26px;align-items:start}
-@media(max-width:860px){.app{grid-template-columns:1fr;padding-top:16px}}
-.side-nav{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:14px;position:sticky;top:88px;display:flex;flex-direction:column;gap:4px}
-@media(max-width:860px){.side-nav{position:static;flex-direction:row;overflow-x:auto;gap:6px}}
-.nav-i{display:flex;align-items:center;gap:.7rem;padding:.7rem .85rem;border-radius:11px;font-family:'Montserrat';font-weight:600;font-size:.92rem;color:var(--texte-doux);cursor:pointer;transition:.18s;white-space:nowrap}
-.nav-i:hover{background:var(--gris-clair);color:var(--bleu-roi)}
-.nav-i.active{background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff}
-.nav-i svg{flex-shrink:0}
-.nav-sep{height:1px;background:var(--gris-bord);margin:8px 4px}
-@media(max-width:860px){.nav-sep{display:none}}
+/* ── APP LAYOUT ── */
+.app { max-width: 1200px; margin: 0 auto; padding: 24px 24px 72px; display: grid; grid-template-columns: 220px 1fr; gap: 22px; align-items: start; }
+@media(max-width:860px) { .app { grid-template-columns: 1fr; padding-top: 14px; } }
 
-.view{display:none;animation:fade .35s ease}.view.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.h-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap;gap:12px}
-.h-row h1{font-size:1.55rem;font-weight:800}.h-row p{color:var(--texte-doux);font-size:.95rem;margin-top:.2rem}
-.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.9rem;padding:.65rem 1.15rem;border-radius:10px;cursor:pointer;border:none;background:var(--bleu-violet);color:#fff;transition:.22s;box-shadow:0 6px 16px rgba(92,107,192,.28)}
-.btn:hover{background:var(--bleu-roi);transform:translateY(-2px)}
-.btn-ghost{background:#fff;color:var(--bleu-roi);border:1.5px solid var(--gris-bord);box-shadow:none}
-.btn-ghost:hover{border-color:var(--bleu-violet);color:var(--bleu-violet)}
-.btn-sm{padding:.5rem .9rem;font-size:.84rem}
+/* ── SIDEBAR ── */
+.side-nav { background: #fff; border: 1px solid var(--gris-bord); border-radius: 16px; padding: 12px; position: sticky; top: 82px; }
+@media(max-width:860px) { .side-nav { position: static; display: flex; overflow-x: auto; gap: 4px; scrollbar-width: none; } .side-nav::-webkit-scrollbar { display: none; } }
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}}
-.stat{background:#fff;border:1px solid var(--gris-bord);border-radius:16px;padding:18px}
-.stat .ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:10px}
-.stat .v{font-family:'Montserrat';font-weight:800;font-size:1.45rem;color:var(--bleu-roi)}
-.stat .l{font-size:.82rem;color:var(--texte-doux)}
+.nav-section-label { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; color: var(--texte-leger, #8896A7); padding: .5rem .75rem .25rem; display: block; }
+@media(max-width:860px) { .nav-section-label { display: none; } }
 
-.card{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:22px;margin-bottom:18px}
-.card h3{font-size:1.08rem;margin-bottom:3px}.card .csub{color:var(--texte-doux);font-size:.86rem;margin-bottom:14px}
-.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}
-@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.nav-i { display: flex; align-items: center; gap: .6rem; padding: .62rem .75rem; border-radius: 9px; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .84rem; color: var(--texte-doux); cursor: pointer; transition: .15s; white-space: nowrap; }
+.nav-i svg { flex-shrink: 0; opacity: .6; }
+.nav-i:hover { background: var(--gris-clair); color: var(--navy); }
+.nav-i:hover svg { opacity: 1; }
+.nav-i.active { background: var(--navy); color: #fff; }
+.nav-i.active svg { opacity: 1; }
+.nav-i.admin-item { color: var(--accent); }
+.nav-i.admin-item svg { opacity: 1; }
+.nav-i.admin-item.active { background: var(--navy); color: #fff; }
+.nav-sep { height: 1px; background: var(--gris-bord); margin: 6px 4px; }
+@media(max-width:860px) { .nav-sep { display: none; } }
 
-.row-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-top:1px solid var(--gris-bord)}
-.row-item:first-child{border-top:none}
-.r-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
-.row-item b{font-family:'Open Sans';font-weight:600;font-size:.93rem;display:block}
-.row-item span{font-size:.8rem;color:var(--texte-doux)}
-.row-act{margin-left:auto;display:flex;gap:8px;align-items:center}
-.mini-link{color:var(--bleu-violet);font-weight:600;font-size:.84rem;cursor:pointer;font-family:'Montserrat'}
-.del{color:#cbd0e0;cursor:pointer;font-size:1.15rem;transition:.2s}.del:hover{color:#eb5757}
-.pill{font-size:.72rem;font-weight:700;padding:.22rem .6rem;border-radius:99px;font-family:'Montserrat'}
-.pill.soon{background:rgba(242,153,74,.15);color:#c97a23}.pill.ok{background:rgba(165,196,189,.25);color:#2c6e5b}
-.pill.full{background:rgba(92,107,192,.14);color:var(--bleu-violet)}
+/* ── MAIN VIEWS ── */
+.view { display: none; }
+.view.active { display: block; animation: fadein .3s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* feature/tool cards */
-.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:760px){.tool-grid{grid-template-columns:1fr}}
-.tool{display:block;background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:22px;transition:.25s;cursor:pointer}
-.tool:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:transparent}
-.tool .ic{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--bleu-violet),var(--bleu-roi));display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:13px}
-.tool h4{font-size:1.04rem;margin-bottom:.3rem}.tool p{color:var(--texte-doux);font-size:.88rem}
+/* ── PAGE HEADER ── */
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+.page-head h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+.page-head p { color: var(--texte-doux); font-size: .88rem; margin-top: 3px; }
 
-.drop{border:2px dashed var(--bleu-violet-clair);border-radius:14px;padding:22px;text-align:center;color:var(--texte-doux);cursor:pointer;transition:.2s;background:rgba(92,107,192,.04);margin-bottom:8px}
-.drop:hover,.drop.over{background:rgba(92,107,192,.1);border-color:var(--bleu-violet)}
-.drop .big{font-size:1.5rem}.drop b{color:var(--bleu-roi);font-family:'Montserrat'}
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: .45rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .86rem; padding: .6rem 1.1rem; border-radius: 9px; cursor: pointer; border: none; background: var(--navy); color: #fff; transition: .18s; box-shadow: 0 2px 8px rgba(15,31,61,.18); }
+.btn:hover { background: var(--navy-mid); transform: translateY(-1px); }
+.btn-ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--gris-bord); box-shadow: none; }
+.btn-ghost:hover { border-color: var(--accent-light); color: var(--accent); }
+.btn-sm { padding: .45rem .85rem; font-size: .78rem; }
+.btn-teal { background: var(--teal); }
+.btn-teal:hover { background: var(--teal-light); }
 
-.pro-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-top:1px solid var(--gris-bord)}
-.pro-row:first-child{border-top:none}
-.pro-av{width:44px;height:44px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat';font-weight:700;flex-shrink:0}
-.donut-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
-.legend{display:flex;flex-direction:column;gap:.5rem;font-size:.9rem}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:.5rem}
-.legend b{font-family:'Montserrat';color:var(--bleu-roi);margin-left:6px}
-.empty{text-align:center;color:var(--texte-doux);padding:26px;font-size:.92rem}
+/* ── CARDS ── */
+.card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.card-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .96rem; color: var(--navy); margin-bottom: 4px; }
+.card-sub { color: var(--texte-doux); font-size: .82rem; margin-bottom: 14px; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 
-.banner{background:linear-gradient(135deg,var(--bleu-roi),var(--bleu-violet));color:#fff;border-radius:18px;padding:22px 24px;display:flex;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap}
-.banner b{font-family:'Montserrat'}
-.banner .btn-light{background:#fff;color:var(--bleu-roi);margin-left:auto}
+/* ── STATS GRID ── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+@media(max-width:900px) { .stats { grid-template-columns: 1fr 1fr; } }
+.stat { background: #fff; border: 1px solid var(--gris-bord); border-radius: 12px; padding: 16px; }
+.stat .ic { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 10px; }
+.stat .sv { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--navy); }
+.stat .sl { font-size: .76rem; color: var(--texte-doux); margin-top: 1px; }
 
-/* ===== carte ===== */
-#map{height:460px;width:100%;border-radius:16px;border:1px solid var(--gris-bord);z-index:1}
-.map-hint{display:flex;align-items:center;gap:.5rem;background:rgba(92,107,192,.08);color:var(--bleu-roi);border-radius:10px;padding:10px 14px;font-size:.86rem;margin-bottom:14px;font-family:'Montserrat';font-weight:600}
-.leaflet-popup-content{font-family:'Open Sans';margin:12px 14px}
-.leaflet-popup-content b{font-family:'Montserrat';color:var(--bleu-roi)}
-.map-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
-.map-legend .it{display:flex;align-items:center;gap:.5rem;font-size:.86rem;color:var(--texte-doux);cursor:pointer}
-.map-legend .it:hover{color:var(--bleu-roi)}
-.map-legend .pin{width:14px;height:14px;border-radius:50% 50% 50% 0;background:var(--bleu-violet);transform:rotate(-45deg);flex-shrink:0}
+/* ── COLS ── */
+.cols2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+@media(max-width:860px) { .cols2 { grid-template-columns: 1fr; } }
 
+/* ── ROWS ── */
+.row-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.row-item:first-child { border-top: none; }
+.r-ic { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+.row-item b { font-weight: 600; font-size: .9rem; color: var(--navy); display: block; }
+.row-item span { font-size: .77rem; color: var(--texte-doux); }
+.row-act { margin-left: auto; display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+.mini-link { color: var(--accent-light); font-weight: 600; font-size: .8rem; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: .15s; }
+.mini-link:hover { color: var(--navy); }
+.del { color: var(--gris-mid); cursor: pointer; font-size: 1.05rem; transition: .15s; line-height: 1; }
+.del:hover { color: #C0392B; }
 
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bleu-roi);color:#fff;padding:.85rem 1.3rem;border-radius:12px;font-family:'Montserrat';font-weight:600;font-size:.92rem;box-shadow:0 12px 30px rgba(26,35,126,.3);opacity:0;pointer-events:none;transition:.3s;z-index:400}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── PILLS ── */
+.pill { font-size: .68rem; font-weight: 700; padding: .2rem .55rem; border-radius: 99px; font-family: 'Montserrat', sans-serif; white-space: nowrap; }
+.pill-ok { background: rgba(45,106,106,.12); color: var(--teal); }
+.pill-warn { background: rgba(200,130,30,.12); color: #9A6010; }
+.pill-info { background: rgba(44,82,130,.1); color: var(--accent); }
+.pill-neu { background: var(--gris-clair); color: var(--texte-doux); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 32px 16px; color: var(--texte-doux); font-size: .88rem; }
+.empty-ic { font-size: 2rem; margin-bottom: 10px; opacity: .4; }
+
+/* ── BANNER ── */
+.banner { background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.banner p { font-size: .88rem; color: rgba(255,255,255,.8); }
+.banner b { font-family: 'Montserrat', sans-serif; font-weight: 700; display: block; margin-bottom: 2px; }
+.btn-banner { background: #fff; color: var(--navy); margin-left: auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .82rem; padding: .5rem 1rem; border-radius: 8px; cursor: pointer; border: none; transition: .15s; flex-shrink: 0; }
+.btn-banner:hover { background: rgba(255,255,255,.9); }
+
+/* ── MAP ── */
+#map { height: 440px; width: 100%; border-radius: 12px; border: 1px solid var(--gris-bord); z-index: 1; }
+
+/* ── TOAST ── */
+#toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--navy); color: #fff; padding: .8rem 1.25rem; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .86rem; box-shadow: 0 8px 24px rgba(15,31,61,.3); opacity: 0; pointer-events: none; transition: .25s; z-index: 500; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── PORTFOLIO GRID ── */
+.portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+@media(max-width:860px) { .portfolio-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:540px) { .portfolio-grid { grid-template-columns: 1fr; } }
+.bien-card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 18px; transition: .22s; cursor: pointer; }
+.bien-card:hover { border-color: var(--accent-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.bien-card-ico { font-size: 1.6rem; margin-bottom: 12px; }
+.bien-card-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .96rem; color: var(--navy); margin-bottom: 3px; }
+.bien-card-meta { font-size: .78rem; color: var(--texte-doux); margin-bottom: 14px; }
+.bien-card-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--navy); margin-bottom: 10px; }
+.bien-card-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── BUDGET ── */
+.budget-total { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+@media(max-width:600px) { .budget-total { grid-template-columns: 1fr 1fr; } }
+.bt-card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 12px; padding: 14px 16px; }
+.bt-card .label { font-size: .72rem; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--texte-leger); margin-bottom: 4px; }
+.bt-card .amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--navy); }
+.bt-card.green .amount { color: var(--teal); }
+.bt-card.red .amount { color: #C0392B; }
+.trans-row { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--gris-bord); font-size: .85rem; }
+.trans-row:first-child { border-top: none; }
+.trans-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+.trans-desc b { font-weight: 600; color: var(--navy); font-size: .88rem; display: block; }
+.trans-desc span { font-size: .74rem; color: var(--texte-doux); }
+.trans-amount { margin-left: auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; }
+.trans-amount.neg { color: #C0392B; }
+.trans-amount.pos { color: var(--teal); }
+
+/* ── PLANNING ── */
+.planning-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:700px) { .planning-grid { grid-template-columns: 1fr; } }
+.event-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--gris-bord); align-items: flex-start; }
+.event-item:first-child { border-top: none; }
+.event-date { width: 42px; text-align: center; flex-shrink: 0; }
+.event-date .day { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--navy); line-height: 1; }
+.event-date .month { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .65rem; text-transform: uppercase; color: var(--texte-doux); }
+.event-info b { font-weight: 600; font-size: .88rem; color: var(--navy); display: block; margin-bottom: 2px; }
+.event-info span { font-size: .76rem; color: var(--texte-doux); }
+
+/* ── ACTIONS ── */
+.action-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-top: 1px solid var(--gris-bord); }
+.action-item:first-child { border-top: none; }
+.action-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--gris-mid); background: #fff; cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: .15s; display: flex; align-items: center; justify-content: center; }
+.action-check.done { background: var(--teal); border-color: var(--teal); color: #fff; font-size: .65rem; }
+.action-item.done .action-title { text-decoration: line-through; color: var(--texte-doux); }
+.action-title { font-weight: 600; font-size: .88rem; color: var(--navy); }
+.action-meta { font-size: .74rem; color: var(--texte-doux); margin-top: 2px; }
+.action-right { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+/* ── RÉUNIONS ── */
+.reunion-item { padding: 14px 0; border-top: 1px solid var(--gris-bord); }
+.reunion-item:first-child { border-top: none; }
+.reunion-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+.reunion-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; color: var(--navy); }
+.reunion-date { font-size: .76rem; color: var(--texte-doux); }
+.reunion-desc { font-size: .82rem; color: var(--texte-doux); line-height: 1.6; }
+
+/* ── INVENTAIRE ── */
+.inv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media(max-width:700px) { .inv-grid { grid-template-columns: 1fr 1fr; } }
+.inv-item { background: var(--gris-clair); border-radius: 11px; padding: 14px; }
+.inv-ico { font-size: 1.4rem; margin-bottom: 8px; }
+.inv-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--navy); margin-bottom: 2px; }
+.inv-val { font-size: .76rem; color: var(--texte-doux); }
+
+/* ── INCIDENTS ── */
+.incident-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--gris-bord); align-items: flex-start; }
+.incident-item:first-child { border-top: none; }
+.incident-ico { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+.incident-title { font-weight: 600; font-size: .88rem; color: var(--navy); display: block; margin-bottom: 2px; }
+.incident-meta { font-size: .75rem; color: var(--texte-doux); }
+.incident-right { margin-left: auto; flex-shrink: 0; }
+
+/* ── CO-INDIVISAIRES ── */
+.donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.legend { display: flex; flex-direction: column; gap: .45rem; font-size: .84rem; }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: .45rem; }
+.legend b { font-family: 'Montserrat', sans-serif; color: var(--navy); margin-left: 4px; font-size: .84rem; }
+
+/* ── DRAG ZONE ── */
+.drop-zone { border: 2px dashed var(--gris-mid); border-radius: 12px; padding: 24px; text-align: center; color: var(--texte-doux); cursor: pointer; transition: .18s; background: rgba(44,82,130,.02); margin-bottom: 10px; }
+.drop-zone:hover, .drop-zone.over { background: rgba(44,82,130,.06); border-color: var(--accent-light); }
+.drop-zone .dz-ico { font-size: 1.6rem; margin-bottom: 8px; }
+.drop-zone b { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--navy); }
+
+/* ── ADMIN ── */
+.admin-links .row-item a { color: var(--accent-light); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .82rem; }
 </style>
 </head>
 <body>
 
-<!-- ============ HEADER (cohérent avec le site) ============ -->
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
-    <a href="index.html" class="brand-logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1A237E" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#5C6BC0"/><circle cx="17" cy="17" r="4.5" fill="#1A237E"/></svg> Divimo</a>
+    <a href="index.html" class="brand-logo">
+      <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
+      Divimo
+    </a>
     <nav class="main-nav">
       <a href="index.html">Accueil</a>
       <a href="simulateurs.html">Simulateurs</a>
@@ -123,230 +227,350 @@ a{color:inherit;text-decoration:none}
       <a href="espace.html" class="active">Mon espace</a>
     </nav>
     <div class="header-actions">
-      <span class="user-chip"><span class="av" id="chipAv">MF</span> <span id="chipName">Marti</span></span>
-      <button class="logout-btn" onclick="logout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Déconnexion</button>
+      <span class="user-chip"><span class="av" id="chipAv">—</span><span id="chipName">—</span></span>
+      <button class="logout-btn" onclick="logout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Déconnexion
+      </button>
     </div>
-    <button class="nav-toggle" aria-label="Menu" onclick="this.closest('.site-header').classList.toggle('open')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <button class="nav-toggle" onclick="this.closest('.site-header').classList.toggle('open')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
   </div>
 </header>
 
-<!-- ============ APP ============ -->
 <div class="app">
+
+  <!-- ── SIDEBAR ── -->
   <aside class="side-nav">
-    <div class="nav-i active" data-v="dash"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord</div>
-    <div class="nav-i" data-v="biens"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg> Mes biens</div>
-    <div class="nav-i" data-v="carte"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg> Carte des biens</div>
-    <div class="nav-i" data-v="estim"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg> Mes estimations</div>
-    <div class="nav-i" data-v="docs"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Documents</div>
-    <div class="nav-i" data-v="coi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg> Co-indivisaires</div>
-    <div class="nav-i" data-v="juri"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7l14 0M7 7l-3 7a4 4 0 0 0 6 0L7 7zM17 7l-3 7a4 4 0 0 0 6 0L17 7z"/></svg> Conseil juridique</div>
+    <div class="nav-i active" data-v="dash"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</div>
+    <div class="nav-i" data-v="portfolio"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/><path d="M9 7h6"/></svg>Mon patrimoine</div>
+    <div class="nav-i" data-v="carte"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg>Carte des biens</div>
+
     <div class="nav-sep"></div>
-    <div class="nav-i" data-v="abo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Abonnement</div>
-    <!-- Tab admin — injecté dynamiquement si role=admin -->
-    <div class="nav-i admin-only" data-v="admin" id="nav-admin" style="display:none;background:rgba(92,107,192,.08);color:var(--bleu-violet)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Administration</div>
+    <span class="nav-section-label">Gestion</span>
+    <div class="nav-i" data-v="planning"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Planning</div>
+    <div class="nav-i" data-v="actions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Actions</div>
+    <div class="nav-i" data-v="budget"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>Budget</div>
+    <div class="nav-i" data-v="reunions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Réunions & AG</div>
+    <div class="nav-i" data-v="inventaire"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Inventaire</div>
+    <div class="nav-i" data-v="incidents"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidents</div>
+
+    <div class="nav-sep"></div>
+    <span class="nav-section-label">Ressources</span>
+    <div class="nav-i" data-v="docs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Documents</div>
+    <div class="nav-i" data-v="coi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Co-indivisaires</div>
+    <div class="nav-i" data-v="estim"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Simulations</div>
+    <div class="nav-i" data-v="juri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7l14 0M7 7l-3 7a4 4 0 0 0 6 0L7 7zM17 7l-3 7a4 4 0 0 0 6 0L17 7z"/></svg>Conseil juridique</div>
+
+    <div class="nav-sep"></div>
+    <div class="nav-i" data-v="profil"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Profil & compte</div>
+    <div class="nav-i admin-item" data-v="admin" id="nav-admin" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Administration</div>
   </aside>
 
+  <!-- ━━━━ MAIN ━━━━ -->
   <main>
-    <!-- ===== DASHBOARD ===== -->
+
+    <!-- TABLEAU DE BORD -->
     <div class="view active" id="v-dash">
+      <div class="page-head">
+        <div><h1 id="greet">Bonjour 👋</h1><p>Voici un résumé de votre patrimoine en indivision.</p></div>
+        <button class="btn btn-sm" onclick="go('portfolio')">Voir mon patrimoine →</button>
+      </div>
       <div class="banner">
-        <span style="font-size:1.6rem">✨</span>
-        <div><b>Accès complet activé</b><div style="font-size:.88rem;color:rgba(255,255,255,.9)">Toutes les fonctionnalités Divimo sont débloquées sur votre compte.</div></div>
-        <a class="btn btn-light" onclick="go('estim')">Faire une estimation</a>
+        <span style="font-size:1.4rem">🏛</span>
+        <div><b id="bannerTitle">Accès complet activé</b><p>Tous les outils Divimo sont disponibles sur votre compte.</p></div>
+        <button class="btn-banner" onclick="go('estim')">Lancer une simulation</button>
       </div>
-      <div class="h-row"><div><h1>Bonjour Marti 👋</h1><p>Voici un aperçu de votre indivision.</p></div></div>
       <div class="stats">
-        <div class="stat"><div class="ic" style="background:rgba(26,35,126,.1)">🏠</div><div class="v" id="kBiens">1</div><div class="l">Bien(s)</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(92,107,192,.12)">👥</div><div class="v" id="kCoi">3</div><div class="l">Co-indivisaires</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(165,196,189,.25)">📄</div><div class="v" id="kDocs">3</div><div class="l">Documents</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(242,153,74,.15)">📊</div><div class="v" id="kEstim">0</div><div class="l">Estimations</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="kBiens">—</div><div class="sl">Bien(s)</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">👥</div><div class="sv" id="kCoi">—</div><div class="sl">Co-indivisaires</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">📄</div><div class="sv" id="kDocs">—</div><div class="sl">Documents</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">📊</div><div class="sv" id="kEstim">—</div><div class="sl">Simulations</div></div>
       </div>
-      <div class="cols">
+      <div class="cols2">
         <div class="card">
-          <h3>Maison familiale — Annecy</h3><p class="csub">Valeur estimée : 320 000 € · Indivision successorale</p>
+          <div class="card-head"><div><div class="card-title" id="bien-dash-title">Maison familiale — Annecy</div><div class="card-sub">Indivision successorale · 3 parts</div></div></div>
           <div class="donut-wrap">
-            <svg width="140" height="140" viewBox="0 0 42 42" style="transform:rotate(-90deg)"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF0FB" stroke-width="6"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1A237E" stroke-width="6" stroke-dasharray="44.9 55.1" stroke-dashoffset="0"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#5C6BC0" stroke-width="6" stroke-dasharray="30 70" stroke-dashoffset="-44.9"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#19a974" stroke-width="6" stroke-dasharray="25.1 74.9" stroke-dashoffset="-74.9"/>
+            <svg width="130" height="130" viewBox="0 0 42 42" style="transform:rotate(-90deg);flex-shrink:0">
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF2F8" stroke-width="5.5"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2C5282" stroke-width="5.5" stroke-dasharray="44.9 55.1"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2D6A6A" stroke-width="5.5" stroke-dasharray="30 70" stroke-dashoffset="-44.9"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#4A7FB5" stroke-width="5.5" stroke-dasharray="25.1 74.9" stroke-dashoffset="-74.9"/>
             </svg>
             <div class="legend">
-              <span><i style="background:#1A237E"></i>Marti (45%)<b>144 000 €</b></span>
-              <span><i style="background:#5C6BC0"></i>Paul (30%)<b>96 000 €</b></span>
-              <span><i style="background:#19a974"></i>Léa (25%)<b>80 000 €</b></span>
+              <span><i style="background:#2C5282"></i>Marti (45%) <b id="p1">144 000 €</b></span>
+              <span><i style="background:#2D6A6A"></i>Paul (30%) <b id="p2">96 000 €</b></span>
+              <span><i style="background:#4A7FB5"></i>Léa (25%) <b id="p3">80 000 €</b></span>
             </div>
           </div>
         </div>
         <div class="card">
-          <h3>Raccourcis</h3><p class="csub">Tout ce dont vous avez besoin, en un clic.</p>
-          <div class="row-item" onclick="go('estim')" style="cursor:pointer"><div class="r-ic" style="background:rgba(92,107,192,.12)">📊</div><div><b>Faire une estimation</b><span>Valeur, parts, vente/rachat</span></div><span class="mini-link">Ouvrir →</span></div>
-          <div class="row-item" onclick="go('juri')" style="cursor:pointer"><div class="r-ic" style="background:rgba(165,196,189,.25)">⚖️</div><div><b>Parler à un notaire / avocat</b><span>Prenez rendez-vous</span></div><span class="mini-link">Ouvrir →</span></div>
-          <div class="row-item" onclick="go('docs')" style="cursor:pointer"><div class="r-ic" style="background:rgba(26,35,126,.1)">📄</div><div><b>Déposer un document</b><span>Coffre-fort sécurisé</span></div><span class="mini-link">Ouvrir →</span></div>
-          <div class="row-item" onclick="go('coi')" style="cursor:pointer"><div class="r-ic" style="background:rgba(242,153,74,.15)">✉️</div><div><b>Inviter un co-indivisaire</b><span>Partagez l'accès</span></div><span class="mini-link">Ouvrir →</span></div>
+          <div class="card-title">Raccourcis</div>
+          <div class="card-sub">Actions fréquentes</div>
+          <div class="row-item" onclick="go('estim')" style="cursor:pointer"><div class="r-ic" style="background:rgba(44,82,130,.1)">📊</div><div><b>Lancer une simulation</b><span>Estimation, parts, vente</span></div><span class="mini-link">→</span></div>
+          <div class="row-item" onclick="go('juri')" style="cursor:pointer"><div class="r-ic" style="background:rgba(45,106,106,.1)">⚖️</div><div><b>Consulter un expert</b><span>Notaire ou avocat</span></div><span class="mini-link">→</span></div>
+          <div class="row-item" onclick="go('docs')" style="cursor:pointer"><div class="r-ic" style="background:rgba(15,31,61,.07)">📄</div><div><b>Déposer un document</b><span>Coffre-fort sécurisé</span></div><span class="mini-link">→</span></div>
+          <div class="row-item" onclick="go('actions')" style="cursor:pointer"><div class="r-ic" style="background:rgba(74,127,181,.1)">✅</div><div><b>Mes actions en cours</b><span>Tâches et décisions</span></div><span class="mini-link">→</span></div>
         </div>
       </div>
     </div>
 
-    <!-- ===== BIENS ===== -->
-    <div class="view" id="v-biens">
-      <div class="h-row"><div><h1>Mes biens</h1><p>Les biens que vous gérez en indivision.</p></div><button class="btn" onclick="addBien()">+ Ajouter un bien</button></div>
-      <div class="card"><div id="biensList"></div></div>
+    <!-- MON PATRIMOINE -->
+    <div class="view" id="v-portfolio">
+      <div class="page-head">
+        <div><h1>Mon patrimoine</h1><p>Vue d'ensemble de tous vos biens en indivision.</p></div>
+        <button class="btn" onclick="addBien()">+ Ajouter un bien</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="ptBiens">—</div><div class="sl">Biens</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">💰</div><div class="sv" id="ptValeur">—</div><div class="sl">Valeur totale</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">👥</div><div class="sv" id="ptCoi">—</div><div class="sl">Co-indivisaires</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">📄</div><div class="sv" id="ptDocs">—</div><div class="sl">Documents</div></div>
+      </div>
+      <div class="portfolio-grid" id="portfolioGrid"></div>
     </div>
 
-    <!-- ===== CARTE ===== -->
+    <!-- CARTE -->
     <div class="view" id="v-carte">
-      <div class="h-row"><div><h1>Carte des biens</h1><p>Visualisez tous vos biens en indivision sur la carte.</p></div><button class="btn" onclick="addBienOnMap()">📍 Ajouter un bien sur la carte</button></div>
-      <div class="card">
-        <div class="map-hint">🗺️ Carte interactive — zoomez, déplacez, cliquez un repère pour les détails. Cliquez « Ajouter un bien sur la carte » puis sur la carte pour placer un nouveau bien.</div>
-        <div id="map"></div>
-        <div class="map-legend" id="mapLegend"></div>
+      <div class="page-head">
+        <div><h1>Carte des biens</h1><p>Localisation de vos biens en indivision.</p></div>
+        <button class="btn btn-sm" onclick="addBienOnMap()">📍 Placer un bien</button>
+      </div>
+      <div class="card"><div id="map"></div></div>
+    </div>
+
+    <!-- PLANNING -->
+    <div class="view" id="v-planning">
+      <div class="page-head">
+        <div><h1>Planning</h1><p>Échéances, réunions et dates importantes.</p></div>
+        <button class="btn" onclick="addEvent()">+ Ajouter</button>
+      </div>
+      <div class="planning-grid">
+        <div class="card">
+          <div class="card-title">À venir</div>
+          <div class="card-sub">Prochains événements</div>
+          <div id="eventsUpcoming"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Passés</div>
+          <div class="card-sub">Historique</div>
+          <div id="eventsPast"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ===== ESTIMATIONS ===== -->
-    <div class="view" id="v-estim">
-      <div class="h-row"><div><h1>Mes estimations</h1><p>Lancez un simulateur ou retrouvez vos résultats.</p></div></div>
-      <div class="tool-grid" style="margin-bottom:22px">
-        <a class="tool" href="simulateurs.html#estimer"><div class="ic">🏠</div><h4>Estimer son bien</h4><p>Évaluez la valeur de votre bien.</p></a>
-        <a class="tool" href="simulateurs.html#parts"><div class="ic">📊</div><h4>Calculer les parts</h4><p>Répartissez la valeur entre indivisaires.</p></a>
-        <a class="tool" href="simulateurs.html#vente"><div class="ic">🔑</div><h4>Vente / rachat</h4><p>Anticipez un partage ou une soulte.</p></a>
+    <!-- ACTIONS -->
+    <div class="view" id="v-actions">
+      <div class="page-head">
+        <div><h1>Actions</h1><p>Tâches et décisions à traiter.</p></div>
+        <button class="btn" onclick="addAction()">+ Ajouter</button>
       </div>
-      <div class="card">
-        <div class="h-row" style="margin-bottom:14px"><div><h3>Estimations enregistrées</h3></div><button class="btn btn-ghost btn-sm" onclick="addEstim()">+ Enregistrer une estimation</button></div>
-        <div id="estimList"></div>
+      <div class="cols2">
+        <div class="card">
+          <div class="card-title">En cours</div>
+          <div class="card-sub">Actions à réaliser</div>
+          <div id="actionsList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Terminées</div>
+          <div class="card-sub">Actions résolues</div>
+          <div id="actionsDone"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ===== DOCUMENTS ===== -->
+    <!-- BUDGET -->
+    <div class="view" id="v-budget">
+      <div class="page-head">
+        <div><h1>Budget</h1><p>Revenus, charges et solde par bien.</p></div>
+        <button class="btn" onclick="addTransaction()">+ Transaction</button>
+      </div>
+      <div class="budget-total" id="budgetTotals"></div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Transactions</div></div>
+        <div id="transactionsList"></div>
+      </div>
+    </div>
+
+    <!-- RÉUNIONS -->
+    <div class="view" id="v-reunions">
+      <div class="page-head">
+        <div><h1>Réunions & AG</h1><p>Comptes rendus et assemblées générales.</p></div>
+        <button class="btn" onclick="addReunion()">+ Nouvelle réunion</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Réunions enregistrées</div></div>
+        <div id="reunionsList"></div>
+      </div>
+    </div>
+
+    <!-- INVENTAIRE -->
+    <div class="view" id="v-inventaire">
+      <div class="page-head">
+        <div><h1>Inventaire</h1><p>Mobilier, équipements et objets de valeur.</p></div>
+        <button class="btn" onclick="addInventaire()">+ Ajouter un élément</button>
+      </div>
+      <div class="card"><div class="inv-grid" id="inventaireGrid"></div></div>
+    </div>
+
+    <!-- INCIDENTS -->
+    <div class="view" id="v-incidents">
+      <div class="page-head">
+        <div><h1>Incidents & Sinistres</h1><p>Suivi des problèmes et déclarations de sinistres.</p></div>
+        <button class="btn btn-sm" onclick="addIncident()" style="background:#B03030">+ Déclarer</button>
+      </div>
+      <div class="card"><div id="incidentsList"></div></div>
+    </div>
+
+    <!-- DOCUMENTS -->
     <div class="view" id="v-docs">
-      <div class="h-row"><div><h1>Documents</h1><p>Votre coffre-fort, centralisé et sécurisé.</p></div></div>
+      <div class="page-head">
+        <div><h1>Documents</h1><p>Coffre-fort numérique de l'indivision.</p></div>
+      </div>
       <div class="card">
-        <div class="drop" id="drop"><div class="big">⬆️</div><b>Glissez un fichier ici</b><br>ou cliquez pour déposer un document</div>
+        <div class="drop-zone" id="dropZone">
+          <div class="dz-ico">⬆️</div>
+          <b>Glissez un fichier ici</b><br>
+          <span style="font-size:.82rem">ou cliquez pour déposer</span>
+        </div>
         <div id="docsList"></div>
       </div>
     </div>
 
-    <!-- ===== CO-INDIVISAIRES ===== -->
+    <!-- CO-INDIVISAIRES -->
     <div class="view" id="v-coi">
-      <div class="h-row"><div><h1>Co-indivisaires</h1><p>Les membres de votre indivision.</p></div><button class="btn" onclick="inviteCoi()">+ Inviter</button></div>
+      <div class="page-head">
+        <div><h1>Co-indivisaires</h1><p>Membres de votre indivision.</p></div>
+        <button class="btn" onclick="inviteCoi()">+ Inviter</button>
+      </div>
       <div class="card"><div id="coiList"></div></div>
     </div>
 
-    <!-- ===== JURIDIQUE ===== -->
+    <!-- SIMULATIONS -->
+    <div class="view" id="v-estim">
+      <div class="page-head"><div><h1>Simulations</h1><p>Lancez un simulateur ou retrouvez vos résultats enregistrés.</p></div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+        <a class="card" href="simulateurs.html" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">🏠</div><div class="card-title" style="font-size:.92rem">Estimer un bien</div></a>
+        <a class="card" href="simulateurs.html#parts" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">📊</div><div class="card-title" style="font-size:.92rem">Calculer les parts</div></a>
+        <a class="card" href="simulateurs.html#vente" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">🔑</div><div class="card-title" style="font-size:.92rem">Vente & rachat</div></a>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Simulations enregistrées</div><button class="btn btn-ghost btn-sm" onclick="addEstim()">+ Enregistrer</button></div>
+        <div id="estimList"></div>
+      </div>
+    </div>
+
+    <!-- JURIDIQUE -->
     <div class="view" id="v-juri">
-      <div class="h-row"><div><h1>Conseil juridique</h1><p>Échangez avec un notaire ou un avocat spécialisé.</p></div></div>
+      <div class="page-head"><div><h1>Conseil juridique</h1><p>Experts disponibles pour votre indivision.</p></div></div>
       <div class="card">
-        <h3>Nos experts disponibles</h3><p class="csub">Un premier échange sans engagement.</p>
-        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#1A237E,#5C6BC0)">MD</div><div><b>Maître Dubois</b><span>Notaire · Indivision &amp; successions</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Dubois')">Rendez-vous</button></div></div>
-        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#5C6BC0,#A5C4BD)">ML</div><div><b>Maître Lambert</b><span>Avocate · Droit immobilier &amp; médiation</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Lambert')">Rendez-vous</button></div></div>
-        <div class="pro-row"><div class="pro-av" style="background:linear-gradient(135deg,#19a974,#A5C4BD)">MR</div><div><b>Maître Roux</b><span>Notaire · Rachat de parts</span></div><div class="row-act"><span class="pill ok">Dispo</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Roux')">Rendez-vous</button></div></div>
+        <div class="card-title">Nos experts</div>
+        <div class="card-sub">Premier échange sans engagement.</div>
+        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#0F1F3D,#2C5282);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">MD</div><div><b>Maître Dubois</b><span>Notaire · Indivision & successions</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Dubois')">Rendez-vous</button></div></div>
+        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#2D6A6A,#4A9B8E);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">ML</div><div><b>Maître Lambert</b><span>Avocate · Droit immobilier & médiation</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Lambert')">Rendez-vous</button></div></div>
+        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#1E3A5F,#2D6A6A);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">MR</div><div><b>Maître Roux</b><span>Notaire · Rachat de parts</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Roux')">Rendez-vous</button></div></div>
       </div>
-      <div class="card">
-        <h3>Mes rendez-vous</h3><p class="csub">Vos demandes de consultation.</p>
-        <div id="rdvList"></div>
+      <div class="card"><div class="card-head"><div class="card-title">Mes rendez-vous</div></div><div id="rdvList"></div></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="view" id="v-profil">
+      <div class="page-head"><div><h1>Profil & compte</h1><p>Vos informations personnelles.</p></div></div>
+      <div class="card" style="max-width:560px">
+        <div class="card-title">Identité</div>
+        <div class="card-sub">Informations de votre compte Divimo.</div>
+        <div class="row-item">
+          <div class="r-ic" style="background:linear-gradient(135deg,var(--navy),var(--accent));color:#fff;font-family:'Montserrat';font-weight:700" id="profilAv">—</div>
+          <div><b id="profilName">—</b><span id="profilEmail">—</span></div>
+          <span class="row-act"><span class="mini-link" onclick="toast('Édition du profil — bientôt disponible.')">Modifier</span></span>
+        </div>
+      </div>
+      <div class="card" style="max-width:560px">
+        <div class="card-title">Formule</div>
+        <div class="card-sub">Votre accès actuel.</div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(44,82,130,.1)">⭐</div><div><b>Accès complet</b><span>Tous les modules inclus</span></div><span class="pill pill-info">Actif</span></div>
       </div>
     </div>
 
-    <!-- ===== ABONNEMENT ===== -->
-    <div class="view" id="v-abo">
-      <div class="h-row"><div><h1>Abonnement &amp; profil</h1><p>Votre compte Divimo.</p></div></div>
-      <div class="card" style="max-width:600px">
-        <h3>Profil</h3><p class="csub">Vos informations personnelles.</p>
-        <div class="row-item"><div class="pro-av" style="background:linear-gradient(135deg,#1A237E,#5C6BC0)">MF</div><div><b>Marti Fiatte</b><span>marti@email.com</span></div><span class="row-act"><span class="mini-link" onclick="toast('✏️ Édition du profil — démo')">Modifier</span></span></div>
-      </div>
-      <div class="card" style="max-width:600px">
-        <h3>Votre formule</h3><p class="csub">Accès complet (projet étudiant).</p>
-        <div class="row-item"><div class="r-ic" style="background:rgba(92,107,192,.12)">⭐</div><div><b>Accès complet — démo</b><span>Toutes les fonctionnalités débloquées</span></div><span class="pill full">Tout inclus</span></div>
-        <p style="font-size:.82rem;color:var(--texte-doux);margin-top:12px">ℹ️ Dans la version finale, certaines fonctionnalités passeront en accès payant (offres Particuliers / Professionnels).</p>
-        <a href="offres.html" class="btn btn-ghost btn-sm" style="margin-top:10px">Voir les offres</a>
-      </div>
-    </div>
-    <!-- ===== ADMIN ===== -->
+    <!-- ADMINISTRATION -->
     <div class="view" id="v-admin">
-      <div class="h-row"><div><h1>⭐ Administration</h1><p>Panneau réservé — accès propriétaire du site.</p></div></div>
-
-      <div class="card" style="background:linear-gradient(135deg,rgba(26,35,126,.06),rgba(92,107,192,.08));border-color:rgba(92,107,192,.25)">
-        <h3>👋 Bienvenue, Marti</h3>
-        <p class="csub">Tu es connecté en tant qu'administrateur de Divimo. Seul ton compte a accès à cette section.</p>
+      <div class="page-head"><div><h1>Administration</h1><p>Panneau propriétaire — accès exclusif.</p></div></div>
+      <div class="card" style="background:rgba(15,31,61,.03);border-color:rgba(44,82,130,.2)">
+        <div class="card-title">Bienvenue, <span id="adminName">—</span></div>
+        <div class="card-sub">Vous êtes connecté en tant qu'administrateur de Divimo.</div>
       </div>
-
       <div class="stats">
-        <div class="stat"><div class="ic" style="background:rgba(26,35,126,.1)">👥</div><div class="v" id="admin-users">—</div><div class="l">Utilisateurs inscrits</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(92,107,192,.12)">📅</div><div class="v" id="admin-today">—</div><div class="l">Inscrits aujourd'hui</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(165,196,189,.25)">✅</div><div class="v" id="admin-confirmed">—</div><div class="l">Emails confirmés</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(242,153,74,.15)">🔐</div><div class="v">Admin</div><div class="l">Ton rôle</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">👥</div><div class="sv" id="admin-users">—</div><div class="sl">Utilisateurs inscrits</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">📅</div><div class="sv" id="admin-today">—</div><div class="sl">Inscrits aujourd'hui</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">✅</div><div class="sv" id="admin-confirmed">—</div><div class="sl">Confirmés</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">🔐</div><div class="sv">Admin</div><div class="sl">Votre rôle</div></div>
       </div>
-
       <div class="card">
-        <div class="h-row" style="margin-bottom:14px">
-          <div><h3>Utilisateurs inscrits</h3><p class="csub">Liste des comptes créés sur Divimo.</p></div>
+        <div class="card-head">
+          <div><div class="card-title">Utilisateurs inscrits</div></div>
           <button class="btn btn-ghost btn-sm" onclick="loadAdminData()" id="admin-refresh-btn">↻ Actualiser</button>
         </div>
-        <div id="admin-user-list"><div class="empty">Chargement…</div></div>
+        <div id="admin-user-list"><div class="empty"><div class="empty-ic">👥</div>Chargement…</div></div>
       </div>
-
-      <div class="card">
-        <h3>Liens rapides — Administration</h3>
-        <p class="csub">Accès direct aux outils Supabase et Vercel.</p>
-        <div class="row-item"><div class="r-ic" style="background:rgba(26,35,126,.1)">🗄</div><div><b>Supabase Dashboard</b><span>Base de données, utilisateurs, logs</span></div><a href="https://supabase.com/dashboard/project/anrwoxsibhabivtkepqt" target="_blank" class="mini-link">Ouvrir →</a></div>
-        <div class="row-item"><div class="r-ic" style="background:rgba(92,107,192,.12)">▲</div><div><b>Vercel Dashboard</b><span>Déploiements, analytics, logs</span></div><a href="https://vercel.com/martifiatte-2970s-projects/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
-        <div class="row-item"><div class="r-ic" style="background:rgba(165,196,189,.25)">🐙</div><div><b>GitHub — divimo</b><span>Code source, branches, pull requests</span></div><a href="https://github.com/martifiatte/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
+      <div class="card admin-links">
+        <div class="card-title">Liens rapides</div>
+        <div class="card-sub">Accès direct aux outils de gestion.</div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(15,31,61,.07)">🗄</div><div><b>Supabase</b><span>Base de données, utilisateurs, logs</span></div><a href="https://supabase.com/dashboard/project/anrwoxsibhabivtkepqt" target="_blank" class="mini-link">Ouvrir →</a></div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(44,82,130,.1)">▲</div><div><b>Vercel</b><span>Déploiements, analytics</span></div><a href="https://vercel.com/martifiatte-2970s-projects/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(45,106,106,.1)">🐙</div><div><b>GitHub</b><span>Code source, branches</span></div><a href="https://github.com/martifiatte/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
       </div>
     </div>
+
   </main>
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* ===================== AUTH (Supabase) ===================== */
-const STATE_KEY='divimo_state';
+/* ━━━━ AUTH ━━━━ */
+const STATE_KEY = 'divimo_state';
 function ssGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function ssSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-
 async function logout(){await sb.auth.signOut();window.location.href='connexion.html';}
 
 function applyUser(user){
-  const meta=user.user_metadata||{};
-  const prenom=(meta.prenom||'').trim();
-  const nom=(meta.nom||'').trim();
-  const displayName=prenom||(user.email||'').split('@')[0];
-  const initials=((prenom[0]||'')+(nom[0]||'')).toUpperCase()||displayName.slice(0,2).toUpperCase();
-  const isAdmin=meta.role==='admin';
-  const el=id=>document.getElementById(id);
-  if(el('chipAv'))el('chipAv').textContent=initials;
-  if(el('chipName'))el('chipName').textContent=displayName+(isAdmin?' 👑':'');
-  const greet=document.querySelector('#v-dash .h-row h1');
-  if(greet)greet.textContent='Bonjour '+displayName+' 👋';
-  const profAv=document.querySelector('#v-abo .pro-av');
-  if(profAv){
-    profAv.textContent=initials;
-    const sib=profAv.nextElementSibling;
-    const nameEl=sib?.querySelector('b');
-    const emailEl=sib?.querySelector('span');
-    if(nameEl)nameEl.textContent=[prenom,nom].filter(Boolean).join(' ')||displayName;
-    if(emailEl)emailEl.textContent=user.email||'';
-  }
-  /* Afficher le tab admin uniquement pour l'admin */
+  const m = user.user_metadata || {};
+  const prenom = (m.prenom||'').trim();
+  const nom = (m.nom||'').trim();
+  const name = prenom || user.email.split('@')[0];
+  const initials = ((prenom[0]||'')+(nom[0]||'')).toUpperCase() || name.slice(0,2).toUpperCase();
+  const isAdmin = m.role === 'admin';
+
+  document.getElementById('chipAv').textContent = initials;
+  document.getElementById('chipName').textContent = name + (isAdmin?' 👑':'');
+  document.getElementById('greet').textContent = 'Bonjour, ' + name + ' 👋';
+  document.getElementById('profilAv').textContent = initials;
+  document.getElementById('profilName').textContent = [prenom,nom].filter(Boolean).join(' ') || name;
+  document.getElementById('profilEmail').textContent = user.email;
   if(isAdmin){
-    const navAdmin=el('nav-admin');
-    if(navAdmin)navAdmin.style.display='flex';
-    /* Bannière dashboard admin */
-    const banner=document.querySelector('.banner div b');
-    if(banner)banner.textContent='Espace Administrateur activé';
+    document.getElementById('nav-admin').style.display = 'flex';
+    document.getElementById('adminName').textContent = name;
+    document.getElementById('bannerTitle').textContent = 'Espace Administrateur';
   }
 }
 
 (async()=>{
-  const {data:{session}}=await sb.auth.getSession();
+  const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='connexion.html';return;}
   applyUser(session.user);
+  renderAll();
 })();
 
-/* ===================== TOAST ===================== */
-let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+/* ━━━━ TOAST ━━━━ */
+let _tt;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(()=>t.classList.remove('show'),2800);
+}
 
-/* ===================== NAV ===================== */
+/* ━━━━ NAV ━━━━ */
 function go(v){
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.toggle('active',n.dataset.v===v));
   document.querySelectorAll('.view').forEach(w=>w.classList.toggle('active',w.id==='v-'+v));
@@ -355,162 +579,333 @@ function go(v){
   if(v==='carte')setTimeout(initMap,80);
   if(v==='admin'){loadAdminData();clearInterval(window._adminTimer);window._adminTimer=setInterval(loadAdminData,30000);}
 }
-
-async function loadAdminData(){
-  /* Compte utilisateurs via la table profiles si elle existe */
-  try{
-    const {data,error}=await sb.from('profiles').select('id,email,prenom,nom,created_at',{count:'exact'});
-    if(error||!data)throw error;
-    const today=new Date().toISOString().slice(0,10);
-    const todayCount=data.filter(u=>u.created_at?.startsWith(today)).length;
-    const confirmedCount=data.length;
-    document.getElementById('admin-users').textContent=data.length;
-    document.getElementById('admin-today').textContent=todayCount;
-    document.getElementById('admin-confirmed').textContent=confirmedCount;
-    document.getElementById('admin-user-list').innerHTML=data.map((u,i)=>`
-      <div class="row-item">
-        <div class="pro-av" style="background:linear-gradient(135deg,#5C6BC0,#7986CB)">${((u.prenom||u.email||'?')[0]).toUpperCase()}</div>
-        <div><b>${[u.prenom,u.nom].filter(Boolean).join(' ')||u.email}</b><span>${u.email} · ${u.created_at?new Date(u.created_at).toLocaleDateString('fr-FR'):''}</span></div>
-        ${u.email==='martifiatte@gmail.com'?'<span class="pill full">Admin</span>':'<span class="pill ok">Utilisateur</span>'}
-      </div>`).join('');
-  }catch(e){
-    /* Si la table profiles n'existe pas encore, afficher message */
-    document.getElementById('admin-users').textContent='—';
-    document.getElementById('admin-today').textContent='—';
-    document.getElementById('admin-confirmed').textContent='—';
-    document.getElementById('admin-user-list').innerHTML=`
-      <div class="empty" style="text-align:left;padding:16px 0">
-        ℹ️ Les statistiques d'utilisateurs seront disponibles une fois la table <code>profiles</code> configurée dans Supabase.<br>
-        <a href="https://supabase.com/dashboard/project/anrwoxsibhabivtkepqt/editor" target="_blank" class="mini-link" style="margin-top:8px;display:inline-block">Ouvrir l'éditeur SQL →</a>
-      </div>`;
-  }
-}
 document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
 
-/* ===================== DONNÉES PERSISTANTES ===================== */
-const DEFAULT={
-  biens:[{nom:'Maison familiale — Annecy',info:'74000 Annecy · 120 m² · Indivision successorale',val:'320 000 €',lat:45.8992,lng:6.1294}],
-  docs:[{name:'Acte notarié.pdf',meta:'Ajouté par Marti · 2,4 Mo',ic:'📄'},{name:'Factures travaux 2025.zip',meta:'Partagé · 8 fichiers',ic:'🧾'},{name:'Relevé de charges.xlsx',meta:'Mis à jour hier',ic:'📊'}],
-  coi:[{n:'Marti Fiatte (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'soon'}],
-  estim:[],
-  rdv:[]
+/* ━━━━ STATE ━━━━ */
+const DEFAULT = {
+  biens:[{nom:'Maison familiale — Annecy',info:'74000 Annecy · 120 m²',val:'320 000 €',lat:45.8992,lng:6.1294}],
+  docs:[{name:'Acte notarié.pdf',meta:'Marie · 2,4 Mo',ic:'📄'},{name:'Factures travaux 2025',meta:'8 fichiers',ic:'🧾'},{name:'Relevé de charges.xlsx',meta:'Hier',ic:'📊'}],
+  coi:[{n:'Marti (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'pill-ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'pill-warn'}],
+  estim:[],rdv:[],
+  events:[
+    {titre:'Réunion annuelle co-indivisaires',date:'2026-07-15',type:'reunion',lieu:'Annecy'},
+    {titre:'Échéance taxe foncière',date:'2026-10-15',type:'echeance',lieu:''},
+    {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy'},
+  ],
+  actions:[
+    {titre:'Signer le mandat de vente',meta:'Assigné à Marie · Urgent',done:false},
+    {titre:'Régler la facture plomberie',meta:'580 € · Paul',done:false},
+    {titre:'Demander devis toiture',meta:'À chiffrer',done:true},
+  ],
+  transactions:[
+    {desc:'Taxe foncière 2025',cat:'Charge',bien:'Maison Annecy',montant:-2400,ic:'🏛'},
+    {desc:'Loyer saisonnier',cat:'Revenu',bien:'Maison Annecy',montant:1800,ic:'💰'},
+    {desc:'Facture plomberie',cat:'Entretien',bien:'Maison Annecy',montant:-580,ic:'🔧'},
+    {desc:'Charges copropriété',cat:'Charge',bien:'Appt. Lyon',montant:-340,ic:'🏢'},
+  ],
+  reunions:[
+    {titre:'AG constitutive — Indivision Annecy',date:'2025-11-10',desc:'Vote à l\'unanimité pour la désignation d\'un gérant. PV signé par les 3 indivisaires.'},
+    {titre:'Réunion entretien toiture',date:'2026-03-22',desc:'Décision de reporter les travaux à l\'automne. Devis demandé à 2 entreprises.'},
+  ],
+  inventaire:[
+    {nom:'Canapé 3 places',val:'800 €',ic:'🛋'},
+    {nom:'Réfrigérateur',val:'650 €',ic:'🧊'},
+    {nom:'Table de jardin',val:'320 €',ic:'🌿'},
+    {nom:'Lit king size',val:'1 200 €',ic:'🛏'},
+    {nom:'Télévision 65"',val:'900 €',ic:'📺'},
+    {nom:'Lave-linge',val:'480 €',ic:'🫧'},
+  ],
+  incidents:[
+    {titre:'Fuite sous-sol',meta:'Signalé par Paul · 12/03/2026',st:'En cours',ic:'💧',stCls:'pill-warn'},
+    {titre:'Gouttière endommagée',meta:'Signalé par Marti · 05/01/2026',st:'Résolu',ic:'🌧',stCls:'pill-ok'},
+  ],
 };
-let S=load();
-function load(){try{return Object.assign(JSON.parse(JSON.stringify(DEFAULT)),JSON.parse(ssGet(STATE_KEY)||'{}'));}catch(e){return JSON.parse(JSON.stringify(DEFAULT));}}
+let S = load();
+function load(){
+  try{return Object.assign(JSON.parse(JSON.stringify(DEFAULT)),JSON.parse(ssGet(STATE_KEY)||'{}'));}
+  catch(e){return JSON.parse(JSON.stringify(DEFAULT));}
+}
 function save(){ssSet(STATE_KEY,JSON.stringify(S));renderAll();}
-const ICONS=['📄','🧾','📊','📑','🖼️'];const TINTS=['rgba(26,35,126,.1)','rgba(92,107,192,.12)','rgba(165,196,189,.22)','rgba(242,153,74,.15)'];
 
-/* ===================== RENDERERS ===================== */
-function renderAll(){renderBiens();renderDocs();renderCoi();renderEstim();renderRdv();renderKpis();if(typeof renderMap==='function'&&map)renderMap();}
+const PAL=['#2C5282','#2D6A6A','#4A7FB5','#4A9B8E','#1E3A5F','#3D7A7A'];
+const ICONS=['📄','🧾','📊','📑','🖼️'];
+
+/* ━━━━ RENDERERS ━━━━ */
+function renderAll(){
+  renderKpis(); renderPortfolio(); renderDocs(); renderCoi();
+  renderEstim(); renderRdv(); renderEvents(); renderActions();
+  renderBudget(); renderReunions(); renderInventaire(); renderIncidents();
+}
+
 function renderKpis(){
-  document.getElementById('kBiens').textContent=S.biens.length;
-  document.getElementById('kCoi').textContent=S.coi.length;
-  document.getElementById('kDocs').textContent=S.docs.length;
-  document.getElementById('kEstim').textContent=S.estim.length;
+  const v = S.biens[0]?.val || '—';
+  document.getElementById('kBiens').textContent = S.biens.length;
+  document.getElementById('kCoi').textContent = S.coi.length;
+  document.getElementById('kDocs').textContent = S.docs.length;
+  document.getElementById('kEstim').textContent = S.estim.length;
+  document.getElementById('ptBiens').textContent = S.biens.length;
+  document.getElementById('ptCoi').textContent = S.coi.length;
+  document.getElementById('ptDocs').textContent = S.docs.length;
+  // valeur totale (somme grossière)
+  const totalStr = S.biens.map(b=>(b.val||'0').replace(/\s|€/g,'').replace(',','.')).reduce((a,b)=>a+(parseFloat(b)||0),0);
+  document.getElementById('ptValeur').textContent = totalStr.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €';
 }
-function renderBiens(){
-  document.getElementById('biensList').innerHTML=S.biens.map((b,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(26,35,126,.08)">🏡</div><div><b>${b.nom}</b><span>${b.info}</span></div><div class="row-act"><span class="pill ok">${b.val}</span>${i>0?`<span class="del" onclick="rm('biens',${i})">×</span>`:''}</div></div>`).join('')
-    || '<div class="empty">Aucun bien pour l\'instant.</div>';
-}
-function renderDocs(){
-  document.getElementById('docsList').innerHTML=S.docs.map((d,i)=>`<div class="row-item"><div class="r-ic" style="background:${TINTS[i%TINTS.length]}">${d.ic||'📄'}</div><div><b>${d.name}</b><span>${d.meta}</span></div><div class="row-act"><span class="mini-link" onclick="toast('📥 Téléchargement (démo)')">Télécharger</span><span class="del" onclick="rm('docs',${i})">×</span></div></div>`).join('')
-    || '<div class="empty">Aucun document. Déposez votre premier fichier ci-dessus.</div>';
-}
-function renderCoi(){
-  document.getElementById('coiList').innerHTML=S.coi.map((c,i)=>`<div class="row-item"><div class="pro-av" style="background:linear-gradient(135deg,#5C6BC0,#7986CB)">${c.ini}</div><div><b>${c.n}</b><span>${c.r}</span></div><div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="rm('coi',${i})">×</span>`:''}</div></div>`).join('');
-}
-function renderEstim(){
-  document.getElementById('estimList').innerHTML=S.estim.map((e,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(92,107,192,.12)">📊</div><div><b>${e.titre}</b><span>${e.detail}</span></div><div class="row-act"><span class="del" onclick="rm('estim',${i})">×</span></div></div>`).join('')
-    || '<div class="empty">Aucune estimation enregistrée. Lancez un simulateur ci-dessus.</div>';
-}
-function renderRdv(){
-  document.getElementById('rdvList').innerHTML=S.rdv.map((r,i)=>`<div class="row-item"><div class="r-ic" style="background:rgba(165,196,189,.25)">⚖️</div><div><b>${r.pro}</b><span>${r.when}</span></div><div class="row-act"><span class="pill soon">En attente</span><span class="del" onclick="rm('rdv',${i})">×</span></div></div>`).join('')
-    || '<div class="empty">Aucun rendez-vous. Demandez une consultation ci-dessus.</div>';
-}
-function rm(key,i){S[key].splice(i,1);save();}
 
-/* ===================== ACTIONS ===================== */
-// Petit annuaire de villes (lat,lng) pour situer un bien sans service externe
-const VILLES={paris:[48.8566,2.3522],lyon:[45.7640,4.8357],marseille:[43.2965,5.3698],annecy:[45.8992,6.1294],bordeaux:[44.8378,-0.5792],lille:[50.6292,3.0573],toulouse:[43.6047,1.4442],nantes:[47.2184,-1.5536],nice:[43.7102,7.2620],strasbourg:[48.5734,7.7521],rennes:[48.1173,-1.6778],montpellier:[43.6108,3.8767],grenoble:[45.1885,5.7245],dijon:[47.3220,5.0415],chambery:[45.5646,5.9178],aix:[43.5297,5.4474]};
-function geocodeVille(txt){
-  const k=(txt||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-  for(const v in VILLES){if(k.includes(v))return VILLES[v];}
-  // sinon, un point au centre de la France avec léger décalage aléatoire
-  return [46.6+(Math.random()-.5)*2,2.4+(Math.random()-.5)*3];
+function renderPortfolio(){
+  const g = document.getElementById('portfolioGrid');
+  if(!g) return;
+  g.innerHTML = S.biens.map((b,i)=>`
+    <div class="bien-card" onclick="toast('${b.nom}')">
+      <div class="bien-card-ico">🏠</div>
+      <div class="bien-card-name">${b.nom}</div>
+      <div class="bien-card-meta">${b.info}</div>
+      <div class="bien-card-val">${b.val}</div>
+      <div class="bien-card-pills">
+        <span class="pill pill-ok">${S.coi.length} indivisaires</span>
+        <span class="pill pill-info">${S.docs.length} docs</span>
+        ${i>0?`<span class="del" onclick="event.stopPropagation();S.biens.splice(${i},1);save()" title="Supprimer">×</span>`:''}
+      </div>
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien. Ajoutez votre premier bien ci-dessus.</div>';
 }
+
+function renderDocs(){
+  const el = document.getElementById('docsList');
+  if(!el) return;
+  el.innerHTML = S.docs.map((d,i)=>`
+    <div class="row-item">
+      <div class="r-ic" style="background:rgba(44,82,130,.08)">${d.ic||'📄'}</div>
+      <div><b>${d.name}</b><span>${d.meta}</span></div>
+      <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="S.docs.splice(${i},1);save()">×</span></div>
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">📁</div>Aucun document. Déposez votre premier fichier.</div>';
+}
+
+function renderCoi(){
+  const el = document.getElementById('coiList');
+  if(!el) return;
+  el.innerHTML = S.coi.map((c,i)=>`
+    <div class="row-item">
+      <div class="r-ic" style="background:linear-gradient(135deg,${PAL[i%PAL.length]},${PAL[(i+1)%PAL.length]});color:#fff;font-family:'Montserrat';font-weight:700;font-size:.75rem">${c.ini}</div>
+      <div><b>${c.n}</b><span>${c.r}</span></div>
+      <div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="S.coi.splice(${i},1);save()">×</span>`:''}</div>
+    </div>`).join('');
+}
+
+function renderEstim(){
+  const el = document.getElementById('estimList');
+  if(!el) return;
+  el.innerHTML = S.estim.map((e,i)=>`
+    <div class="row-item">
+      <div class="r-ic" style="background:rgba(44,82,130,.1)">📊</div>
+      <div><b>${e.titre}</b><span>${e.detail}</span></div>
+      <div class="row-act"><span class="del" onclick="S.estim.splice(${i},1);save()">×</span></div>
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">📊</div>Aucune simulation enregistrée.</div>';
+}
+
+function renderRdv(){
+  const el = document.getElementById('rdvList');
+  if(!el) return;
+  el.innerHTML = S.rdv.map((r,i)=>`
+    <div class="row-item">
+      <div class="r-ic" style="background:rgba(45,106,106,.1)">⚖️</div>
+      <div><b>${r.pro}</b><span>${r.when}</span></div>
+      <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="S.rdv.splice(${i},1);save()">×</span></div>
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">⚖️</div>Aucun rendez-vous planifié.</div>';
+}
+
+function renderEvents(){
+  const now = new Date().toISOString().slice(0,10);
+  const up = S.events.filter(e=>e.date>=now).sort((a,b)=>a.date.localeCompare(b.date));
+  const ps = S.events.filter(e=>e.date<now).sort((a,b)=>b.date.localeCompare(a.date));
+  const fmt = d=>{const dt=new Date(d);return {day:dt.getDate(),month:dt.toLocaleString('fr-FR',{month:'short'})}};
+  const row = (e,i,arr)=>{const f=fmt(e.date);return`<div class="event-item"><div class="event-date"><div class="day">${f.day}</div><div class="month">${f.month}</div></div><div class="event-info"><b>${e.titre}</b><span>${e.lieu||'—'} <span class="pill pill-info" style="margin-left:4px">${e.type}</span></span></div><span class="del" onclick="S.events.splice(${i+(arr===ps?up.length:0)},1);save()">×</span></div>`;};
+  const uel=document.getElementById('eventsUpcoming');const pel=document.getElementById('eventsPast');
+  if(uel) uel.innerHTML = up.map((e,i)=>row(e,i,up)).join('') || '<div class="empty">Aucun événement à venir.</div>';
+  if(pel) pel.innerHTML = ps.map((e,i)=>row(e,i,ps)).join('') || '<div class="empty">Aucun événement passé.</div>';
+}
+
+function renderActions(){
+  const todo = S.actions.filter(a=>!a.done);
+  const done = S.actions.filter(a=>a.done);
+  const row=(a,i)=>`<div class="action-item${a.done?' done':''}">
+    <div class="action-check${a.done?' done':''}" onclick="S.actions[${i}].done=!S.actions[${i}].done;save()">${a.done?'✓':''}</div>
+    <div><div class="action-title">${a.titre}</div><div class="action-meta">${a.meta}</div></div>
+    <div class="action-right"><span class="del" onclick="S.actions.splice(${i},1);save()">×</span></div>
+  </div>`;
+  const al=document.getElementById('actionsList');const dl=document.getElementById('actionsDone');
+  if(al) al.innerHTML=todo.map((a,i)=>row(a,S.actions.indexOf(a))).join('')||'<div class="empty">Aucune action en cours.</div>';
+  if(dl) dl.innerHTML=done.map((a,i)=>row(a,S.actions.indexOf(a))).join('')||'<div class="empty">Aucune action terminée.</div>';
+}
+
+function renderBudget(){
+  const revenus=S.transactions.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
+  const charges=S.transactions.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0);
+  const solde=revenus+charges;
+  const el=document.getElementById('budgetTotals');
+  if(el) el.innerHTML=`
+    <div class="bt-card green"><div class="label">Revenus</div><div class="amount">+${revenus.toLocaleString('fr-FR')} €</div></div>
+    <div class="bt-card red"><div class="label">Charges</div><div class="amount">${charges.toLocaleString('fr-FR')} €</div></div>
+    <div class="bt-card ${solde>=0?'green':'red'}"><div class="label">Solde</div><div class="amount">${solde>=0?'+':''}${solde.toLocaleString('fr-FR')} €</div></div>`;
+  const tl=document.getElementById('transactionsList');
+  if(tl) tl.innerHTML=S.transactions.map((t,i)=>`
+    <div class="trans-row">
+      <div class="trans-ico" style="background:${t.montant>=0?'rgba(45,106,106,.1)':'rgba(180,60,60,.08)'}">${t.ic}</div>
+      <div class="trans-desc"><b>${t.desc}</b><span>${t.cat} · ${t.bien}</span></div>
+      <div class="trans-amount ${t.montant>=0?'pos':'neg'}">${t.montant>=0?'+':''}${t.montant.toLocaleString('fr-FR')} €</div>
+      <span class="del" onclick="S.transactions.splice(${i},1);save()">×</span>
+    </div>`).join('')||'<div class="empty">Aucune transaction enregistrée.</div>';
+}
+
+function renderReunions(){
+  const el=document.getElementById('reunionsList');
+  if(!el) return;
+  el.innerHTML=S.reunions.map((r,i)=>`
+    <div class="reunion-item">
+      <div class="reunion-head"><div class="reunion-title">${r.titre}</div><div style="display:flex;gap:8px;align-items:center"><span class="reunion-date">${new Date(r.date).toLocaleDateString('fr-FR')}</span><span class="del" onclick="S.reunions.splice(${i},1);save()">×</span></div></div>
+      <div class="reunion-desc">${r.desc}</div>
+    </div>`).join('')||'<div class="empty">Aucune réunion enregistrée.</div>';
+}
+
+function renderInventaire(){
+  const el=document.getElementById('inventaireGrid');
+  if(!el) return;
+  el.innerHTML=S.inventaire.map((it,i)=>`
+    <div class="inv-item">
+      <div class="inv-ico">${it.ic}</div>
+      <div class="inv-name">${it.nom}</div>
+      <div class="inv-val">${it.val} <span class="del" style="float:right" onclick="S.inventaire.splice(${i},1);save()">×</span></div>
+    </div>`).join('')||'<div class="empty" style="grid-column:1/-1">Aucun élément dans l\'inventaire.</div>';
+}
+
+function renderIncidents(){
+  const el=document.getElementById('incidentsList');
+  if(!el) return;
+  el.innerHTML=S.incidents.map((inc,i)=>`
+    <div class="incident-item">
+      <div class="incident-ico" style="background:rgba(180,60,60,.08)">${inc.ic}</div>
+      <div><span class="incident-title">${inc.titre}</span><span class="incident-meta">${inc.meta}</span></div>
+      <div class="incident-right"><span class="pill ${inc.stCls}">${inc.st}</span></div>
+      <span class="del" style="margin-left:8px" onclick="S.incidents.splice(${i},1);save()">×</span>
+    </div>`).join('')||'<div class="empty">Aucun incident signalé.</div>';
+}
+
+/* ━━━━ ACTIONS ━━━━ */
 function addBien(){
-  const nom=prompt('Nom du bien :','Appartement — Lyon');if(!nom)return;
-  const ville=prompt('Ville du bien (pour la carte) :','Lyon')||'';
+  const nom=prompt('Nom du bien :','');if(!nom)return;
+  const info=prompt('Localisation / description :','')||'';
   const val=prompt('Valeur estimée :','250 000 €')||'—';
-  const c=geocodeVille(ville+' '+nom);
-  S.biens.push({nom,info:(ville?ville+' · ':'')+'Ajouté à l\'instant',val,lat:c[0],lng:c[1]});
-  save();toast('🏠 Bien ajouté');
+  const ville=info.toLowerCase();
+  const VILLES={paris:[48.85,2.35],lyon:[45.76,4.84],marseille:[43.30,5.37],annecy:[45.90,6.13],bordeaux:[44.84,-0.58],lille:[50.63,3.06],toulouse:[43.60,1.44],nantes:[47.22,-1.55],nice:[43.71,7.26]};
+  let lat=46.6+(Math.random()-.5)*2,lng=2.4+(Math.random()-.5)*3;
+  for(const v in VILLES){if(ville.includes(v)){lat=VILLES[v][0];lng=VILLES[v][1];break;}}
+  S.biens.push({nom,info,val,lat,lng});save();toast('Bien ajouté.');
 }
 function addEstim(){
-  const titre=prompt('Titre de l\'estimation :','Estimation Maison Annecy');if(!titre)return;
-  const detail=prompt('Résultat / détail :','Valeur estimée ~ 320 000 €')||'—';
-  S.estim.unshift({titre,detail});save();toast('✅ Estimation enregistrée');
+  const t=prompt('Titre :','');if(!t)return;
+  const d=prompt('Résultat :','')||'—';
+  S.estim.unshift({titre:t,detail:d});save();toast('Simulation enregistrée.');
 }
 function inviteCoi(){
-  const n=prompt('Nom du co-indivisaire à inviter :','');if(!n)return;
-  const part=prompt('Sa quote-part (%) :','0')||'0';
-  const ini=n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';
-  S.coi.push({n,r:part+'% · Co-indivisaire',ini,st:'Invité',cls:'soon'});save();toast('✉️ Invitation envoyée à '+n);
+  const n=prompt('Prénom et nom du co-indivisaire :','');if(!n)return;
+  const p=prompt('Quote-part (%) :','0')||'0';
+  const ini=n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'??';
+  S.coi.push({n,r:p+'% · Co-indivisaire',ini,st:'Invité',cls:'pill-warn'});save();toast('Invitation envoyée.');
 }
 function book(pro){
-  const when=prompt('Créneau souhaité pour '+pro+' :','Mercredi après-midi');if(!when)return;
-  S.rdv.unshift({pro,when});save();toast('📅 Demande envoyée à '+pro);go('juri');
+  const w=prompt('Créneau souhaité :','');if(!w)return;
+  S.rdv.unshift({pro,when:w});save();toast('Demande envoyée.');go('juri');
 }
-/* documents drop */
-let di=0;
-function addDocFile(name){S.docs.unshift({name,meta:'Ajouté à l\'instant · '+(Math.random()*4+0.3).toFixed(1)+' Mo',ic:ICONS[di++%ICONS.length]});save();}
-function pickFile(){const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.onchange=()=>{[...inp.files].forEach(f=>addDocFile(f.name));toast('✅ Document(s) déposé(s)');};inp.click();}
-const drop=document.getElementById('drop');
-drop.addEventListener('click',pickFile);
-drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
-drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
-drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files.length){[...e.dataTransfer.files].forEach(f=>addDocFile(f.name));}else{addDocFile('Document '+(S.docs.length+1)+'.pdf');}toast('✅ Document déposé');});
+function addEvent(){
+  const t=prompt('Titre de l\'événement :','');if(!t)return;
+  const d=prompt('Date (AAAA-MM-JJ) :',new Date().toISOString().slice(0,10))||'';
+  const l=prompt('Lieu (optionnel) :','')||'';
+  S.events.push({titre:t,date:d,type:'autre',lieu:l});save();toast('Événement ajouté.');
+}
+function addAction(){
+  const t=prompt('Titre de l\'action :','');if(!t)return;
+  const m=prompt('Assigné à / note :','')||'';
+  S.actions.unshift({titre:t,meta:m,done:false});save();toast('Action ajoutée.');
+}
+function addTransaction(){
+  const d=prompt('Description :','');if(!d)return;
+  const m=parseFloat(prompt('Montant (négatif = charge, positif = revenu) :','0').replace(',','.'))||0;
+  const c=prompt('Catégorie :','Charge')||'Charge';
+  const b=S.biens[0]?.nom||'—';
+  S.transactions.unshift({desc:d,cat:c,bien:b,montant:m,ic:m>=0?'💰':'💸'});save();toast('Transaction ajoutée.');
+}
+function addReunion(){
+  const t=prompt('Titre de la réunion :','');if(!t)return;
+  const d=prompt('Date (AAAA-MM-JJ) :',new Date().toISOString().slice(0,10))||'';
+  const desc=prompt('Compte rendu / notes :','')||'';
+  S.reunions.unshift({titre:t,date:d,desc});save();toast('Réunion enregistrée.');
+}
+function addInventaire(){
+  const n=prompt('Nom de l\'élément :','');if(!n)return;
+  const v=prompt('Valeur estimée :','0 €')||'—';
+  S.inventaire.push({nom:n,val:v,ic:'📦'});save();toast('Élément ajouté.');
+}
+function addIncident(){
+  const t=prompt('Description de l\'incident :','');if(!t)return;
+  S.incidents.unshift({titre:t,meta:'Signalé à l\'instant',st:'Ouvert',ic:'⚠️',stCls:'pill-warn'});save();toast('Incident déclaré.');
+}
+function addBienOnMap(){go('carte');setTimeout(()=>{placing=true;if(map)map.getContainer().style.cursor='crosshair';toast('Cliquez sur la carte pour placer le bien.');},150);}
 
-/* ===================== CARTE INTERACTIVE (Leaflet) ===================== */
-let map=null, markersLayer=null, placing=false;
-function pinIcon(){
-  return L.divIcon({className:'',html:'<div style="width:26px;height:26px;border-radius:50% 50% 50% 0;background:#5C6BC0;border:2px solid #fff;box-shadow:0 3px 8px rgba(26,35,126,.4);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px">🏠</span></div>',iconSize:[26,26],iconAnchor:[13,26],popupAnchor:[0,-26]});
-}
+/* ━━━━ DOCUMENTS DROP ━━━━ */
+let di=0;
+const dz=document.getElementById('dropZone');
+dz.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.onchange=()=>{[...inp.files].forEach(f=>{S.docs.unshift({name:f.name,meta:'Ajouté à l\'instant',ic:ICONS[di++%ICONS.length]});});save();toast('Document(s) ajouté(s).');};inp.click();});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');[...e.dataTransfer.files].forEach(f=>{S.docs.unshift({name:f.name,meta:'Glissé-déposé',ic:ICONS[di++%ICONS.length]});});save();toast('Document(s) déposé(s).');});
+
+/* ━━━━ CARTE ━━━━ */
+let map=null,markersLayer=null,placing=false;
+function pinIcon(){return L.divIcon({className:'',html:'<div style="width:24px;height:24px;border-radius:50% 50% 50% 0;background:#2C5282;border:2px solid #fff;box-shadow:0 2px 8px rgba(15,31,61,.4);transform:rotate(-45deg)"></div>',iconSize:[24,24],iconAnchor:[12,24],popupAnchor:[0,-26]});}
 function initMap(){
-  if(typeof L==='undefined'){document.getElementById('map').innerHTML='<div class="empty">Carte indisponible hors connexion.</div>';return;}
+  if(typeof L==='undefined'){document.getElementById('map').innerHTML='<div class="empty">Carte indisponible.</div>';return;}
   if(!map){
     map=L.map('map',{scrollWheelZoom:true}).setView([46.6,2.4],5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
     markersLayer=L.layerGroup().addTo(map);
-    map.on('click',e=>{ if(!placing)return; placing=false; map.getContainer().style.cursor='';
-      const nom=prompt('Nom du bien :','Nouveau bien');if(!nom){renderMap();return;}
-      const val=prompt('Valeur estimée :','250 000 €')||'—';
-      S.biens.push({nom,info:'Placé sur la carte',val,lat:e.latlng.lat,lng:e.latlng.lng});
-      save();toast('📍 Bien ajouté sur la carte');
+    map.on('click',e=>{if(!placing)return;placing=false;map.getContainer().style.cursor='';
+      const n=prompt('Nom du bien :','');if(!n)return;
+      const v=prompt('Valeur :','—')||'—';
+      S.biens.push({nom:n,info:'Placé sur la carte',val:v,lat:e.latlng.lat,lng:e.latlng.lng});
+      save();toast('Bien ajouté.');
     });
   }
   map.invalidateSize();
-  renderMap();
-}
-function renderMap(){
-  if(!map||!markersLayer)return;
+  if(!markersLayer)return;
   markersLayer.clearLayers();
   const pts=[];
-  S.biens.forEach((b,i)=>{
-    if(typeof b.lat!=='number')return;
+  S.biens.forEach(b=>{if(typeof b.lat!=='number')return;
     const m=L.marker([b.lat,b.lng],{icon:pinIcon()}).addTo(markersLayer);
     m.bindPopup('<b>'+b.nom+'</b><br>'+(b.info||'')+'<br><b>'+(b.val||'')+'</b>');
     pts.push([b.lat,b.lng]);
   });
-  if(pts.length===1){map.setView(pts[0],11);}
-  else if(pts.length>1){map.fitBounds(pts,{padding:[40,40],maxZoom:11});}
-  // légende cliquable
-  document.getElementById('mapLegend').innerHTML=S.biens.filter(b=>typeof b.lat==='number').map((b,i)=>
-    `<div class="it" onclick="flyTo(${b.lat},${b.lng})"><span class="pin"></span>${b.nom} — ${b.val||''}</div>`).join('');
+  if(pts.length===1)map.setView(pts[0],11);
+  else if(pts.length>1)map.fitBounds(pts,{padding:[40,40],maxZoom:11});
 }
-function flyTo(lat,lng){if(map){map.flyTo([lat,lng],13);document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'});}}
-function addBienOnMap(){
-  go('carte');setTimeout(()=>{placing=true;if(map)map.getContainer().style.cursor='crosshair';toast('🖱️ Cliquez sur la carte pour placer le bien');},150);
+
+/* ━━━━ ADMIN ━━━━ */
+async function loadAdminData(){
+  try{
+    const {data,error}=await sb.from('profiles').select('id,email,prenom,nom,created_at');
+    if(error||!data)throw error;
+    const today=new Date().toISOString().slice(0,10);
+    document.getElementById('admin-users').textContent=data.length;
+    document.getElementById('admin-today').textContent=data.filter(u=>u.created_at?.startsWith(today)).length;
+    document.getElementById('admin-confirmed').textContent=data.length;
+    document.getElementById('admin-user-list').innerHTML=data.map(u=>`
+      <div class="row-item">
+        <div class="r-ic" style="background:linear-gradient(135deg,var(--navy),var(--accent));color:#fff;font-family:'Montserrat';font-weight:700;font-size:.72rem">${((u.prenom||u.email||'?')[0]).toUpperCase()}</div>
+        <div><b>${[u.prenom,u.nom].filter(Boolean).join(' ')||u.email}</b><span>${u.email} · ${u.created_at?new Date(u.created_at).toLocaleDateString('fr-FR'):''}</span></div>
+        ${u.email==='martifiatte@gmail.com'?'<span class="pill pill-info">Admin</span>':'<span class="pill pill-ok">Utilisateur</span>'}
+      </div>`).join('');
+  }catch(e){
+    ['admin-users','admin-today','admin-confirmed'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    const ul=document.getElementById('admin-user-list');
+    if(ul) ul.innerHTML='<div class="empty">Données non disponibles.</div>';
+  }
 }
 
 renderAll();
