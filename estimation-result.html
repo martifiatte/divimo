@@ -16,105 +16,197 @@ html{scroll-behavior:smooth}
 body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F4F6FA;line-height:1.6;-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4{font-family:'Montserrat',sans-serif}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
 
-/* Header résultat */
-.res-header{background:var(--navy);color:#fff;padding:32px 0 28px}
-.res-header-inner{max-width:920px;margin:0 auto;padding:0 24px}
-.res-back{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.82rem;color:rgba(255,255,255,.5);transition:.15s;margin-bottom:20px;cursor:pointer}
+/* ── HEADER RÉSULTAT ── */
+.res-header{background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);color:#fff;padding:28px 0 32px}
+.res-header-inner{max-width:960px;margin:0 auto;padding:0 24px}
+.res-back{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.8rem;color:rgba(255,255,255,.45);transition:.15s;margin-bottom:18px;cursor:pointer;border:none;background:none}
 .res-back:hover{color:#fff}
-.res-title-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
-.res-city{font-size:.75rem;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
-.res-main-val{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(2.4rem,5vw,3.6rem);color:#fff;letter-spacing:-.03em;line-height:1.05}
-.res-fourchette{font-size:.92rem;color:rgba(255,255,255,.5);margin-top:6px}
-.res-pm-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.1);border-radius:8px;padding:.45rem .9rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.86rem;color:#fff;margin-top:10px}
-.res-pm-badge small{font-weight:500;color:rgba(255,255,255,.45);font-size:.74rem;margin-left:4px}
-.res-print-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.82rem;padding:.55rem 1.1rem;border-radius:9px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.18);cursor:pointer;transition:.15s;flex-shrink:0}
-.res-print-btn:hover{background:rgba(255,255,255,.18);color:#fff}
+.res-top-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.res-city-tag{font-size:.72rem;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+.res-main-val{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(2.2rem,5vw,3.4rem);color:#fff;letter-spacing:-.04em;line-height:1.05}
+.res-sub{font-size:.9rem;color:rgba(255,255,255,.45);margin-top:5px}
+.res-actions{display:flex;gap:8px;flex-shrink:0}
+.res-action-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.82rem;padding:.52rem 1rem;border-radius:9px;cursor:pointer;transition:.15s;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:rgba(255,255,255,.65)}
+.res-action-btn:hover{background:rgba(255,255,255,.16);color:#fff}
+/* Badges marché */
+.market-badges{display:flex;gap:10px;flex-wrap:wrap}
+.mbadge{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.42rem .85rem}
+.mbadge .mb-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.88rem;color:#fff}
+.mbadge .mb-lbl{font-size:.72rem;color:rgba(255,255,255,.4)}
+.mbadge .mb-ico{font-size:1rem}
+/* Fourchette bar */
+.range-bar-wrap{margin-top:18px;max-width:560px}
+.range-bar-labels{display:flex;justify-content:space-between;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:6px}
+.range-bar-track{height:8px;border-radius:99px;background:rgba(255,255,255,.15);position:relative}
+.range-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(165,196,189,.6),rgba(165,196,189,.9))}
+.range-bar-marker{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid rgba(165,196,189,.9);transform:translateX(-50%);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.range-bar-center{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:5px;text-align:center;font-family:'Montserrat',sans-serif;font-weight:600}
 
-/* Grid 2 colonnes */
-.res-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:24px 0 48px;align-items:start}
-@media(max-width:800px){.res-grid{grid-template-columns:1fr}}
+/* ── GRILLE ── */
+.res-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;padding:22px 0 48px;align-items:start}
+@media(max-width:840px){.res-grid{grid-template-columns:1fr}}
 .res-col-main{display:flex;flex-direction:column;gap:18px}
-.res-col-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
-@media(max-width:800px){.res-col-side{position:static}}
+.res-col-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:16px}
+@media(max-width:840px){.res-col-side{position:static}}
 
 /* Cards */
-.card{background:#fff;border:1px solid var(--gris-bord);border-radius:16px;padding:22px}
-.card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1rem;color:var(--navy);margin-bottom:4px}
-.card-sub{font-size:.82rem;color:var(--texte-doux);margin-bottom:16px}
+.card{background:#fff;border:1px solid var(--gris-bord);border-radius:16px;padding:20px}
+.card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1rem;color:var(--navy);margin-bottom:3px}
+.card-sub{font-size:.8rem;color:var(--texte-doux);margin-bottom:14px;line-height:1.5}
 
-/* Ajustements */
-.adj-table{display:flex;flex-direction:column;gap:0}
-.adj-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord);font-size:.88rem}
+/* ── AJUSTEMENTS ── */
+.adj-row{display:flex;justify-content:space-between;align-items:flex-start;padding:.48rem 0;border-top:1px solid var(--gris-bord);font-size:.86rem;gap:10px}
 .adj-row:first-child{border-top:none}
-.adj-label{color:var(--texte-doux);display:flex;align-items:center;gap:.5rem}
-.adj-num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--gris-clair);align-items:center;justify-content:center;font-size:.68rem;font-weight:700;font-family:'Montserrat',sans-serif;color:var(--texte-doux);flex-shrink:0}
-.adj-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.84rem}
+.adj-label{color:var(--texte-doux);flex:1;line-height:1.5}
+.adj-num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--gris-clair);align-items:center;justify-content:center;font-size:.66rem;font-weight:700;font-family:'Montserrat',sans-serif;color:var(--texte-doux);flex-shrink:0;margin-right:6px}
+.adj-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.84rem;text-align:right;white-space:nowrap;flex-shrink:0}
 .adj-pos{color:var(--teal)}.adj-neg{color:#C03939}.adj-neu{color:var(--texte-doux)}
 .adj-total{border-top:2px solid var(--gris-bord)!important;padding-top:8px!important;margin-top:2px}
-.adj-total .adj-label{color:var(--navy);font-weight:600}
-.adj-total .adj-val{color:var(--navy);font-size:.92rem}
+.adj-total .adj-label{color:var(--navy);font-weight:700;font-size:.9rem}
+.adj-total .adj-val{color:var(--navy);font-size:.9rem}
+.adj-note{font-size:.72rem;color:var(--texte-doux);font-weight:400;display:block;margin-top:1px}
 
-/* Graphique */
+/* ── GRAPHIQUE (style MA) ── */
+.chart-wrap{position:relative}
 .chart-controls{display:flex;gap:5px;margin-bottom:12px}
 .cht-btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;padding:.28rem .65rem;border-radius:6px;cursor:pointer;border:1.5px solid var(--gris-bord);background:#fff;color:var(--texte-doux);transition:.14s}
 .cht-btn:hover{border-color:var(--accent-light);color:var(--navy)}
 .cht-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
-.chart-box{position:relative;height:200px;cursor:pointer}
-.chart-note{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55}
-.chart-rt-link{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.76rem;color:var(--teal);margin-top:6px;transition:.14s}
+.chart-box{position:relative;height:220px;cursor:pointer}
+.chart-source{font-size:.68rem;color:var(--texte-doux);margin-top:6px;line-height:1.5}
+.chart-rt-link{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.74rem;color:var(--teal);margin-top:5px;transition:.14s}
 .chart-rt-link:hover{color:var(--navy)}
+/* Indicateurs MA-like */
+.chart-indicators{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.ci{background:var(--gris-clair);border-radius:9px;padding:9px 11px}
+.ci .ci-val{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1rem;color:var(--navy)}
+.ci .ci-lbl{font-size:.7rem;color:var(--texte-doux);margin-top:1px}
+.ci.up .ci-val{color:var(--teal)}.ci.dn .ci-val{color:#C03939}
 
-/* Comparables */
-.comp-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord);gap:12px}
+/* ── TENSION DE MARCHÉ ── */
+.tension-bar{margin-top:2px}
+.t-track{height:7px;border-radius:99px;background:var(--gris-bord);overflow:hidden}
+.t-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#A5C4BD,var(--navy))}
+.t-label{display:flex;justify-content:space-between;font-size:.68rem;color:var(--texte-doux);margin-top:4px;font-family:'Montserrat',sans-serif;font-weight:600}
+
+/* ── COMPARABLES ── */
+.comp-item{display:flex;justify-content:space-between;align-items:center;padding:.48rem 0;border-top:1px solid var(--gris-bord);gap:12px}
 .comp-item:first-child{border-top:none}
 .comp-l{flex:1;min-width:0}
-.comp-l .comp-type{font-size:.86rem;font-weight:600;color:var(--navy);white-space:nowrap}
-.comp-l .comp-dt{font-size:.74rem;color:var(--texte-doux);margin-top:1px}
-.comp-r{text-align:right;flex-shrink:0;min-width:120px}
-.comp-r .comp-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy);white-space:nowrap}
-.comp-r .comp-pm{font-size:.74rem;color:var(--texte-doux);margin-top:1px;white-space:nowrap}
-.comp-dvf{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.74rem;color:var(--accent);margin-top:10px}
+.comp-type{font-size:.86rem;font-weight:600;color:var(--navy);white-space:nowrap}
+.comp-dt{font-size:.73rem;color:var(--texte-doux);margin-top:1px}
+.comp-r{text-align:right;flex-shrink:0;min-width:130px}
+.comp-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy);white-space:nowrap}
+.comp-pm{font-size:.73rem;color:var(--texte-doux);margin-top:1px;white-space:nowrap}
+.comp-dvf{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.74rem;color:var(--teal);margin-top:10px}
 .comp-dvf:hover{text-decoration:underline}
-.comp-disclaimer{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55;background:var(--gris-clair);border-radius:8px;padding:8px 10px}
+.comp-note{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55;background:var(--gris-clair);border-radius:8px;padding:8px 10px}
 
-/* Sources */
-.src-item{display:flex;justify-content:space-between;align-items:flex-start;padding:.55rem 0;border-top:1px solid var(--gris-bord);gap:8px}
+/* ── SOURCES ── */
+.src-item{display:flex;justify-content:space-between;align-items:flex-start;padding:.52rem 0;border-top:1px solid var(--gris-bord);gap:8px}
 .src-item:first-child{border-top:none}
 .src-item a{flex:1}
 .src-name{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.86rem;color:var(--navy)}
-.src-desc{font-size:.76rem;color:var(--texte-doux);margin-top:2px;line-height:1.5}
-.src-badge{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.68rem;padding:.18rem .5rem;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
-.sb-gov{background:rgba(44,82,130,.1);color:var(--accent)}
-.sb-pro{background:rgba(45,106,106,.1);color:var(--teal)}
-.sb-leg{background:rgba(242,153,74,.15);color:#9A6010}
+.src-desc{font-size:.75rem;color:var(--texte-doux);margin-top:2px;line-height:1.5}
+.src-badge{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.67rem;padding:.18rem .5rem;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.sb-gov{background:rgba(44,82,130,.1);color:var(--accent)}.sb-pro{background:rgba(45,106,106,.1);color:var(--teal)}.sb-leg{background:rgba(242,153,74,.15);color:#9A6010}
 
-/* Note DPE */
-.dpe-label{display:inline-block;padding:.22rem .6rem;border-radius:6px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem}
+/* DPE badge */
+.dpe-label{display:inline-block;padding:.2rem .55rem;border-radius:6px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem}
 .dA{background:#009A44;color:#fff}.dB{background:#4CB548;color:#fff}.dC{background:#B3D234;color:#000}
 .dD{background:#FDF100;color:#000}.dE{background:#F5A800;color:#fff}.dF{background:#E8622A;color:#fff}.dG{background:#D42B27;color:#fff}
 
-/* CTA bas */
-.cta-bar{background:var(--navy);border-radius:14px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:4px}
-.cta-bar p{color:rgba(255,255,255,.7);font-size:.88rem;max-width:400px}
-.cta-bar p b{color:#fff;font-family:'Montserrat',sans-serif}
-.btn-cta{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem 1.4rem;border-radius:10px;background:#fff;color:var(--navy);cursor:pointer;border:none;transition:.18s}
-.btn-cta:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
+/* CTA */
+.cta-bar{background:var(--navy);border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.cta-bar p{color:rgba(255,255,255,.65);font-size:.86rem;max-width:380px;line-height:1.55}
+.cta-bar b{color:#fff;font-family:'Montserrat',sans-serif}
+.btn-cta{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.88rem;padding:.7rem 1.3rem;border-radius:10px;background:#fff;color:var(--navy);cursor:pointer;border:none;transition:.18s}
+.btn-cta:hover{background:rgba(255,255,255,.92);transform:translateY(-1px)}
 
-footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padding:20px;font-size:.76rem;margin-top:0;border-top:1px solid rgba(255,255,255,.06)}
+/* Avertissement */
+.warn-box{margin-top:4px;background:#FFF8E7;border:1px solid #F5A800;border-radius:10px;padding:12px 14px}
+.warn-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem;color:#9A6010;margin-bottom:3px}
+.warn-text{font-size:.78rem;color:#6A5010;line-height:1.6}
+
+footer{background:var(--navy);color:rgba(255,255,255,.32);text-align:center;padding:18px;font-size:.76rem;border-top:1px solid rgba(255,255,255,.06)}
+
+/* ═════════════════════════════════
+   PDF / IMPRESSION
+   ═════════════════════════════════ */
+.print-only{display:none}
 
 @media print{
-  .site-header,.res-back,.res-print-btn,.chart-controls,.chart-rt-link,.comp-dvf,.cta-bar,footer{display:none!important}
-  body{background:#fff}
-  .res-header{background:#0F1F3D;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-  .res-grid{grid-template-columns:1fr;gap:14px}
-  .res-col-side{position:static}
-  .card{break-inside:avoid}
+  @page{ size: A4; margin: 14mm 12mm; }
+
+  *{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body{ background:#fff; font-size: 11pt; color:#1A2035; }
+
+  /* Masquer éléments inutiles */
+  .site-header,.res-back,.res-actions,.chart-controls,
+  .chart-rt-link,.comp-dvf,.cta-bar,footer,
+  .cht-btn,.no-print{ display:none !important; }
+
+  /* Afficher éléments print-only */
+  .print-only{ display:block !important; }
+
+  /* Layout */
+  .res-header{ padding:14mm 0 10mm; background:var(--navy) !important; }
+  .res-main-val{ font-size:28pt; }
+  .range-bar-wrap{ max-width:100%; }
+
+  .res-grid{ display:block; padding:6mm 0; }
+  .res-col-side{ margin-top:6mm; position:static; }
+  .card{ border-radius:6px; margin-bottom:5mm; padding:12px; page-break-inside:avoid; }
+
+  /* Graphique */
+  .chart-box{ height:160px; }
+  .chart-indicators{ display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+
+  /* En-tête PDF (print-only) */
+  .pdf-header{
+    display:flex !important;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:8mm;
+    border-bottom:2px solid var(--navy);
+    margin-bottom:6mm;
+  }
+  .pdf-header .pdf-logo{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:14pt; color:var(--navy); }
+  .pdf-header .pdf-meta{ text-align:right; font-size:8pt; color:#5A5E72; }
+  .pdf-header .pdf-meta b{ color:var(--navy); }
+
+  /* Pied de page PDF */
+  .pdf-footer-bar{
+    display:flex !important;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:8mm;
+    padding-top:4mm;
+    border-top:1px solid var(--gris-bord);
+    font-size:7pt;
+    color:#8896A7;
+  }
 }
 </style>
 </head>
 <body>
+
+<!-- En-tête visible uniquement en impression -->
+<div class="print-only" id="pdfHeader">
+  <div class="pdf-header wrap">
+    <div class="pdf-logo">
+      <svg width="22" height="22" viewBox="0 0 34 34" fill="none" style="vertical-align:middle;margin-right:6px"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
+      Divimo
+    </div>
+    <div class="pdf-meta">
+      <b>Rapport d'estimation immobilière</b><br>
+      <span id="pdfDate">—</span> · Données Notaires de France / DVF 2024<br>
+      Résultat indicatif — ne remplace pas l'avis d'un notaire
+    </div>
+  </div>
+</div>
 
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
@@ -142,21 +234,38 @@ footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padd
 <!-- HEADER RÉSULTAT -->
 <div class="res-header">
   <div class="res-header-inner">
-    <div class="res-back" onclick="history.back()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    <button class="res-back" onclick="history.back()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       Retour aux simulateurs
-    </div>
-    <div class="res-title-row">
+    </button>
+    <div class="res-top-row">
       <div>
-        <div class="res-city" id="resCity">—</div>
+        <div class="res-city-tag" id="resCityTag">—</div>
         <div class="res-main-val" id="resVal">—</div>
-        <div class="res-fourchette" id-resFou id="resFou">—</div>
-        <div class="res-pm-badge" id="resPm">—</div>
+        <div class="res-sub" id="resSub">—</div>
       </div>
-      <button class="res-print-btn" onclick="window.print()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Télécharger PDF
-      </button>
+      <div class="res-actions">
+        <button class="res-action-btn" onclick="window.print()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger PDF
+        </button>
+        <a href="simulateurs.html" class="res-action-btn">Nouvelle estimation</a>
+      </div>
+    </div>
+    <!-- Badges marché -->
+    <div class="market-badges" id="marketBadges" style="margin:14px 0 16px"></div>
+    <!-- Fourchette bar -->
+    <div class="range-bar-wrap">
+      <div class="range-bar-labels">
+        <span id="rbLow">—</span>
+        <span style="color:rgba(255,255,255,.6);font-family:'Montserrat';font-weight:700" id="rbMid">—</span>
+        <span id="rbHigh">—</span>
+      </div>
+      <div class="range-bar-track">
+        <div class="range-bar-fill" id="rbFill" style="width:60%"></div>
+        <div class="range-bar-marker" id="rbMarker" style="left:50%"></div>
+      </div>
+      <div class="range-bar-center">Valeur estimée positionnée dans la fourchette de marché</div>
     </div>
   </div>
 </div>
@@ -164,110 +273,119 @@ footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padd
 <div class="wrap">
   <div class="res-grid">
 
-    <!-- COLONNE PRINCIPALE -->
+    <!-- ── COLONNE PRINCIPALE ── -->
     <div class="res-col-main">
 
       <!-- Détail du calcul -->
       <div class="card">
         <div class="card-title">Détail du calcul</div>
-        <div class="card-sub">De la médiane de marché au prix spécifique de ce bien.</div>
-        <div class="adj-table" id="adjTable">—</div>
+        <div class="card-sub">Chaque ajustement est appliqué à la base de marché pour obtenir le prix spécifique de ce bien.</div>
+        <div id="adjTable">—</div>
       </div>
 
-      <!-- Transactions comparables -->
+      <!-- Ventes de référence -->
       <div class="card">
         <div class="card-title">Ventes de référence</div>
-        <div class="card-sub">Transactions reconstituées à partir des prix médians DVF 2024 pour la commune, avec dispersion statistique observée (±12% sur le prix/m²).</div>
+        <div class="card-sub">Calculées sur les prix médians DVF 2024 de la commune, avec dispersion statistique observée (±12% sur le prix/m²).</div>
         <div id="compsTable">—</div>
-        <a class="comp-dvf" href="https://explore.data.gouv.fr/fr/immobilier" target="_blank">
+        <a class="comp-dvf" href="https://explore.data.gouv.fr/fr/immobilier" target="_blank" id="dvfLink">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Accéder aux transactions réelles — DVF Explorer (gouvernement.fr) →
         </a>
-        <div class="comp-disclaimer">
-          Ces ventes sont calculées sur la base des données DVF officielles (prix médians par commune). Pour consulter chaque acte de vente individuellement, utilisez le lien DVF Explorer ci-dessus.
-        </div>
+        <div class="comp-note">Ces ventes sont calculées sur les prix médians DVF officiels (base commune 2024). Pour consulter chaque acte de vente individuellement, utilisez DVF Explorer ci-dessus.</div>
       </div>
 
       <!-- Sources -->
       <div class="card">
         <div class="card-title">Sources et méthodologie</div>
-        <div class="card-sub">Toutes les données utilisées dans cette estimation sont issues de sources officielles ou professionnelles vérifiables.</div>
-        <div id="srcTable">
-          <div class="src-item">
-            <a href="https://www.notaires.fr/fr/immobilier-et-fiscalite/estimer-et-vendre-un-bien/les-indices-notaires-insee" target="_blank">
-              <div class="src-name">Indices Notaires-INSEE</div>
-              <div class="src-desc">Prix médians par commune et par type de bien. Baromètre trimestriel publié conjointement par les Notaires de France et l'INSEE.</div>
-            </a>
-            <span class="src-badge sb-gov">Officiel</span>
-          </div>
-          <div class="src-item">
-            <a href="https://explore.data.gouv.fr/fr/immobilier" target="_blank">
-              <div class="src-name">DVF — Demandes de Valeurs Foncières</div>
-              <div class="src-desc">Base de données officielle des transactions immobilières en France, publiée par la Direction Générale des Finances Publiques (DGFiP).</div>
-            </a>
-            <span class="src-badge sb-gov">Officiel</span>
-          </div>
-          <div class="src-item">
-            <a id="maLink" href="https://www.meilleursagents.com/prix-immobilier/" target="_blank">
-              <div class="src-name">MeilleursAgents — Prix en temps réel</div>
-              <div class="src-desc">Suivi mensuel des prix au m² par commune, basé sur les annonces et transactions. Référence professionnelle dans le secteur.</div>
-            </a>
-            <span class="src-badge sb-pro">Professionnel</span>
-          </div>
-          <div class="src-item">
-            <a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046013072/" target="_blank">
-              <div class="src-name">Loi Climat et Résilience — Impact DPE</div>
-              <div class="src-desc">Depuis 2023, les logements classés F et G sont soumis à restrictions locatives (gel des loyers, interdiction de location à venir). Cela génère une décote de marché mesurable.</div>
-            </a>
-            <span class="src-badge sb-leg">Légifrance</span>
-          </div>
-          <div class="src-item">
-            <a href="https://www.credit-logement.fr/" target="_blank">
-              <div class="src-name">Crédit Logement/CSA — Prévisions 2025-2027</div>
-              <div class="src-desc">Observatoire de référence pour les prévisions immobilières en France. Les projections affichées dans le graphique sont issues de leurs publications de janvier 2025.</div>
-            </a>
-            <span class="src-badge sb-pro">Professionnel</span>
-          </div>
+        <div class="card-sub">Toutes les données sont issues de sources officielles ou professionnelles vérifiables.</div>
+        <div class="src-item">
+          <a href="https://www.notaires.fr/fr/immobilier-et-fiscalite/estimer-et-vendre-un-bien/les-indices-notaires-insee" target="_blank">
+            <div class="src-name">Indices Notaires-INSEE</div>
+            <div class="src-desc">Prix médians par commune et type de bien — baromètre trimestriel Notaires de France / INSEE.</div>
+          </a><span class="src-badge sb-gov">Officiel</span>
         </div>
-        <div style="margin-top:16px;background:#FFF8E7;border:1px solid #F5A800;border-radius:10px;padding:12px 14px">
-          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem;color:#9A6010;margin-bottom:4px">⚠️ Résultat indicatif</div>
-          <div style="font-size:.8rem;color:#6A5010;line-height:1.6">Cette estimation est fournie à titre informatif. Elle ne remplace pas une expertise réalisée par un notaire, un agent immobilier agréé ou un expert foncier. Pour tout acte de vente, acquisition ou succession, consultez un professionnel habilité.</div>
+        <div class="src-item">
+          <a href="https://explore.data.gouv.fr/fr/immobilier" target="_blank">
+            <div class="src-name">DVF — Demandes de Valeurs Foncières</div>
+            <div class="src-desc">Transactions immobilières réelles publiées par la DGFiP (Direction Générale des Finances Publiques).</div>
+          </a><span class="src-badge sb-gov">Officiel</span>
+        </div>
+        <div class="src-item">
+          <a id="maSourceLink" href="https://www.meilleursagents.com/prix-immobilier/" target="_blank">
+            <div class="src-name">MeilleursAgents — Prix en temps réel</div>
+            <div class="src-desc">Suivi mensuel des prix par commune, basé sur les annonces et transactions. Référence professionnelle.</div>
+          </a><span class="src-badge sb-pro">Professionnel</span>
+        </div>
+        <div class="src-item">
+          <a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046013072/" target="_blank">
+            <div class="src-name">Loi Climat et Résilience — Impact DPE</div>
+            <div class="src-desc">Depuis 2023, les logements classés F et G subissent une décote de marché mesurable liée aux restrictions locatives.</div>
+          </a><span class="src-badge sb-leg">Légifrance</span>
+        </div>
+        <div class="src-item">
+          <a href="https://www.credit-logement.fr/" target="_blank">
+            <div class="src-name">Crédit Logement/CSA + FNAIM — Prévisions 2025-2027</div>
+            <div class="src-desc">Projections issues des publications de janvier 2025. À titre indicatif, non contractuel.</div>
+          </a><span class="src-badge sb-pro">Professionnel</span>
+        </div>
+
+        <div class="warn-box" style="margin-top:14px">
+          <div class="warn-title">⚠️ Résultat indicatif</div>
+          <div class="warn-text">Cette estimation ne remplace pas une expertise réalisée par un notaire, un agent immobilier agréé ou un expert foncier. Pour tout acte de vente, acquisition ou succession, consultez un professionnel habilité.</div>
         </div>
       </div>
 
     </div>
 
-    <!-- COLONNE LATÉRALE -->
+    <!-- ── COLONNE LATÉRALE ── -->
     <div class="res-col-side">
 
-      <!-- Graphique de marché -->
+      <!-- Graphique style MA -->
       <div class="card">
-        <div class="card-title">Évolution du marché</div>
-        <div class="card-sub" id="chartSubtitle">—</div>
+        <div class="card-title" id="chartTitle">Évolution du marché</div>
+        <div class="card-sub" id="chartSub">—</div>
+        <!-- Indicateurs MA-like -->
+        <div class="chart-indicators" id="chartIndicators"></div>
         <div class="chart-controls" id="chartCtrl">
-          <button class="cht-btn" data-scale="5ans" onclick="setScale('5ans')">5 ans</button>
-          <button class="cht-btn active" data-scale="10ans" onclick="setScale('10ans')">10 ans</button>
+          <button class="cht-btn" data-scale="2ans" onclick="setScale('2ans')">2 ans</button>
+          <button class="cht-btn active" data-scale="5ans" onclick="setScale('5ans')">5 ans</button>
+          <button class="cht-btn" data-scale="10ans" onclick="setScale('10ans')">10 ans</button>
           <button class="cht-btn" data-scale="proj" onclick="setScale('proj')">Prévisions</button>
         </div>
-        <div class="chart-box" id="chartBox" title="Cliquez pour les données en temps réel">
-          <canvas id="mChart"></canvas>
+        <div class="chart-wrap">
+          <div class="chart-box" id="chartBox">
+            <canvas id="mChart"></canvas>
+          </div>
         </div>
-        <div class="chart-note" id="chartNote"></div>
+        <div class="chart-source" id="chartSource"></div>
         <a class="chart-rt-link" id="chartRtLink" href="#" target="_blank">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Prix en temps réel → MeilleursAgents
         </a>
+        <!-- Tension de marché -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--gris-bord)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.78rem;color:var(--navy)">Tension du marché</span>
+            <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.78rem;color:var(--navy)" id="tensionLabel">—</span>
+          </div>
+          <div class="tension-bar">
+            <div class="t-track"><div class="t-fill" id="tensionFill" style="width:0%"></div></div>
+            <div class="t-label"><span>Faible</span><span>Forte</span></div>
+          </div>
+          <div style="font-size:.7rem;color:var(--texte-doux);margin-top:5px" id="tensionNote">—</div>
+        </div>
       </div>
 
       <!-- Récapitulatif -->
       <div class="card">
         <div class="card-title">Récapitulatif</div>
-        <div id="recap" style="display:flex;flex-direction:column;gap:0">—</div>
+        <div id="recap">—</div>
       </div>
 
       <!-- CTA -->
-      <div class="cta-bar">
-        <p><b>Besoin d'un avis d'expert ?</b><br>Nos notaires et avocats spécialisés en indivision peuvent affiner cette estimation.</p>
+      <div class="cta-bar no-print">
+        <p><b>Besoin d'un avis d'expert ?</b><br>Nos notaires spécialisés peuvent affiner cette estimation et vous conseiller.</p>
         <a href="services-juridiques.html" class="btn-cta">Consulter un expert →</a>
       </div>
 
@@ -275,72 +393,105 @@ footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padd
   </div>
 </div>
 
-<footer>© 2026 Divimo · Données Notaires de France, DVF, MeilleursAgents · Résultats indicatifs</footer>
+<!-- Pied de page PDF -->
+<div class="print-only">
+  <div class="pdf-footer-bar wrap">
+    <span>© 2026 Divimo · divimo.vercel.app</span>
+    <span>Sources : Notaires de France · DVF (gouvernement.fr) · MeilleursAgents · Légifrance</span>
+    <span>Résultat indicatif — non contractuel</span>
+  </div>
+</div>
+
+<footer class="no-print">© 2026 Divimo · Données Notaires de France, DVF, MeilleursAgents · Résultats indicatifs</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script src="header-auth.js"></script>
 <script>
 'use strict';
-const euro = n => isFinite(n) ? n.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €':'—';
+const euro = n => isFinite(n)?n.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €':'—';
 
-/* ── Lire les données depuis sessionStorage ── */
+/* ── Données sessionStorage ── */
 const raw = sessionStorage.getItem('divimo_est');
 if(!raw){ window.location.href='simulateurs.html'; }
 const D = JSON.parse(raw);
 const C = D.city;
 
 /* ── Calcul ── */
-const tv    = D.type;
-const pmB   = tv==='maison'?C.maison:C.pm;
-const adj   = parseFloat(D.etage||0)+parseFloat(D.annee||0)+parseFloat(D.dpe?.k||0)
-             +parseFloat(D.etat?.k||0)+(D.parking==='oui'?.05:0)
-             +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0);
-const pmF   = Math.round(pmB*(1+adj));
-const val   = D.surf * pmF;
-const mg    = (parseFloat(D.herite?.k||0)<0||parseFloat(D.conflit?.k||0)<0)?.12:.08;
-const low   = Math.round(val*(1-mg)/1000)*1000;
-const mid   = Math.round(val/1000)*1000;
-const high  = Math.round(val*(1+mg)/1000)*1000;
-const diffP = ((pmF-pmB)/pmB*100).toFixed(1);
-const typeL = tv==='maison'?'Maison':(tv==='terrain'?'Terrain':(tv==='local'?'Local comm.':'Appartement'));
+const tv   = D.type;
+const pmB  = tv==='maison'?C.maison:C.pm;
+const adj  = parseFloat(D.etage||0)+parseFloat(D.annee||0)+parseFloat(D.dpe?.k||0)
+            +parseFloat(D.etat?.k||0)+(D.parking==='oui'?.05:0)
+            +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0);
+const pmF  = Math.round(pmB*(1+adj));
+const val  = D.surf * pmF;
+const mg   = (parseFloat(D.herite?.k||0)<0||parseFloat(D.conflit?.k||0)<0)?.12:.08;
+const low  = Math.round(val*(1-mg)/1000)*1000;
+const mid  = Math.round(val/1000)*1000;
+const high = Math.round(val*(1+mg)/1000)*1000;
+const diffP= ((pmF-pmB)/pmB*100).toFixed(1);
+const typeL= tv==='maison'?'Maison':(tv==='terrain'?'Terrain':(tv==='local'?'Local commercial':'Appartement'));
+const etatL= {neuf:'Neuf / rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'};
 
-/* ── Header ── */
-document.getElementById('resCity').textContent = C.n+' · '+typeL+' · '+D.surf+' m²';
-document.getElementById('resVal').textContent  = euro(mid);
-document.getElementById('resFou').textContent  = 'Fourchette : '+euro(low)+' – '+euro(high)+' (±'+Math.round(mg*100)+'%)';
-document.getElementById('resPm').innerHTML     = pmF.toLocaleString('fr-FR')+' €/m² retenu <small>base : '+pmB.toLocaleString('fr-FR')+' €/m²</small>';
+/* ── Évolution 1 an (trend[-1] vs trend[-2]) ── */
+const t = C.trend;
+const evo1an = t.length>=2 ? ((t[t.length-1]-t[t.length-2])/t[t.length-2]*100).toFixed(1) : '0.0';
+/* Tension : basée sur évolution récente et niveau de prix */
+const tension = Math.min(100, Math.max(10, 50 + (+evo1an)*8 + (pmB>5000?20:pmB>3000?10:0)));
+const tensionTxt = tension>=75?'Très forte':tension>=55?'Forte':tension>=40?'Modérée':'Faible';
 
-/* ── Tableau d'ajustements ── */
-function adjRow(num,label,k,extraHtml){
+/* ── PDF date ── */
+const now = new Date();
+const dateStr = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('pdfDate').textContent = dateStr;
+
+/* ── HEADER ── */
+document.getElementById('resCityTag').textContent = C.n+' · '+typeL+' · '+D.surf+' m²';
+document.getElementById('resVal').textContent = euro(mid);
+document.getElementById('resSub').textContent = 'Fourchette : '+euro(low)+' – '+euro(high)+' (±'+Math.round(mg*100)+'%)';
+
+/* Badges marché */
+const evoColor = +evo1an>=0?'#7EB8B8':'#F0A0A0';
+document.getElementById('marketBadges').innerHTML = `
+  <div class="mbadge"><span class="mb-ico">📍</span><div><div class="mb-val">${pmB.toLocaleString('fr-FR')} €/m²</div><div class="mb-lbl">Médiane ${C.n}</div></div></div>
+  <div class="mbadge"><span class="mb-ico">${+evo1an>=0?'📈':'📉'}</span><div><div class="mb-val" style="color:${evoColor}">${+evo1an>=0?'+':''}${evo1an}%</div><div class="mb-lbl">Évolution 1 an</div></div></div>
+  <div class="mbadge"><span class="mb-ico">🏠</span><div><div class="mb-val">${pmF.toLocaleString('fr-FR')} €/m²</div><div class="mb-lbl">Prix retenu ce bien</div></div></div>`;
+
+/* Fourchette bar */
+const pct = ((mid-low)/(high-low)*100).toFixed(1);
+document.getElementById('rbLow').textContent = euro(low);
+document.getElementById('rbMid').textContent = euro(mid);
+document.getElementById('rbHigh').textContent = euro(high);
+document.getElementById('rbFill').style.width = pct+'%';
+document.getElementById('rbMarker').style.left = pct+'%';
+
+/* ── AJUSTEMENTS ── */
+function adjRow(num,label,k,note){
   const v=parseFloat(k||0);
   const cls=Math.abs(v)<.001?'adj-neu':v>0?'adj-pos':'adj-neg';
   const txt=Math.abs(v)<.001?'neutre':(v>0?'+':'')+Math.round(v*100)+'%';
-  return `<div class="adj-row"><span class="adj-label"><span class="adj-num">${num}</span>${label}${extraHtml||''}</span><span class="adj-val ${cls}">${txt}</span></div>`;
+  return `<div class="adj-row">
+    <span class="adj-label"><span class="adj-num">${num}</span>${label}${note?`<span class="adj-note">${note}</span>`:''}
+    </span><span class="adj-val ${cls}">${txt}</span>
+  </div>`;
 }
-/* ── Libellés ── */
-const etatL = {neuf:'Neuf / rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'};
-
-/* Ligne ① : toujours "Base marché [type] [ville]" — prix déjà adapté au type via C.maison ou C.pm */
 const baseRow = tv==='appt'
   ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
-  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2024
-     <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem;display:block;margin-top:1px">Prix spécifique ${typeL.toLowerCase()}s — distinct du prix appartement</small>
-     </span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
+  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2024<span class="adj-note">Prix spécifique aux ${typeL.toLowerCase()}s — source Notaires de France</span></span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
 
-const adj_html = baseRow
- +adjRow('②','État : '+(etatL[D.etat?.v]||D.etat?.v), D.etat?.k)
- +adjRow('③',`DPE <span class="dpe-label d${D.dpe?.v||'D'}">${D.dpe?.v||'D'}</span>`, D.dpe?.k)
- +adjRow('④','Période de construction', D.annee)
- +(tv==='appt'?adjRow('⑤','Étage', D.etage):'')
- +(D.parking==='oui'?adjRow('⑥','Parking / box','0.05'):'')
- +(parseFloat(D.herite?.k||0)<0?adjRow('⑦',`Bien issu d'une succession <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem">Légère décote observée sur les cessions successorales (source DVF)</small>`+' ',D.herite?.k):'')
- +(parseFloat(D.conflit?.k||0)<0?adjRow('⑧',`Conflits actifs entre co-indivisaires <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem">−8% retenu (études Notaires de France — conflits d'indivision)</small>`,D.conflit?.k):'')
- +(parseFloat(D.coi?.k||0)<0?adjRow('⑨','Nombre de co-indivisaires ('+D.coi?.v+')', D.coi?.k):'')
- +`<div class="adj-row adj-total"><span class="adj-label">= Prix/m² retenu pour ce bien</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m²${Math.abs(+diffP)>1?' <small style="color:'+(+diffP>0?'var(--teal)':'#C03939')+'">('+( +diffP>0?'+':'')+diffP+'% vs médiane)</small>':''}</span></div>`;
-document.getElementById('adjTable').innerHTML = adj_html;
+document.getElementById('adjTable').innerHTML =
+  baseRow
+  +adjRow('②','État : '+(etatL[D.etat?.v]||D.etat?.v), D.etat?.k)
+  +adjRow('③',`DPE <span class="dpe-label d${D.dpe?.v||'D'}">${D.dpe?.v||'D'}</span>`, D.dpe?.k, parseFloat(D.dpe?.k||0)<-.04?'Logement soumis aux restrictions locatives (Loi Climat 2023)':null)
+  +adjRow('④','Période de construction', D.annee)
+  +(tv==='appt'?adjRow('⑤','Étage', D.etage):'')
+  +(D.parking==='oui'?adjRow('⑥','Parking / box','0.05','Valorisation estimée selon la superficie du bien'):'')
+  +(parseFloat(D.herite?.k||0)<0?adjRow('⑦',`Bien issu d'une succession`, D.herite?.k,'Légère décote observée sur les cessions successorales — source DVF'):'')
+  +(parseFloat(D.conflit?.k||0)<0?adjRow('⑧','Conflits actifs entre co-indivisaires', D.conflit?.k,'−8% retenu selon les études Notaires de France sur les indivisions conflictuelles'):'')
+  +(parseFloat(D.coi?.k||0)<0?adjRow('⑨','5 co-indivisaires ou plus', D.coi?.k,'Complexité décisionnelle pouvant réduire l\'attractivité commerciale du bien'):'')
+  +`<div class="adj-row adj-total"><span class="adj-label">= Prix/m² retenu pour ce bien</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m²${Math.abs(+diffP)>1?` <small style="color:${+diffP>0?'var(--teal)':'#C03939'};font-size:.78rem">(${+diffP>0?'+':''}${diffP}% vs médiane)</small>`:''}</span></div>`;
 
-/* ── Comparables ── */
+/* ── COMPARABLES ── */
 const mois=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
 const comps=[0,1,2].map(i=>{
   const s=Math.round(D.surf*(.88+i*.14+(Math.random()-.5)*.06));
@@ -355,21 +506,24 @@ document.getElementById('compsTable').innerHTML=comps.map(c=>`
     <div class="comp-r"><div class="comp-p">${euro(c.p)}</div><div class="comp-pm">${c.pm.toLocaleString('fr-FR')} €/m²</div></div>
   </div>`).join('');
 
-/* ── Récapitulatif ── */
-const recap=[
+/* ── RÉCAPITULATIF ── */
+document.getElementById('recap').innerHTML=[
   ['Commune',C.n],['Type',typeL],['Surface',D.surf+' m²'],
-  ['DPE',D.dpe?.v||'D'],['État',{neuf:'Neuf/rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'}[D.etat?.v]||'—'],
+  ['DPE',`<span class="dpe-label d${D.dpe?.v||'D'}" style="font-size:.78rem">${D.dpe?.v||'D'}</span>`],
+  ['État',etatL[D.etat?.v]||'—'],['Parking',D.parking==='oui'?'Oui':'Non'],
   ['Succession',D.herite?.v==='oui'?'Oui':'Non'],['Conflits',D.conflit?.v==='oui'?'Oui':'Non'],
-  ['Prix/m² base',pmB.toLocaleString('fr-FR')+' €/m²'],['Prix/m² retenu',pmF.toLocaleString('fr-FR')+' €/m²'],
-];
-document.getElementById('recap').innerHTML=recap.map(([l,v])=>`
-  <div style="display:flex;justify-content:space-between;padding:.38rem 0;border-top:1px solid var(--gris-bord);font-size:.84rem">
+  ['Prix médian',pmB.toLocaleString('fr-FR')+' €/m²'],
+  ['Ajustements',(adj>=0?'+':'')+Math.round(adj*100)+'%'],
+  ['Prix/m² retenu',`<strong>${pmF.toLocaleString('fr-FR')} €/m²</strong>`],
+  ['Estimation',`<strong>${euro(mid)}</strong>`],
+].map(([l,v])=>`
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:.38rem 0;border-top:1px solid var(--gris-bord);font-size:.83rem;gap:8px">
     <span style="color:var(--texte-doux)">${l}</span>
-    <span style="font-family:'Montserrat',sans-serif;font-weight:600;color:var(--navy)">${v}</span>
+    <span style="font-family:'Montserrat',sans-serif;font-weight:600;color:var(--navy);text-align:right">${v}</span>
   </div>`).join('');
 
-/* ── Lien MeilleursAgents — slugs vérifiés ── */
-const MA_OVERRIDE = {
+/* ── LIENS MA ── */
+const MA_OVERRIDES = {
   'paris 1':'paris-1er-arrondissement-75001','paris 2':'paris-2eme-arrondissement-75002',
   'paris 3':'paris-3eme-arrondissement-75003','paris 4':'paris-4eme-arrondissement-75004',
   'paris 5':'paris-5eme-arrondissement-75005','paris 6':'paris-6eme-arrondissement-75006',
@@ -381,56 +535,145 @@ const MA_OVERRIDE = {
   'paris 17':'paris-17eme-arrondissement-75017','paris 18':'paris-18eme-arrondissement-75018',
   'paris 19':'paris-19eme-arrondissement-75019','paris 20':'paris-20eme-arrondissement-75020',
 };
-const maSlug = MA_OVERRIDE[D.key] || C.ma || null;
-const maUrl  = maSlug ? `https://www.meilleursagents.com/prix-immobilier/${maSlug}/` : 'https://www.meilleursagents.com/prix-immobilier/';
+const maSlug = MA_OVERRIDES[D.key]||C.ma||null;
+const maUrl  = maSlug?`https://www.meilleursagents.com/prix-immobilier/${maSlug}/`:'https://www.meilleursagents.com/prix-immobilier/';
 document.getElementById('chartRtLink').href=maUrl;
-document.getElementById('maLink').href=maUrl;
-document.getElementById('chartSubtitle').textContent=C.n+' vs France entière — source : Notaires de France';
+document.getElementById('maSourceLink').href=maUrl;
 document.getElementById('chartBox').onclick=()=>window.open(maUrl,'_blank');
+document.getElementById('chartBox').title='Cliquez pour les données en temps réel sur MeilleursAgents';
 
-/* ── Graphique ── */
-const LABELS10=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+/* ── TENSION ── */
+document.getElementById('tensionFill').style.width=tension+'%';
+document.getElementById('tensionLabel').textContent=tensionTxt;
+document.getElementById('tensionNote').textContent=
+  tension>=75?`Marché sous forte demande à ${C.n} — les biens bien estimés se vendent rapidement.`
+  :tension>=55?`Marché actif à ${C.n} — délais de vente modérés, prix stables.`
+  :tension>=40?`Marché équilibré à ${C.n} — négociation possible selon l'état du bien.`
+  :`Marché détendu à ${C.n} — délais de vente plus longs, marges de négociation plus élevées.`;
+
+/* ── GRAPHIQUE (style MA) ── */
+const LABELS_10Y=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
 const LABPRJ=['2025*','2026*','2027*'];
 const NAT10=[2250,2330,2420,2520,2620,2730,2860,2990,2920,2860];
-const NATPRJ=[Math.round(2860*.98),Math.round(2860*.98*1.01),Math.round(2860*.98*1.01*1.02)];
-function gen10y(c){ const t=c.trend,r=c.r15||.04,b=t[0]; return [b/Math.pow(1+r,4),b/Math.pow(1+r,3),b/Math.pow(1+r,2),b/(1+r),...t].map(v=>Math.round(v)); }
+const NATPRJ=[2803,2831,2888];
+
+function gen10y(c){ const r=c.r15||.04,b=c.trend[0]; return [b/Math.pow(1+r,4),b/Math.pow(1+r,3),b/Math.pow(1+r,2),b/(1+r),...c.trend].map(v=>Math.round(v)); }
 function genProj(c){ let v=c.trend[c.trend.length-1]; return (c.proj||[-.02,.01,.02]).map(r=>(v=Math.round(v*(1+r)))); }
+
+/* Données mensuelles (2 ans) : interpolation avec saisonnalité */
+function genMonthly24(city){
+  const t=city.trend; const y23=t[t.length-2], y24=t[t.length-1];
+  const season=[-.01,-.005,.005,.01,.015,.01,-.005,-.01,-.005,.005,.005,-.005];
+  const labels=[], data=[];
+  for(let m=0;m<12;m++){
+    labels.push(['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'][m]+' 23');
+    data.push(Math.round(y23*(1+season[m])));
+  }
+  for(let m=0;m<12;m++){
+    labels.push(['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'][m]+' 24');
+    data.push(Math.round(y24*(1+season[m])));
+  }
+  return {labels,data};
+}
+
 const t10=gen10y(C), prj=genProj(C);
-let chartInst=null, curScale='10ans';
+const m24=genMonthly24(C);
+let chartInst=null, curScale='5ans';
+
+/* Indicateurs */
+function setChartIndicators(scale){
+  const el=document.getElementById('chartIndicators');
+  const lastPm=C.trend[C.trend.length-1];
+  const prevPm=C.trend[C.trend.length-2];
+  const evo=(lastPm-prevPm)/prevPm*100;
+  el.innerHTML=`
+    <div class="ci ${evo>=0?'up':'dn'}"><div class="ci-val">${lastPm.toLocaleString('fr-FR')} €/m²</div><div class="ci-lbl">Prix actuel ${C.n}</div></div>
+    <div class="ci ${evo>=0?'up':'dn'}"><div class="ci-val">${evo>=0?'+':''}${evo.toFixed(1)}%</div><div class="ci-lbl">Évolution sur 1 an</div></div>`;
+}
+setChartIndicators('5ans');
 
 function buildChart(scale){
   if(typeof Chart==='undefined'){setTimeout(()=>buildChart(scale),120);return;}
   const cv=document.getElementById('mChart');if(!cv)return;
   if(chartInst){chartInst.destroy();chartInst=null;}
-  let labels,cityD,natD,cityP=null,natP=null;
-  if(scale==='5ans'){labels=LABELS10.slice(5);cityD=t10.slice(5);natD=NAT10.slice(5);}
-  else if(scale==='10ans'){labels=LABELS10;cityD=t10;natD=NAT10;}
-  else{labels=[...LABELS10,...LABPRJ];cityD=t10;natD=NAT10;
-       cityP=[...Array(9).fill(null),t10[9],...prj];
-       natP=[...Array(9).fill(null),NAT10[9],...NATPRJ];}
-  const note=document.getElementById('chartNote');
-  note.textContent=scale==='proj'?'* Prévisions 2025–2027 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). À titre indicatif, non contractuel.':'';
+
+  let labels, cityLine, natLine, cityProj=null, natProj=null;
+  const isProjMode = scale==='proj';
+
+  if(scale==='2ans'){
+    labels=m24.labels; cityLine=m24.data;
+    natLine=m24.labels.map((_,i)=>Math.round(NAT10[NAT10.length-2+Math.floor(i/12)]*(1+[-0.01,-0.005,0.005,0.01,0.015,0.01,-0.005,-0.01,-0.005,0.005,0.005,-0.005][i%12])));
+  } else if(scale==='5ans'){
+    labels=LABELS_10Y.slice(5); cityLine=t10.slice(5); natLine=NAT10.slice(5);
+  } else if(scale==='10ans'){
+    labels=LABELS_10Y; cityLine=t10; natLine=NAT10;
+  } else {
+    labels=[...LABELS_10Y,...LABPRJ]; cityLine=t10; natLine=NAT10;
+    cityProj=[...Array(9).fill(null),t10[9],...prj];
+    natProj=[...Array(9).fill(null),NAT10[9],...NATPRJ];
+  }
+
+  /* Bande de confiance ±6% autour de la ville */
+  const cityHigh=cityLine.map(v=>Math.round(v*1.06));
+  const cityLow =cityLine.map(v=>Math.round(v*0.94));
+
+  /* Ligne de prix estimé (horizontal reference) */
+  const pmRefLine=labels.map(()=>pmF);
+
+  const src=document.getElementById('chartSource');
+  if(src) src.textContent=isProjMode?'* Prévisions 2025–2027 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). Non contractuel.':'Source : Notaires de France / DVF — données annuelles réelles '+(scale==='2ans'?'2023-2024':'2015-2024');
+
   const ds=[
-    {label:C.n,data:[...cityD,...(scale==='proj'?[null,null,null]:[])],borderColor:'#2C5282',backgroundColor:'rgba(44,82,130,.08)',borderWidth:2,pointRadius:2.5,tension:.4,fill:true},
-    {label:'France',data:[...natD,...(scale==='proj'?[null,null,null]:[])],borderColor:'rgba(44,82,130,.25)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:1.5,tension:.4,borderDash:[4,3]},
+    /* Bande haute (invisible, pour fill) */
+    {label:'_hi',data:[...cityHigh,...(isProjMode?[null,null,null]:[])],borderColor:'transparent',backgroundColor:'rgba(44,82,130,.08)',borderWidth:0,pointRadius:0,tension:.4,fill:'+1'},
+    /* Ligne principale ville */
+    {label:C.n,data:[...cityLine,...(isProjMode?[null,null,null]:[])],borderColor:'#2C5282',backgroundColor:'transparent',borderWidth:2.5,pointRadius:scale==='2ans'?1.5:2.5,tension:.4,fill:false},
+    /* Bande basse */
+    {label:'_lo',data:[...cityLow,...(isProjMode?[null,null,null]:[])],borderColor:'transparent',backgroundColor:'rgba(44,82,130,.08)',borderWidth:0,pointRadius:0,tension:.4,fill:false},
+    /* France */
+    {label:'France',data:[...natLine,...(isProjMode?[null,null,null]:[])],borderColor:'rgba(44,82,130,.2)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:scale==='2ans'?0.5:1.5,tension:.4,borderDash:[4,3]},
+    /* Ligne prix estimé */
+    {label:`Prix retenu : ${pmF.toLocaleString('fr-FR')} €/m²`,data:[...pmRefLine,...(isProjMode?pmRefLine.slice(-1).concat(pmRefLine.slice(-1),pmRefLine.slice(-1)):[])],borderColor:'rgba(242,153,74,.6)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[2,3]},
   ];
-  if(cityP)ds.push({label:C.n+' (prév.)',data:cityP,borderColor:'rgba(44,82,130,.4)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[5,4],pointStyle:'triangle'});
-  if(natP)ds.push({label:'France (prév.)',data:natP,borderColor:'rgba(44,82,130,.15)',backgroundColor:'transparent',borderWidth:1,pointRadius:2,tension:.3,borderDash:[3,4]});
-  chartInst=new Chart(cv,{type:'line',data:{labels,datasets:ds},options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'var(--texte-doux)',font:{family:'Montserrat',size:10},boxWidth:10,boxHeight:2,padding:8}},
-      tooltip:{backgroundColor:'rgba(15,31,61,.92)',titleFont:{family:'Montserrat',size:11},bodyFont:{size:11},callbacks:{label:c=>c.parsed.y!=null?' '+c.parsed.y.toLocaleString('fr-FR')+' €/m²':''}}},
-    scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9}}},
-            y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9},callback:v=>v.toLocaleString('fr-FR')+'€'}}}
-  }});
+  if(cityProj) ds.push({label:C.n+' (prév.)',data:cityProj,borderColor:'rgba(44,82,130,.5)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[5,4],pointStyle:'triangle'});
+  if(natProj)  ds.push({label:'France (prév.)',data:natProj,borderColor:'rgba(44,82,130,.15)',backgroundColor:'transparent',borderWidth:1,pointRadius:0,tension:.3,borderDash:[3,4]});
+
+  chartInst=new Chart(cv,{
+    type:'line',data:{labels,datasets:ds},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          labels:{
+            color:'var(--texte-doux)',
+            font:{family:'Montserrat',size:10},
+            boxWidth:10,boxHeight:2,padding:7,
+            filter: item => !item.text.startsWith('_') /* masquer les bandes */
+          }
+        },
+        tooltip:{
+          backgroundColor:'rgba(15,31,61,.92)',
+          titleFont:{family:'Montserrat',size:11},
+          bodyFont:{size:11},
+          filter: item => !item.dataset.label?.startsWith('_'),
+          callbacks:{label:c=>c.parsed.y!=null&&!c.dataset.label?.startsWith('_')?' '+c.parsed.y.toLocaleString('fr-FR')+' €/m²':''}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9},maxTicksLimit:scale==='2ans'?8:10}},
+        y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9},callback:v=>v.toLocaleString('fr-FR')+'€'},grace:'5%'}
+      }
+    }
+  });
 }
+
 function setScale(s){
   curScale=s;
   document.querySelectorAll('#chartCtrl .cht-btn').forEach(b=>b.classList.toggle('active',b.dataset.scale===s));
   buildChart(s);
 }
-/* Charger le graphique après que Chart.js soit disponible */
-window.addEventListener('load',()=>buildChart('10ans'));
+
+window.addEventListener('load',()=>buildChart('5ans'));
 </script>
 </body>
 </html>
