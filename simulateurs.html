@@ -215,16 +215,17 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <!-- Étape 0 -->
         <div class="est-step active" data-s="0">
           <div class="field">
-            <label>Commune ou arrondissement</label>
+            <label>Adresse du bien <span class="hint">— numéro, rue, ville</span></label>
             <div class="search-wrap">
               <div class="search-bar" id="sBar" onclick="document.getElementById('cInput').focus()">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="cInput" class="search-input" placeholder="Paris, Lyon, Annecy, Paris 16e…" autocomplete="off" spellcheck="false" oninput="onCI(this.value)" onkeydown="onCK(event)">
+                <input type="text" id="cInput" class="search-input" placeholder="15 rue de la Paix, Paris — ou ville seule" autocomplete="off" spellcheck="false" oninput="onCI(this.value)" onkeydown="onCK(event)">
                 <button class="search-clear" id="clrBtn" onclick="clearCity()" title="Effacer">✕</button>
               </div>
               <div class="search-dd" id="sDrop"></div>
             </div>
             <div class="city-badge" id="cBadge"></div>
+            <p class="note" style="margin-top:5px">Source : Base Adresse Nationale — api-adresse.data.gouv.fr (gouvernement français)</p>
           </div>
           <div class="field">
             <label>Type de bien</label>
@@ -515,28 +516,28 @@ function goStep(i){
 
 /* ── BASE DE DONNÉES ── */
 const DB = {
-  'paris':      {n:'Paris (intramuros)',  pm:9700, maison:11500,trend:[8500,9200,9800,9900,9600,9700],r15:.065,proj:[-.03,.00,.01],ma:'paris-75056'},
-  'paris 1':    {n:'Paris 1er',           pm:11200,maison:13000,trend:[9800,10500,11200,11500,11100,11200],r15:.07, proj:[-.04,.00,.01],ma:'paris-75001'},
-  'paris 2':    {n:'Paris 2e',            pm:10800,maison:12500,trend:[9400,10100,10700,11000,10700,10800],r15:.068,proj:[-.03,.00,.01],ma:'paris-75002'},
-  'paris 3':    {n:'Paris 3e',            pm:11300,maison:13200,trend:[9900,10600,11200,11600,11200,11300],r15:.07, proj:[-.03,.00,.01],ma:'paris-75003'},
-  'paris 4':    {n:'Paris 4e',            pm:12000,maison:14000,trend:[10500,11200,11800,12300,11900,12000],r15:.07,proj:[-.04,.00,.01],ma:'paris-75004'},
-  'paris 5':    {n:'Paris 5e',            pm:11400,maison:13500,trend:[10000,10700,11300,11700,11300,11400],r15:.07,proj:[-.04,.00,.01],ma:'paris-75005'},
-  'paris 6':    {n:'Paris 6e',            pm:13200,maison:16000,trend:[11500,12200,12800,13400,13000,13200],r15:.072,proj:[-.04,.00,.01],ma:'paris-75006'},
-  'paris 7':    {n:'Paris 7e',            pm:13800,maison:17000,trend:[12000,12800,13400,14000,13600,13800],r15:.072,proj:[-.04,.00,.01],ma:'paris-75007'},
-  'paris 8':    {n:'Paris 8e',            pm:11500,maison:14000,trend:[10000,10700,11200,11700,11300,11500],r15:.07, proj:[-.03,.00,.01],ma:'paris-75008'},
-  'paris 9':    {n:'Paris 9e',            pm:10900,maison:12800,trend:[9500,10200,10800,11200,10800,10900],r15:.068,proj:[-.03,.01,.01],ma:'paris-75009'},
-  'paris 10':   {n:'Paris 10e',           pm:10100,maison:11800,trend:[8700,9300,9800,10200,9900,10100],r15:.065,proj:[-.02,.01,.02],ma:'paris-75010'},
-  'paris 11':   {n:'Paris 11e',           pm:10200,maison:11900,trend:[8800,9400,9900,10300,10000,10200],r15:.065,proj:[-.02,.01,.02],ma:'paris-75011'},
-  'paris 12':   {n:'Paris 12e',           pm:9400, maison:11000,trend:[8100,8700,9200,9600,9300,9400],r15:.062,proj:[-.02,.01,.02],ma:'paris-75012'},
-  'paris 13':   {n:'Paris 13e',           pm:8900, maison:10400,trend:[7700,8300,8700,9100,8800,8900],r15:.06, proj:[-.02,.01,.02],ma:'paris-75013'},
-  'paris 14':   {n:'Paris 14e',           pm:9600, maison:11200,trend:[8300,8900,9400,9800,9500,9600],r15:.063,proj:[-.02,.01,.02],ma:'paris-75014'},
-  'paris 15':   {n:'Paris 15e',           pm:10200,maison:12000,trend:[8900,9500,10000,10400,10100,10200],r15:.065,proj:[-.03,.00,.01],ma:'paris-75015'},
-  'paris 16':   {n:'Paris 16e',           pm:11000,maison:13500,trend:[9500,10200,10800,11200,10900,11000],r15:.07, proj:[-.04,.00,.01],ma:'paris-75016'},
-  'paris 17':   {n:'Paris 17e',           pm:10500,maison:12500,trend:[9100,9700,10200,10700,10400,10500],r15:.067,proj:[-.03,.00,.01],ma:'paris-75017'},
-  'paris 18':   {n:'Paris 18e',           pm:9200, maison:10800,trend:[7900,8500,9000,9500,9100,9200],r15:.062,proj:[-.02,.01,.02],ma:'paris-75018'},
-  'paris 19':   {n:'Paris 19e',           pm:8600, maison:10000,trend:[7400,7900,8300,8800,8500,8600],r15:.06, proj:[-.02,.01,.02],ma:'paris-75019'},
-  'paris 20':   {n:'Paris 20e',           pm:8800, maison:10200,trend:[7600,8100,8600,9000,8700,8800],r15:.061,proj:[-.02,.01,.02],ma:'paris-75020'},
-  'neuilly':    {n:'Neuilly-sur-Seine',   pm:10800,maison:12500,trend:[9400,10000,10600,11000,10700,10800],r15:.07,proj:[-.03,.00,.01],ma:'neuilly-sur-seine-92051'},
+  'paris':      {n:'Paris (intramuros)',  pm:9500, maison:11200,trend:[8500,9200,9800,9900,9400,9200,9500],r15:.065,proj:[.00,.01,.02],ma:'paris-75056'},
+  'paris 1':    {n:'Paris 1er',           pm:10900,maison:12700,trend:[9800,10500,11200,11500,11100,11200,10900],r15:.07, proj:[-.04,.00,.01],ma:'paris-75001'},
+  'paris 2':    {n:'Paris 2e',            pm:10500,maison:12200,trend:[9400,10100,10700,11000,10700,10800,10500],r15:.068,proj:[-.03,.00,.01],ma:'paris-75002'},
+  'paris 3':    {n:'Paris 3e',            pm:11000,maison:12900,trend:[9900,10600,11200,11600,11200,11300,11000],r15:.07, proj:[-.03,.00,.01],ma:'paris-75003'},
+  'paris 4':    {n:'Paris 4e',            pm:11700,maison:13700,trend:[10500,11200,11800,12300,11900,12000,11700],r15:.07,proj:[-.04,.00,.01],ma:'paris-75004'},
+  'paris 5':    {n:'Paris 5e',            pm:11100,maison:13200,trend:[10000,10700,11300,11700,11300,11400,11100],r15:.07,proj:[-.04,.00,.01],ma:'paris-75005'},
+  'paris 6':    {n:'Paris 6e',            pm:12900,maison:15700,trend:[11500,12200,12800,13400,13000,13200,12900],r15:.072,proj:[-.04,.00,.01],ma:'paris-75006'},
+  'paris 7':    {n:'Paris 7e',            pm:13500,maison:16600,trend:[12000,12800,13400,14000,13600,13800,13500],r15:.072,proj:[-.04,.00,.01],ma:'paris-75007'},
+  'paris 8':    {n:'Paris 8e',            pm:11200,maison:13700,trend:[10000,10700,11200,11700,11300,11500,11200],r15:.07, proj:[-.03,.00,.01],ma:'paris-75008'},
+  'paris 9':    {n:'Paris 9e',            pm:10600,maison:12500,trend:[9500,10200,10800,11200,10800,10900,10600],r15:.068,proj:[-.03,.01,.01],ma:'paris-75009'},
+  'paris 10':   {n:'Paris 10e',           pm:9800,maison:11500,trend:[8700,9300,9800,10200,9900,10100,9800],r15:.065,proj:[-.02,.01,.02],ma:'paris-75010'},
+  'paris 11':   {n:'Paris 11e',           pm:9900,maison:11600,trend:[8800,9400,9900,10300,10000,10200,9900],r15:.065,proj:[-.02,.01,.02],ma:'paris-75011'},
+  'paris 12':   {n:'Paris 12e',           pm:9100, maison:10700,trend:[8100,8700,9200,9600,9300,9400,9100],r15:.062,proj:[-.02,.01,.02],ma:'paris-75012'},
+  'paris 13':   {n:'Paris 13e',           pm:8600, maison:10100,trend:[7700,8300,8700,9100,8800,8900,8600],r15:.06, proj:[-.02,.01,.02],ma:'paris-75013'},
+  'paris 14':   {n:'Paris 14e',           pm:9300, maison:10900,trend:[8300,8900,9400,9800,9500,9600,9300],r15:.063,proj:[-.02,.01,.02],ma:'paris-75014'},
+  'paris 15':   {n:'Paris 15e',           pm:9900,maison:11700,trend:[8900,9500,10000,10400,10100,10200,9900],r15:.065,proj:[-.03,.00,.01],ma:'paris-75015'},
+  'paris 16':   {n:'Paris 16e',           pm:10700,maison:13200,trend:[9500,10200,10800,11200,10900,11000,10700],r15:.07, proj:[-.04,.00,.01],ma:'paris-75016'},
+  'paris 17':   {n:'Paris 17e',           pm:10200,maison:12200,trend:[9100,9700,10200,10700,10400,10500,10200],r15:.067,proj:[-.03,.00,.01],ma:'paris-75017'},
+  'paris 18':   {n:'Paris 18e',           pm:8900, maison:10500,trend:[7900,8500,9000,9500,9100,9200,8900],r15:.062,proj:[-.02,.01,.02],ma:'paris-75018'},
+  'paris 19':   {n:'Paris 19e',           pm:8300, maison:9700,trend:[7400,7900,8300,8800,8500,8600,8300],r15:.06, proj:[-.02,.01,.02],ma:'paris-75019'},
+  'paris 20':   {n:'Paris 20e',           pm:8500, maison:9900,trend:[7600,8100,8600,9000,8700,8800,8500],r15:.061,proj:[-.02,.01,.02],ma:'paris-75020'},
+  'neuilly':    {n:'Neuilly-sur-Seine',   pm:10500,maison:12200,trend:[9400,10000,10600,11000,10700,10800,10500],r15:.07,proj:[-.03,.00,.01],ma:'neuilly-sur-seine-92051'},
   'versailles': {n:'Versailles',          pm:6200, maison:7000, trend:[5200,5600,6000,6400,6100,6200],r15:.05,proj:[-.02,.01,.02],ma:'versailles-78646'},
   'boulogne':   {n:'Boulogne-Billancourt',pm:8200, maison:9500, trend:[7000,7600,8000,8400,8100,8200],r15:.065,proj:[-.02,.01,.02],ma:'boulogne-billancourt-92012'},
   'levallois':  {n:'Levallois-Perret',    pm:8000, maison:9200, trend:[6800,7300,7700,8100,7900,8000],r15:.06,proj:[-.02,.01,.02],ma:'levallois-perret-92044'},
@@ -567,57 +568,143 @@ const DB = {
   'la rochelle':{n:'La Rochelle',    pm:3500, maison:3700, trend:[2800,3100,3400,3700,3500,3500],r15:.056,proj:[-.01,.01,.02],ma:'la-rochelle-17300'},
   'cannes':     {n:'Cannes',         pm:6200, maison:7000, trend:[5200,5600,6000,6500,6300,6200],r15:.04,proj:[.01,.02,.03],ma:'cannes-06029'},
   'antibes':    {n:'Antibes',        pm:4800, maison:5200, trend:[4000,4300,4600,5000,4800,4800],r15:.035,proj:[.00,.02,.03],ma:'antibes-06004'},
-  'saint-tropez':{n:'Saint-Tropez',  pm:12500,maison:15000,trend:[10000,11000,12000,13500,13000,12500],r15:.04,proj:[.02,.03,.04],ma:'saint-tropez-83990'},
+  'saint-tropez':{n:'Saint-Tropez',  pm:12800,maison:15400,trend:[10000,11000,12000,13500,13000,12500,12800],r15:.04,proj:[.02,.03,.04],ma:'saint-tropez-83990'},
   'chambery':   {n:'Chambéry',       pm:3600, maison:3400, trend:[2800,3100,3400,3700,3600,3600],r15:.055,proj:[.00,.02,.03],ma:'chambery-73065'},
   'angers':     {n:'Angers',         pm:2900, maison:2700, trend:[2300,2500,2700,3000,2900,2900],r15:.05,proj:[-.01,.01,.02],ma:'angers-49007'},
   'pau':        {n:'Pau',           pm:2100, maison:2000, trend:[1700,1900,2000,2200,2100,2100],r15:.035,proj:[-.01,.01,.02],ma:'pau-64445'},
   'avignon':    {n:'Avignon',       pm:2800, maison:2700, trend:[2200,2400,2600,2900,2800,2800],r15:.04,proj:[-.01,.01,.02],ma:'avignon-84007'},
-  'clermont':   {n:'Clermont-Ferrand',pm:2400,maison:2100,trend:[1900,2100,2300,2500,2400,2400],r15:.038,proj:[-.01,.01,.02],ma:'clermont-ferrand-63113'},
+  'clermont':   {n:'Clermont-Ferrand',pm:2300,maison:2000,trend:[1900,2100,2300,2500,2400,2400,2300],r15:.038,proj:[-.01,.01,.02],ma:'clermont-ferrand-63113'},
   'limoges':    {n:'Limoges',       pm:1900, maison:1700, trend:[1500,1600,1800,2000,1900,1900],r15:.029,proj:[-.01,.00,.01],ma:'limoges-87085'},
-  'saint-etienne':{n:'Saint-Étienne',pm:1700,maison:1500,trend:[1400,1500,1600,1800,1700,1700],r15:.022,proj:[-.02,.00,.01],ma:'saint-etienne-42218'},
+  'saint-etienne':{n:'Saint-Étienne',pm:1650,maison:1450,trend:[1400,1500,1600,1800,1700,1700,1650],r15:.022,proj:[-.02,.00,.01],ma:'saint-etienne-42218'},
   'le mans':    {n:'Le Mans',        pm:2100, maison:1900, trend:[1700,1800,1900,2200,2100,2100],r15:.032,proj:[-.01,.01,.02],ma:'le-mans-72181'},
   'amiens':     {n:'Amiens',         pm:2300, maison:2000, trend:[1800,2000,2100,2400,2300,2300],r15:.035,proj:[-.01,.01,.02],ma:'amiens-80021'},
   'chamonix':   {n:'Chamonix',       pm:8500, maison:9500, trend:[7000,7500,8000,9000,8600,8500],r15:.045,proj:[.02,.03,.04],ma:'chamonix-mont-blanc-74056'},
   'megeve':     {n:'Megève',         pm:8000, maison:9000, trend:[6500,7000,7600,8500,8200,8000],r15:.042,proj:[.02,.03,.04],ma:'megeve-74153'},
 };
 
-/* ── RECHERCHE ── */
-let selKey=null, dFi=-1;
+/* ── RECHERCHE — API Adresse (gouvernement) + fallback DB ── */
+let selKey=null, selAddr=null, selCoords=null, dFi=-1, _ciT;
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-function hl(txt,q){ const i=norm(txt).indexOf(q); return i<0?txt:txt.slice(0,i)+'<mark>'+txt.slice(i,i+q.length)+'</mark>'+txt.slice(i+q.length); }
+function hl(txt,q){const i=norm(txt).indexOf(q);return i<0?txt:txt.slice(0,i)+'<mark>'+txt.slice(i,i+q.length)+'</mark>'+txt.slice(i+q.length);}
 
-function onCI(v){
+/* Mapping INSEE → clé DB (pour Paris arrondissements et grandes villes) */
+function codeToKey(postcode, cityName){
+  if(postcode && postcode.startsWith('75')){
+    const arr=parseInt(postcode.slice(-2),10);
+    if(arr>=1&&arr<=20) return 'paris '+arr;
+    return 'paris';
+  }
+  const n=norm(cityName||'');
+  // Cherche d'abord correspondance exacte, puis partielle
+  const exact=Object.keys(DB).find(k=>norm(DB[k].n)===n||norm(k)===n);
+  if(exact) return exact;
+  const partial=Object.keys(DB).find(k=>n.includes(norm(k))||norm(k).includes(n.split(' ')[0]));
+  return partial||null;
+}
+
+/* Auto-détecte le type de quartier selon l'arrondissement (Paris) ou le rang de la ville */
+function autoQuartier(key, postcode){
+  if(!key) return;
+  // Paris arrondissements
+  if(key.startsWith('paris ')){
+    const arr=parseInt(key.replace('paris ',''),10);
+    let q='standard';
+    if([1,4,5,6,7].includes(arr)) q='prestige';
+    else if([2,3,8,15,16,17].includes(arr)) q='prise';
+    else if([9,10,11,12,13,14].includes(arr)) q='standard';
+    else q='peripherie';
+    document.querySelectorAll('#e-quartier .chip').forEach(c=>{
+      c.classList.toggle('sel',c.dataset.v===q);
+    });
+  }
+}
+
+async function onCI(v){
   document.getElementById('clrBtn').style.display=v?'block':'none';
   document.getElementById('cBadge').style.display='none';
-  selKey=null;
-  if(!v.length){hideDrop();liveReset();return;}
-  const q=norm(v);
-  const m=Object.entries(DB).filter(([k,c])=>norm(k).includes(q)||norm(c.n).includes(q))
-    .sort(([a],[b])=>{const as=norm(a).startsWith(q),bs=norm(b).startsWith(q);return as===bs?0:as?-1:1})
-    .slice(0,9);
-  if(!m.length){hideDrop();return;}
-  const inp=document.getElementById('sBar');
-  const r=inp.getBoundingClientRect();
-  const dd=document.getElementById('sDrop');
-  dd.style.left=r.left+'px'; dd.style.top=r.bottom+'px'; dd.style.width=r.width+'px';
-  dd.style.display='block'; dFi=-1;
-  dd.innerHTML=m.map(([k,c])=>
-    `<div class="sug" data-key="${k}" onmousedown="pickCity('${k}')">
-       <span class="sug-name">${hl(c.n,q)}</span>
-       <span class="sug-price">${c.pm.toLocaleString('fr-FR')} €/m² <small>appt. 2024</small></span>
-     </div>`).join('');
+  selKey=null; selAddr=null; selCoords=null;
+  if(v.length<2){hideDrop();liveReset();return;}
+  clearTimeout(_ciT);
+  _ciT=setTimeout(async()=>{
+    try{
+      // Appel API Adresse officielle (Base Adresse Nationale)
+      const url=`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(v)}&limit=8&autocomplete=1`;
+      const res=await fetch(url);
+      const json=await res.json();
+      const features=json.features||[];
+      if(!features.length){hideDrop();return;}
+      const dd=document.getElementById('sDrop');
+      const r=document.getElementById('sBar').getBoundingClientRect();
+      dd.style.left=r.left+'px';dd.style.top=r.bottom+'px';dd.style.width=r.width+'px';
+      dd.style.display='block';dFi=-1;
+      dd.innerHTML=features.map((f,i)=>{
+        const p=f.properties;
+        const dbKey=codeToKey(p.postcode,p.city);
+        const pm=dbKey?DB[dbKey]?.pm:null;
+        return `<div class="sug" data-idx="${i}" onmousedown="pickAddr(${i},${JSON.stringify(f).split('"').join('&quot;')})">
+          <span class="sug-name">${p.label}</span>
+          ${pm?`<span class="sug-price">${pm.toLocaleString('fr-FR')} €/m² <small>médiane</small></span>`:''}
+        </div>`;
+      }).join('');
+      // Stocker les features pour pickAddr
+      window._addrFeatures=features;
+    }catch(e){
+      // Fallback : recherche dans la DB locale
+      const q=norm(v);
+      const m=Object.entries(DB).filter(([k,c])=>norm(k).includes(q)||norm(c.n).includes(q))
+        .sort(([a],[b])=>{const as=norm(a).startsWith(q),bs=norm(b).startsWith(q);return as===bs?0:as?-1:1}).slice(0,8);
+      if(!m.length){hideDrop();return;}
+      const dd=document.getElementById('sDrop');
+      const r=document.getElementById('sBar').getBoundingClientRect();
+      dd.style.left=r.left+'px';dd.style.top=r.bottom+'px';dd.style.width=r.width+'px';
+      dd.style.display='block';dFi=-1;
+      dd.innerHTML=m.map(([k,c])=>`<div class="sug" data-key="${k}" onmousedown="pickCity('${k}')"><span class="sug-name">${hl(c.n,q)}</span><span class="sug-price">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane</small></span></div>`).join('');
+    }
+  },220);
 }
+
+function pickAddr(idx){
+  const f=(window._addrFeatures||[])[idx];if(!f)return;
+  const p=f.properties;
+  const key=codeToKey(p.postcode,p.city);
+  selAddr={label:p.label,postcode:p.postcode,city:p.city,type:p.type};
+  selCoords={lon:f.geometry.coordinates[0],lat:f.geometry.coordinates[1]};
+  if(key){selKey=key;}
+  else{
+    // Ville non trouvée dans la DB — afficher quand même l'adresse
+    selKey=null;
+  }
+  document.getElementById('cInput').value=p.label;
+  document.getElementById('clrBtn').style.display='block';
+  hideDrop();
+  const b=document.getElementById('cBadge');
+  b.style.display='flex';
+  const pm=selKey?DB[selKey]?.pm:null;
+  b.innerHTML=`<div><span class="cb-name">${p.label}</span>${pm?`<span style="display:block;font-size:.72rem;color:var(--texte-doux);margin-top:1px">${p.city}${p.postcode?' · '+p.postcode:''}</span>`:''}</div>
+    <div style="display:flex;align-items:center;gap:5px">
+      ${pm?`<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>`:'<span class="cb-pm" style="color:var(--texte-doux);font-size:.8rem">Ville non référencée</span>'}
+      <span class="cb-chg" onclick="clearCity()">Changer</span>
+    </div>`;
+  if(selKey) autoQuartier(selKey, p.postcode);
+  debLive();
+}
+
 function onCK(e){
   const items=document.getElementById('sDrop').querySelectorAll('.sug');
   if(e.key==='ArrowDown'){e.preventDefault();dFi=Math.min(dFi+1,items.length-1);updFi(items);}
   else if(e.key==='ArrowUp'){e.preventDefault();dFi=Math.max(dFi-1,-1);updFi(items);}
-  else if(e.key==='Enter'&&dFi>=0){e.preventDefault();pickCity(items[dFi].dataset.key);}
+  else if(e.key==='Enter'&&dFi>=0){e.preventDefault();
+    const it=items[dFi];
+    if(it.dataset.key)pickCity(it.dataset.key);
+    else{const idx=parseInt(it.dataset.idx||'0');pickAddr(idx);}
+  }
   else if(e.key==='Escape')hideDrop();
 }
-function updFi(its){ its.forEach((it,i)=>it.classList.toggle('foc',i===dFi)); if(dFi>=0)its[dFi].scrollIntoView({block:'nearest'}); }
-function hideDrop(){ document.getElementById('sDrop').style.display='none'; dFi=-1; }
+function updFi(its){its.forEach((it,i)=>it.classList.toggle('foc',i===dFi));if(dFi>=0)its[dFi].scrollIntoView({block:'nearest'});}
+function hideDrop(){document.getElementById('sDrop').style.display='none';dFi=-1;}
 function pickCity(k){
-  selKey=k; const c=DB[k];
+  selKey=k;selAddr=null;selCoords=null;
+  const c=DB[k];
   document.getElementById('cInput').value=c.n;
   document.getElementById('clrBtn').style.display='block';
   hideDrop();
@@ -625,18 +712,18 @@ function pickCity(k){
   b.style.display='flex';
   b.innerHTML=`<div><span class="cb-name">${c.n}</span></div>
     <div style="display:flex;align-items:center;gap:5px">
-      <span class="cb-pm">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane 2024</small></span>
+      <span class="cb-pm">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>
       <span class="cb-chg" onclick="clearCity()">Changer</span>
     </div>`;
   debLive();
 }
 function clearCity(){
-  selKey=null;
+  selKey=null;selAddr=null;selCoords=null;
   document.getElementById('cInput').value='';
   document.getElementById('clrBtn').style.display='none';
   document.getElementById('cBadge').style.display='none';
   document.getElementById('cInput').focus();
-  hideDrop(); liveReset();
+  hideDrop();liveReset();
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))hideDrop();});
 window.addEventListener('scroll',hideDrop,{passive:true});
@@ -690,6 +777,8 @@ function openResult(){
     quartier:{v:gS('e-quartier')?.dataset.v||'standard',k:gS('e-quartier')?.dataset.k||'0'},
     exterieur:{v:gS('e-exterieur')?.dataset.v||'aucun',k:gS('e-exterieur')?.dataset.k||'0'},
     vue:{v:gS('e-vue')?.dataset.v||'standard',k:gS('e-vue')?.dataset.k||'0'},
+    addr: selAddr || null,
+    coords: selCoords || null,
   };
   sessionStorage.setItem('divimo_est',JSON.stringify(data));
   window.location.href='estimation-result.html';
