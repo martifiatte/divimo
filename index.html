@@ -759,9 +759,20 @@ footer { background: #080D1A; border-top: 1px solid rgba(255,255,255,.05); paddi
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script src="header-auth.js"></script>
 <script>
+/* Si déjà connecté → rediriger vers l'espace (pas la landing) */
+(function(){
+  const k='sb-anrwoxsibhabivtkepqt-auth-token';
+  try{
+    const p=JSON.parse(localStorage.getItem(k)||'');
+    const u=p?.user||p?.currentSession?.user;
+    const e=p?.expires_at||p?.currentSession?.expires_at;
+    if(u&&(!e||Date.now()/1000<e)){window.location.replace('espace.html');return;}
+  }catch(err){}
+})();
 const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}), {threshold:.1});
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
