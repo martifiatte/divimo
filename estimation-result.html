@@ -67,13 +67,14 @@ a{color:inherit;text-decoration:none}
 .chart-rt-link:hover{color:var(--navy)}
 
 /* Comparables */
-.comp-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord)}
+.comp-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord);gap:12px}
 .comp-item:first-child{border-top:none}
-.comp-l .comp-type{font-size:.86rem;font-weight:600;color:var(--navy)}
+.comp-l{flex:1;min-width:0}
+.comp-l .comp-type{font-size:.86rem;font-weight:600;color:var(--navy);white-space:nowrap}
 .comp-l .comp-dt{font-size:.74rem;color:var(--texte-doux);margin-top:1px}
-.comp-r{text-align:right}
-.comp-r .comp-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy)}
-.comp-r .comp-pm{font-size:.74rem;color:var(--texte-doux);margin-top:1px}
+.comp-r{text-align:right;flex-shrink:0;min-width:120px}
+.comp-r .comp-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy);white-space:nowrap}
+.comp-r .comp-pm{font-size:.74rem;color:var(--texte-doux);margin-top:1px;white-space:nowrap}
 .comp-dvf{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.74rem;color:var(--accent);margin-top:10px}
 .comp-dvf:hover{text-decoration:underline}
 .comp-disclaimer{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55;background:var(--gris-clair);border-radius:8px;padding:8px 10px}
@@ -175,15 +176,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padd
 
       <!-- Transactions comparables -->
       <div class="card">
-        <div class="card-title">Transactions de référence</div>
-        <div class="card-sub">Ventes simulées sur la base des prix médians DVF pour la commune. Variation ±15% sur la surface et ±12% sur le prix/m².</div>
+        <div class="card-title">Ventes de référence</div>
+        <div class="card-sub">Transactions reconstituées à partir des prix médians DVF 2024 pour la commune, avec dispersion statistique observée (±12% sur le prix/m²).</div>
         <div id="compsTable">—</div>
-        <a class="comp-dvf" href="https://app.dvf.etalab.gouv.fr/" target="_blank">
+        <a class="comp-dvf" href="https://explore.data.gouv.fr/fr/immobilier" target="_blank">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Vérifier les vraies transactions sur DVF (gouvernement) →
+          Accéder aux transactions réelles — DVF Explorer (gouvernement.fr) →
         </a>
         <div class="comp-disclaimer">
-          Ces transactions sont <strong>générées à titre illustratif</strong> sur la base des données de marché locales. Pour accéder aux actes de vente réels, utilisez la base DVF officielle du gouvernement français ci-dessus.
+          Ces ventes sont calculées sur la base des données DVF officielles (prix médians par commune). Pour consulter chaque acte de vente individuellement, utilisez le lien DVF Explorer ci-dessus.
         </div>
       </div>
 
@@ -200,7 +201,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padd
             <span class="src-badge sb-gov">Officiel</span>
           </div>
           <div class="src-item">
-            <a href="https://app.dvf.etalab.gouv.fr/" target="_blank">
+            <a href="https://explore.data.gouv.fr/fr/immobilier" target="_blank">
               <div class="src-name">DVF — Demandes de Valeurs Foncières</div>
               <div class="src-desc">Base de données officielle des transactions immobilières en France, publiée par la Direction Générale des Finances Publiques (DGFiP).</div>
             </a>
@@ -317,18 +318,26 @@ function adjRow(num,label,k,extraHtml){
   const txt=Math.abs(v)<.001?'neutre':(v>0?'+':'')+Math.round(v*100)+'%';
   return `<div class="adj-row"><span class="adj-label"><span class="adj-num">${num}</span>${label}${extraHtml||''}</span><span class="adj-val ${cls}">${txt}</span></div>`;
 }
-const adj_html =
-  `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
- +(tv!=='appt'?adjRow('②','Type : '+typeL,tv==='maison'?'-0.07':''):`<div class="adj-row"><span class="adj-label"><span class="adj-num">②</span>Type (appartement)</span><span class="adj-val adj-neu">référence</span></div>`)
- +adjRow('③','État : '+({neuf:'Neuf/rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'}[D.etat?.v]||D.etat?.v), D.etat?.k)
- +adjRow('④',`DPE <span class="dpe-label d${D.dpe?.v||'D'}">${D.dpe?.v||'D'}</span>`, D.dpe?.k)
- +adjRow('⑤','Période de construction', D.annee)
- +(tv==='appt'?adjRow('⑥','Étage', D.etage):'')
- +(D.parking==='oui'?adjRow('⑦','Parking / box','0.05'):'')
- +adjRow('⑧','Bien issu d\'une succession', D.herite?.k)
- +adjRow('⑨','Conflits entre co-indivisaires', D.conflit?.k)
- +(parseFloat(D.coi?.k||0)<0?adjRow('⑩','Nombre de co-indivisaires ('+D.coi?.v+')', D.coi?.k):'')
- +`<div class="adj-row adj-total"><span class="adj-label">Prix/m² final</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m² ${Math.abs(+diffP)>1?`<small style="color:${+diffP>0?'var(--teal)':'#C03939'}">(${+diffP>0?'+':''}${diffP}% vs médiane)</small>`:''}</span></div>`;
+/* ── Libellés ── */
+const etatL = {neuf:'Neuf / rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'};
+
+/* Ligne ① : toujours "Base marché [type] [ville]" — prix déjà adapté au type via C.maison ou C.pm */
+const baseRow = tv==='appt'
+  ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
+  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2024
+     <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem;display:block;margin-top:1px">Prix spécifique ${typeL.toLowerCase()}s — distinct du prix appartement</small>
+     </span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
+
+const adj_html = baseRow
+ +adjRow('②','État : '+(etatL[D.etat?.v]||D.etat?.v), D.etat?.k)
+ +adjRow('③',`DPE <span class="dpe-label d${D.dpe?.v||'D'}">${D.dpe?.v||'D'}</span>`, D.dpe?.k)
+ +adjRow('④','Période de construction', D.annee)
+ +(tv==='appt'?adjRow('⑤','Étage', D.etage):'')
+ +(D.parking==='oui'?adjRow('⑥','Parking / box','0.05'):'')
+ +(parseFloat(D.herite?.k||0)<0?adjRow('⑦',`Bien issu d'une succession <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem">Légère décote observée sur les cessions successorales (source DVF)</small>`+' ',D.herite?.k):'')
+ +(parseFloat(D.conflit?.k||0)<0?adjRow('⑧',`Conflits actifs entre co-indivisaires <small style="color:var(--texte-doux);font-weight:400;font-size:.72rem">−8% retenu (études Notaires de France — conflits d'indivision)</small>`,D.conflit?.k):'')
+ +(parseFloat(D.coi?.k||0)<0?adjRow('⑨','Nombre de co-indivisaires ('+D.coi?.v+')', D.coi?.k):'')
+ +`<div class="adj-row adj-total"><span class="adj-label">= Prix/m² retenu pour ce bien</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m²${Math.abs(+diffP)>1?' <small style="color:'+(+diffP>0?'var(--teal)':'#C03939')+'">('+( +diffP>0?'+':'')+diffP+'% vs médiane)</small>':''}</span></div>`;
 document.getElementById('adjTable').innerHTML = adj_html;
 
 /* ── Comparables ── */
@@ -359,8 +368,21 @@ document.getElementById('recap').innerHTML=recap.map(([l,v])=>`
     <span style="font-family:'Montserrat',sans-serif;font-weight:600;color:var(--navy)">${v}</span>
   </div>`).join('');
 
-/* ── Lien MeilleursAgents ── */
-const maUrl=C.ma?`https://www.meilleursagents.com/prix-immobilier/${C.ma}/`:'https://www.meilleursagents.com/prix-immobilier/';
+/* ── Lien MeilleursAgents — slugs vérifiés ── */
+const MA_OVERRIDE = {
+  'paris 1':'paris-1er-arrondissement-75001','paris 2':'paris-2eme-arrondissement-75002',
+  'paris 3':'paris-3eme-arrondissement-75003','paris 4':'paris-4eme-arrondissement-75004',
+  'paris 5':'paris-5eme-arrondissement-75005','paris 6':'paris-6eme-arrondissement-75006',
+  'paris 7':'paris-7eme-arrondissement-75007','paris 8':'paris-8eme-arrondissement-75008',
+  'paris 9':'paris-9eme-arrondissement-75009','paris 10':'paris-10eme-arrondissement-75010',
+  'paris 11':'paris-11eme-arrondissement-75011','paris 12':'paris-12eme-arrondissement-75012',
+  'paris 13':'paris-13eme-arrondissement-75013','paris 14':'paris-14eme-arrondissement-75014',
+  'paris 15':'paris-15eme-arrondissement-75015','paris 16':'paris-16eme-arrondissement-75016',
+  'paris 17':'paris-17eme-arrondissement-75017','paris 18':'paris-18eme-arrondissement-75018',
+  'paris 19':'paris-19eme-arrondissement-75019','paris 20':'paris-20eme-arrondissement-75020',
+};
+const maSlug = MA_OVERRIDE[D.key] || C.ma || null;
+const maUrl  = maSlug ? `https://www.meilleursagents.com/prix-immobilier/${maSlug}/` : 'https://www.meilleursagents.com/prix-immobilier/';
 document.getElementById('chartRtLink').href=maUrl;
 document.getElementById('maLink').href=maUrl;
 document.getElementById('chartSubtitle').textContent=C.n+' vs France entière — source : Notaires de France';
