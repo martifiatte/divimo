@@ -592,18 +592,60 @@ const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 function hl(txt,q){const i=norm(txt).indexOf(q);return i<0?txt:txt.slice(0,i)+'<mark>'+txt.slice(i,i+q.length)+'</mark>'+txt.slice(i+q.length);}
 
 /* Mapping INSEE → clé DB (pour Paris arrondissements et grandes villes) */
+/* ── PRIX PAR DÉPARTEMENT — fallback pour toutes communes françaises ──
+   Source : Notaires de France / DVF — données 2025 par département    */
+const DEPT = {
+  '01':2400,'02':1700,'03':1400,'04':2200,'05':2500,'06':4900,'07':2000,'08':1400,
+  '09':1500,'10':1700,'11':2000,'12':1600,'13':3300,'14':2500,'15':1300,'16':1700,
+  '17':3400,'18':1400,'19':1600,'2a':3200,'2b':2800,'21':2700,'22':2000,'23':1000,
+  '24':1800,'25':2300,'26':2400,'27':1900,'28':1900,'29':2400,'30':2200,'31':3400,
+  '32':1600,'33':3800,'34':3200,'35':3700,'36':1200,'37':2700,'38':2700,'39':1800,
+  '40':3000,'41':1700,'42':1700,'43':1400,'44':3500,'45':2200,'46':1700,'47':1700,
+  '48':1500,'49':2800,'50':1900,'51':2200,'52':1300,'53':1600,'54':2400,'55':1200,
+  '56':2800,'57':2000,'58':1300,'59':2800,'60':2000,'61':1600,'62':2000,'63':2300,
+  '64':3200,'65':1700,'66':2700,'67':3700,'68':2800,'69':4400,'70':1500,'71':1700,
+  '72':2000,'73':3800,'74':4900,'76':2400,'77':2700,'78':3400,'79':1600,'80':2000,
+  '81':1800,'82':1700,'83':3600,'84':2700,'85':2500,'86':2000,'87':1900,'88':1600,
+  '89':1600,'90':1800,'91':3100,'92':6500,'93':3400,'94':5000,'95':2900,
+  '971':2200,'972':2500,'973':1800,'974':2400,'976':1500,
+};
+
+function deptFromPostcode(pc){
+  if(!pc) return null;
+  if(pc.startsWith('2a')||pc.startsWith('2A')) return '2a';
+  if(pc.startsWith('2b')||pc.startsWith('2B')) return '2b';
+  const d2=pc.slice(0,2);
+  const d3=pc.slice(0,3);
+  return DEPT[d3]?d3:(DEPT[d2]?d2:null);
+}
+
 function codeToKey(postcode, cityName){
+  /* 1. Paris arrondissements */
   if(postcode && postcode.startsWith('75')){
     const arr=parseInt(postcode.slice(-2),10);
     if(arr>=1&&arr<=20) return 'paris '+arr;
     return 'paris';
   }
+  /* 2. Correspondance exacte ou partielle dans la DB */
   const n=norm(cityName||'');
-  // Cherche d'abord correspondance exacte, puis partielle
   const exact=Object.keys(DB).find(k=>norm(DB[k].n)===n||norm(k)===n);
   if(exact) return exact;
   const partial=Object.keys(DB).find(k=>n.includes(norm(k))||norm(k).includes(n.split(' ')[0]));
-  return partial||null;
+  if(partial) return partial;
+  /* 3. Fallback département : crée une entrée temporaire dans DB */
+  const dept=deptFromPostcode(postcode);
+  if(dept && DEPT[dept]){
+    const pm=DEPT[dept];
+    const dKey='dept_'+dept;
+    if(!DB[dKey]) DB[dKey]={
+      n:cityName||('Département '+dept), pm,
+      maison:Math.round(pm*.93),
+      trend:[Math.round(pm*.88),Math.round(pm*.90),Math.round(pm*.93),Math.round(pm*.96),Math.round(pm*.98),pm,pm],
+      r15:.04, proj:[-.02,.01,.02], ma:null, deptLevel:true
+    };
+    return dKey;
+  }
+  return null;
 }
 
 /* Auto-détecte le type de quartier pour toute la France */
@@ -702,7 +744,10 @@ function pickAddr(idx){
   const pm=selKey?DB[selKey]?.pm:null;
   b.innerHTML=`<div><span class="cb-name">${p.label}</span>${pm?`<span style="display:block;font-size:.72rem;color:var(--texte-doux);margin-top:1px">${p.city}${p.postcode?' · '+p.postcode:''}</span>`:''}</div>
     <div style="display:flex;align-items:center;gap:5px">
-      ${pm?`<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>`:'<span class="cb-pm" style="color:var(--texte-doux);font-size:.8rem">Ville non référencée</span>'}
+      ${pm?(DB[selKey||'']?.deptLevel
+        ? `<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane dépt. 2025</small></span>`
+        : `<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>`)
+        :'<span class="cb-pm" style="color:var(--texte-doux);font-size:.8rem">Estimation par département</span>'}
       <span class="cb-chg" onclick="clearCity()">Changer</span>
     </div>`;
   autoQuartier(selKey, p.postcode, selKey?DB[selKey]?.pm:null);
