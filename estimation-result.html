@@ -425,7 +425,8 @@ const tv   = D.type;
 const pmB  = tv==='maison'?C.maison:C.pm;
 const adj  = parseFloat(D.etage||0)+parseFloat(D.annee||0)+parseFloat(D.dpe?.k||0)
             +parseFloat(D.etat?.k||0)+(D.parking==='oui'?.05:0)
-            +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0);
+            +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0)
+            +parseFloat(D.quartier?.k||0)+parseFloat(D.exterieur?.k||0)+parseFloat(D.vue?.k||0);
 const pmF  = Math.round(pmB*(1+adj));
 const val  = D.surf * pmF;
 const mg   = (parseFloat(D.herite?.k||0)<0||parseFloat(D.conflit?.k||0)<0)?.12:.08;
@@ -492,6 +493,9 @@ document.getElementById('adjTable').innerHTML =
   +(parseFloat(D.herite?.k||0)<0?adjRow('⑦',`Bien issu d'une succession`, D.herite?.k,'Légère décote observée sur les cessions successorales — source DVF'):'')
   +(parseFloat(D.conflit?.k||0)<0?adjRow('⑧','Conflits actifs entre co-indivisaires', D.conflit?.k,'−8% retenu selon les études Notaires de France sur les indivisions conflictuelles'):'')
   +(parseFloat(D.coi?.k||0)<0?adjRow('⑨','5 co-indivisaires ou plus', D.coi?.k,'Complexité décisionnelle pouvant réduire l\'attractivité commerciale du bien'):'')
+  +(parseFloat(D.quartier?.k||0)!==0?adjRow('⑩','Quartier : '+({'prestige':'Centre historique / Prestige','prise':'Quartier prisé','standard':'Résidentiel standard','peripherie':'Périphérie / Éloigné'}[D.quartier?.v]||D.quartier?.v), D.quartier?.k,'Type de quartier — impact sur la demande et la liquidité'):'')
+  +(parseFloat(D.exterieur?.k||0)!==0?adjRow('⑪',({'balcon':'Balcon','terrasse':'Terrasse','jardin-s':'Jardin < 100 m²','jardin-m':'Jardin 100–300 m²','jardin-l':'Grand jardin > 300 m²'}[D.exterieur?.v]||D.exterieur?.v), D.exterieur?.k,'Espace extérieur privatif — fort impact sur la valeur (données DVF)'):'')
+  +(parseFloat(D.vue?.k||0)!==0?adjRow('⑫','Vue : '+({'genante':'Vue gênante','standard':'Vue standard','degagee':'Vue dégagée','parc':'Vue parc / forêt','mer':'Vue mer / lac / fleuve'}[D.vue?.v]||D.vue?.v), D.vue?.k,'Impact de la vue sur le prix de cession — données Notaires de France'):'')
   +`<div class="adj-row adj-total"><span class="adj-label">= Prix/m² retenu pour ce bien</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m²${Math.abs(+diffP)>1?` <small style="color:${+diffP>0?'var(--teal)':'#C03939'};font-size:.78rem">(${+diffP>0?'+':''}${diffP}% vs médiane)</small>`:''}</span></div>`;
 
 /* ── COMPARABLES ── */

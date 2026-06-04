@@ -235,6 +235,15 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
               <div class="chip" data-v="local">Local commercial</div>
             </div>
           </div>
+          <div class="field">
+            <label>Type de quartier <span class="hint">— impact sur la valeur</span></label>
+            <div class="chips" id="e-quartier">
+              <div class="chip" data-v="prestige" data-k="0.10">Centre historique / Prestige</div>
+              <div class="chip" data-v="prise" data-k="0.05">Quartier prisé</div>
+              <div class="chip sel" data-v="standard" data-k="0">Résidentiel standard</div>
+              <div class="chip" data-v="peripherie" data-k="-0.06">Périphérie / Éloigné</div>
+            </div>
+          </div>
           <div class="step-nav">
             <span></span>
             <button class="btn btn-p" onclick="goStep(1)">Continuer →</button>
@@ -316,6 +325,27 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
             <div class="tog" id="e-parking">
               <div class="chip" data-v="oui">Oui</div>
               <div class="chip sel" data-v="non">Non</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Extérieur <span class="hint">— jardin, terrasse, balcon</span></label>
+            <div class="chips" id="e-exterieur">
+              <div class="chip sel" data-v="aucun" data-k="0">Aucun</div>
+              <div class="chip" data-v="balcon" data-k="0.03">Balcon</div>
+              <div class="chip" data-v="terrasse" data-k="0.06">Terrasse</div>
+              <div class="chip" data-v="jardin-s" data-k="0.10">Jardin &lt; 100 m²</div>
+              <div class="chip" data-v="jardin-m" data-k="0.15">Jardin 100–300 m²</div>
+              <div class="chip" data-v="jardin-l" data-k="0.20">Grand jardin &gt; 300 m²</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Vue depuis le bien</label>
+            <div class="chips" id="e-vue">
+              <div class="chip" data-v="genante" data-k="-0.07">Vue gênante</div>
+              <div class="chip sel" data-v="standard" data-k="0">Vue standard</div>
+              <div class="chip" data-v="degagee" data-k="0.05">Vue dégagée</div>
+              <div class="chip" data-v="parc" data-k="0.09">Vue parc / forêt</div>
+              <div class="chip" data-v="mer" data-k="0.20">Vue mer / lac / fleuve</div>
             </div>
           </div>
           <div class="step-nav">
@@ -468,6 +498,9 @@ initChips('e-etage', ()=>debLive());
 initChips('e-annee', ()=>debLive());
 initChips('e-etat', ()=>debLive());
 initChips('e-parking', ()=>debLive());
+initChips('e-quartier', ()=>debLive());
+initChips('e-exterieur', ()=>debLive());
+initChips('e-vue', ()=>debLive());
 initChips('e-herite', ()=>debLive());
 initChips('e-conflit', ()=>debLive());
 initChips('e-coi-nb', ()=>debLive());
@@ -624,7 +657,9 @@ function liveCalc(){
   const adj=(parseFloat(gS('e-etage')?.dataset.k||0))+(parseFloat(gS('e-annee')?.dataset.k||0))
            +(parseFloat(gS('e-dpe')?.dataset.k||0))+(parseFloat(gS('e-etat')?.dataset.k||0))
            +(gS('e-parking')?.dataset.v==='oui'?.05:0)+(parseFloat(gS('e-herite')?.dataset.k||0))
-           +(parseFloat(gS('e-conflit')?.dataset.k||0))+(parseFloat(gS('e-coi-nb')?.dataset.k||0));
+           +(parseFloat(gS('e-conflit')?.dataset.k||0))+(parseFloat(gS('e-coi-nb')?.dataset.k||0))
+           +(parseFloat(gS('e-quartier')?.dataset.k||0))+(parseFloat(gS('e-exterieur')?.dataset.k||0))
+           +(parseFloat(gS('e-vue')?.dataset.k||0));
   const pmF=Math.round(pmB*(1+adj));
   const val=surf*pmF;
   const mg=(gS('e-herite')?.dataset.k<0||gS('e-conflit')?.dataset.k<0)?.12:.08;
@@ -652,6 +687,9 @@ function openResult(){
     herite:{v:gS('e-herite')?.dataset.v||'oui',k:gS('e-herite')?.dataset.k||'0'},
     conflit:{v:gS('e-conflit')?.dataset.v||'non',k:gS('e-conflit')?.dataset.k||'0'},
     coi:{v:gS('e-coi-nb')?.dataset.v||'3',k:gS('e-coi-nb')?.dataset.k||'0'},
+    quartier:{v:gS('e-quartier')?.dataset.v||'standard',k:gS('e-quartier')?.dataset.k||'0'},
+    exterieur:{v:gS('e-exterieur')?.dataset.v||'aucun',k:gS('e-exterieur')?.dataset.k||'0'},
+    vue:{v:gS('e-vue')?.dataset.v||'standard',k:gS('e-vue')?.dataset.k||'0'},
   };
   sessionStorage.setItem('divimo_est',JSON.stringify(data));
   window.location.href='estimation-result.html';
