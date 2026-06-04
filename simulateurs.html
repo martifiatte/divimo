@@ -584,6 +584,58 @@ const DB = {
   'amiens':     {n:'Amiens',         pm:2300, maison:2000, trend:[1800,2000,2100,2400,2300,2300],r15:.035,proj:[-.01,.01,.02],ma:'amiens-80021'},
   'chamonix':   {n:'Chamonix',       pm:8500, maison:9500, trend:[7000,7500,8000,9000,8600,8500],r15:.045,proj:[.02,.03,.04],ma:'chamonix-mont-blanc-74056'},
   'megeve':     {n:'Megève',         pm:8000, maison:9000, trend:[6500,7000,7600,8500,8200,8000],r15:.042,proj:[.02,.03,.04],ma:'megeve-74153'},
+
+  /* ── Île-de-France — communes précises (prix très différents de la médiane dépt.) ── */
+  /* Val-de-Marne (94) */
+  'saint-mande':       {n:'Saint-Mandé',         pm:8200, maison:9500, trend:[6800,7200,7800,8500,8100,7900,8200],r15:.06, proj:[.00,.01,.02],ma:'saint-mande-94277'},
+  'vincennes':         {n:'Vincennes',            pm:7800, maison:9000, trend:[6400,6800,7300,8000,7700,7500,7800],r15:.055,proj:[.00,.01,.02],ma:'vincennes-94080'},
+  'saint-maur':        {n:'Saint-Maur-des-Fossés',pm:6000, maison:6800, trend:[4800,5200,5600,6200,5900,5700,6000],r15:.054,proj:[-.01,.01,.02],ma:'saint-maur-des-fosses-94069'},
+  'nogent':            {n:'Nogent-sur-Marne',     pm:5500, maison:6200, trend:[4400,4700,5100,5600,5300,5200,5500],r15:.056,proj:[-.01,.01,.02],ma:'nogent-sur-marne-94052'},
+  'joinville':         {n:'Joinville-le-Pont',    pm:5200, maison:5800, trend:[4100,4400,4700,5200,5000,4900,5200],r15:.055,proj:[-.01,.01,.02],ma:'joinville-le-pont-94037'},
+  'charenton':         {n:'Charenton-le-Pont',    pm:7200, maison:8200, trend:[5800,6200,6700,7400,7000,6900,7200],r15:.058,proj:[.00,.01,.02],ma:'charenton-le-pont-94018'},
+  'maisons-alfort':    {n:'Maisons-Alfort',       pm:4800, maison:5400, trend:[3800,4100,4400,4900,4700,4600,4800],r15:.054,proj:[-.01,.01,.02],ma:'maisons-alfort-94046'},
+  'ivry':              {n:'Ivry-sur-Seine',        pm:4200, maison:4700, trend:[3400,3600,3900,4300,4100,4000,4200],r15:.053,proj:[-.01,.01,.02],ma:'ivry-sur-seine-94041'},
+  'creteil':           {n:'Créteil',              pm:3500, maison:3800, trend:[2800,3000,3200,3500,3400,3300,3500],r15:.055,proj:[-.01,.01,.02],ma:'creteil-94028'},
+  'vitry':             {n:'Vitry-sur-Seine',      pm:3400, maison:3700, trend:[2700,2900,3100,3400,3300,3200,3400],r15:.056,proj:[-.01,.01,.02],ma:'vitry-sur-seine-94081'},
+  'villejuif':         {n:'Villejuif',            pm:5000, maison:5500, trend:[3900,4200,4500,5000,4800,4700,5000],r15:.062,proj:[.00,.01,.02],ma:'villejuif-94076'},
+  /* Hauts-de-Seine (92) */
+  'issy':              {n:'Issy-les-Moulineaux',  pm:7500, maison:8700, trend:[6100,6600,7100,7700,7300,7100,7500],r15:.059,proj:[.00,.01,.02],ma:'issy-les-moulineaux-92040'},
+  'courbevoie':        {n:'Courbevoie',           pm:7000, maison:8100, trend:[5700,6100,6600,7200,6800,6600,7000],r15:.059,proj:[.00,.01,.02],ma:'courbevoie-92025'},
+  'saint-cloud':       {n:'Saint-Cloud',          pm:7400, maison:8600, trend:[6000,6400,6900,7500,7100,7000,7400],r15:.058,proj:[.00,.01,.02],ma:'saint-cloud-92064'},
+  'meudon':            {n:'Meudon',               pm:5800, maison:6600, trend:[4700,5000,5400,5900,5600,5500,5800],r15:.053,proj:[-.01,.01,.02],ma:'meudon-92048'},
+  'vanves':            {n:'Vanves',               pm:7100, maison:8200, trend:[5800,6200,6700,7300,6900,6800,7100],r15:.058,proj:[.00,.01,.02],ma:'vanves-92075'},
+  'clamart':           {n:'Clamart',              pm:5500, maison:6200, trend:[4400,4700,5100,5600,5300,5200,5500],r15:.056,proj:[-.01,.01,.02],ma:'clamart-92020'},
+  'antony':            {n:'Antony',               pm:4600, maison:5200, trend:[3700,3900,4200,4700,4400,4300,4600],r15:.055,proj:[-.01,.01,.02],ma:'antony-92002'},
+  'colombes':          {n:'Colombes',             pm:5200, maison:5900, trend:[4200,4500,4800,5300,5000,4900,5200],r15:.053,proj:[-.01,.01,.02],ma:'colombes-92022'},
+  'gennevilliers':     {n:'Gennevilliers',        pm:3800, maison:4200, trend:[3000,3200,3500,3900,3700,3600,3800],r15:.054,proj:[-.01,.01,.02],ma:'gennevilliers-92036'},
+  'asnieres':          {n:'Asnières-sur-Seine',   pm:6800, maison:7800, trend:[5500,5900,6400,7000,6600,6400,6800],r15:.059,proj:[.00,.01,.02],ma:'asnieres-sur-seine-92004'},
+  'clichy':            {n:'Clichy',               pm:6500, maison:7400, trend:[5200,5600,6100,6700,6300,6100,6500],r15:.059,proj:[.00,.01,.02],ma:'clichy-92024'},
+  'nanterre':          {n:'Nanterre',             pm:4800, maison:5400, trend:[3800,4100,4400,4900,4700,4600,4800],r15:.055,proj:[-.01,.01,.02],ma:'nanterre-92050'},
+  'rueil':             {n:'Rueil-Malmaison',      pm:5800, maison:6700, trend:[4600,5000,5400,5900,5600,5500,5800],r15:.055,proj:[-.01,.01,.02],ma:'rueil-malmaison-92063'},
+  /* Seine-Saint-Denis (93) */
+  'saint-denis':       {n:'Saint-Denis',          pm:3000, maison:3300, trend:[2400,2600,2800,3100,2900,2800,3000],r15:.055,proj:[-.01,.01,.02],ma:'saint-denis-93066'},
+  'montreuil':         {n:'Montreuil',            pm:5200, maison:5800, trend:[4100,4400,4700,5300,5000,4900,5200],r15:.062,proj:[.00,.01,.02],ma:'montreuil-93048'},
+  'aubervilliers':     {n:'Aubervilliers',        pm:3200, maison:3500, trend:[2500,2700,2900,3200,3100,3000,3200],r15:.054,proj:[-.01,.01,.02],ma:'aubervilliers-93001'},
+  'pantin':            {n:'Pantin',               pm:5000, maison:5600, trend:[3900,4200,4500,5100,4800,4700,5000],r15:.062,proj:[.00,.01,.02],ma:'pantin-93055'},
+  'bagnolet':          {n:'Bagnolet',             pm:4800, maison:5400, trend:[3800,4100,4400,4900,4600,4500,4800],r15:.06, proj:[-.01,.01,.02],ma:'bagnolet-93006'},
+  /* Yvelines (78) */
+  'saint-germain':     {n:'Saint-Germain-en-Laye',pm:6400, maison:7200, trend:[5100,5500,5900,6500,6200,6000,6400],r15:.055,proj:[-.01,.01,.02],ma:'saint-germain-en-laye-78551'},
+  'le-vesinet':        {n:'Le Vésinet',           pm:6800, maison:7600, trend:[5500,5900,6300,6900,6600,6400,6800],r15:.055,proj:[-.01,.01,.02],ma:'le-vesinet-78322'},
+  'marly':             {n:'Marly-le-Roi',         pm:4500, maison:5000, trend:[3600,3800,4100,4600,4300,4200,4500],r15:.052,proj:[-.01,.01,.02],ma:'marly-le-roi-78372'},
+  /* Essonne (91) */
+  'palaiseau':         {n:'Palaiseau',            pm:3800, maison:4200, trend:[3000,3200,3500,3900,3700,3600,3800],r15:.055,proj:[-.01,.01,.02],ma:'palaiseau-91477'},
+  'massy':             {n:'Massy',                pm:3600, maison:4000, trend:[2800,3000,3300,3700,3500,3400,3600],r15:.054,proj:[-.01,.01,.02],ma:'massy-91377'},
+  /* Val-d\'Oise (95) */
+  'cergy':             {n:'Cergy',                pm:2800, maison:3100, trend:[2200,2400,2600,2900,2700,2600,2800],r15:.053,proj:[-.01,.01,.02],ma:'cergy-95127'},
+  'pontoise':          {n:'Pontoise',             pm:3100, maison:3500, trend:[2500,2700,2900,3200,3000,2900,3100],r15:.054,proj:[-.01,.01,.02],ma:'pontoise-95500'},
+  /* Seine-et-Marne (77) */
+  'fontainebleau':     {n:'Fontainebleau',        pm:3500, maison:4000, trend:[2800,3000,3200,3600,3400,3300,3500],r15:.056,proj:[-.01,.01,.02],ma:'fontainebleau-77186'},
+  'meaux':             {n:'Meaux',                pm:2600, maison:2900, trend:[2100,2200,2400,2700,2500,2400,2600],r15:.053,proj:[-.01,.01,.02],ma:'meaux-77284'},
+  /* Autres grandes communes France */
+  'perpignan':         {n:'Perpignan',            pm:2100, maison:2000, trend:[1700,1800,1900,2100,2100,2000,2100],r15:.028,proj:[-.02,.00,.01],ma:'perpignan-66136'},
+  'saint-nazaire':     {n:'Saint-Nazaire',        pm:2600, maison:2400, trend:[2100,2300,2500,2700,2600,2500,2600],r15:.04, proj:[-.01,.01,.02],ma:'saint-nazaire-44184'},
+  'quimper':           {n:'Quimper',              pm:2200, maison:2000, trend:[1800,2000,2100,2300,2200,2100,2200],r15:.038,proj:[-.01,.01,.02],ma:'quimper-29232'},
+  'lorient':           {n:'Lorient',              pm:2400, maison:2200, trend:[1900,2100,2300,2500,2400,2300,2400],r15:.038,proj:[-.01,.01,.02],ma:'lorient-56121'},
 };
 
 /* ── RECHERCHE — API Adresse (gouvernement) + fallback DB ── */
