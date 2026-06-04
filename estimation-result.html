@@ -362,7 +362,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.32);text-align:center;padd
           </div>
         </div>
         <div class="chart-source" id="chartSource"></div>
-        <a class="chart-rt-link" id="chartRtLink" href="#" target="_blank">
+        <a class="chart-rt-link" id="chartRtLink" href="https://www.meilleursagents.com/prix-immobilier/" target="_blank" rel="noopener">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Prix en temps réel → MeilleursAgents
         </a>
@@ -587,12 +587,31 @@ const MA_OVERRIDES = {
   'paris 17':'paris-17eme-arrondissement-75017','paris 18':'paris-18eme-arrondissement-75018',
   'paris 19':'paris-19eme-arrondissement-75019','paris 20':'paris-20eme-arrondissement-75020',
 };
-const maSlug = MA_OVERRIDES[D.key]||C.ma||null;
-const maUrl  = maSlug?`https://www.meilleursagents.com/prix-immobilier/${maSlug}/`:'https://www.meilleursagents.com/prix-immobilier/';
-document.getElementById('chartRtLink').href=maUrl;
-document.getElementById('maSourceLink').href=maUrl;
-/* Chart.js intercepts clicks on canvas for tooltips — lien dédié uniquement */
-document.getElementById('chartBox').style.cursor='default';
+/* Construit un lien MeilleursAgents fiable, quelle que soit la commune.
+   - Slug direct quand on le connaît (Paris arrondissements, villes DB)
+   - Sinon : recherche Google ciblée qui atterrit sur la bonne page MA
+   Garantit que le lien fonctionne toujours, même pour les communes en
+   fallback département (dept_XX) sans slug MeilleursAgents. */
+function buildMaUrl(){
+  const slug = MA_OVERRIDES[D.key] || C.ma || null;
+  if(slug) return 'https://www.meilleursagents.com/prix-immobilier/' + slug + '/';
+  const cityName = (D.addr && D.addr.city) || C.n || '';
+  const postcode = (D.addr && D.addr.postcode) || '';
+  if(cityName){
+    return 'https://www.google.com/search?q=' +
+      encodeURIComponent('prix immobilier ' + cityName + ' ' + postcode + ' meilleursagents');
+  }
+  return 'https://www.meilleursagents.com/prix-immobilier/';
+}
+const maUrl = buildMaUrl();
+
+const rtLink = document.getElementById('chartRtLink');
+const maSrc  = document.getElementById('maSourceLink');
+if(rtLink){ rtLink.setAttribute('href', maUrl); rtLink.setAttribute('rel','noopener'); }
+if(maSrc){ maSrc.setAttribute('href', maUrl); maSrc.setAttribute('rel','noopener'); }
+/* Chart.js capte les clics du canvas pour ses tooltips — lien dédié uniquement */
+const cb = document.getElementById('chartBox');
+if(cb) cb.style.cursor='default';
 
 /* ── TENSION ── */
 document.getElementById('tensionFill').style.width=tension+'%';
