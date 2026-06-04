@@ -236,13 +236,17 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
               <div class="chip" data-v="local">Local commercial</div>
             </div>
           </div>
+          <!-- Quartier auto-calculé depuis l'adresse — champ caché -->
+          <div id="e-quartier" style="display:none">
+            <div class="chip" data-v="prestige" data-k="0.10"></div>
+            <div class="chip" data-v="prise" data-k="0.05"></div>
+            <div class="chip sel" data-v="standard" data-k="0"></div>
+            <div class="chip" data-v="peripherie" data-k="-0.06"></div>
+          </div>
           <div class="field">
-            <label>Type de quartier <span class="hint">— impact sur la valeur</span></label>
-            <div class="chips" id="e-quartier">
-              <div class="chip" data-v="prestige" data-k="0.10">Centre historique / Prestige</div>
-              <div class="chip" data-v="prise" data-k="0.05">Quartier prisé</div>
-              <div class="chip sel" data-v="standard" data-k="0">Résidentiel standard</div>
-              <div class="chip" data-v="peripherie" data-k="-0.06">Périphérie / Éloigné</div>
+            <div id="quartierInfo" style="font-size:.78rem;color:var(--texte-doux);background:var(--gris-clair);border-radius:8px;padding:7px 11px;display:none">
+              <span style="font-family:'Montserrat';font-weight:700;color:var(--navy)">Quartier détecté automatiquement :</span>
+              <span id="quartierLabel">—</span>
             </div>
           </div>
           <div class="step-nav">
@@ -499,7 +503,7 @@ initChips('e-etage', ()=>debLive());
 initChips('e-annee', ()=>debLive());
 initChips('e-etat', ()=>debLive());
 initChips('e-parking', ()=>debLive());
-initChips('e-quartier', ()=>debLive());
+/* e-quartier : auto-calculé, pas de listener manuel */
 initChips('e-exterieur', ()=>debLive());
 initChips('e-vue', ()=>debLive());
 initChips('e-herite', ()=>debLive());
@@ -602,20 +606,36 @@ function codeToKey(postcode, cityName){
   return partial||null;
 }
 
-/* Auto-détecte le type de quartier selon l'arrondissement (Paris) ou le rang de la ville */
-function autoQuartier(key, postcode){
-  if(!key) return;
-  // Paris arrondissements
-  if(key.startsWith('paris ')){
+/* Auto-détecte le type de quartier pour toute la France */
+const QUARTIER_LABELS = {prestige:'Centre historique / Prestige',prise:'Quartier prisé',standard:'Résidentiel standard',peripherie:'Périphérie / Éloigné'};
+
+function autoQuartier(key, postcode, pm){
+  let q = 'standard';
+
+  if(key && key.startsWith('paris ')){
+    /* Paris : précision arrondissement */
     const arr=parseInt(key.replace('paris ',''),10);
-    let q='standard';
-    if([1,4,5,6,7].includes(arr)) q='prestige';
+    if([1,4,5,6,7].includes(arr))      q='prestige';
     else if([2,3,8,15,16,17].includes(arr)) q='prise';
-    else if([9,10,11,12,13,14].includes(arr)) q='standard';
-    else q='peripherie';
-    document.querySelectorAll('#e-quartier .chip').forEach(c=>{
-      c.classList.toggle('sel',c.dataset.v===q);
-    });
+    else if([18,19,20].includes(arr))   q='peripherie';
+    else                                q='standard';
+  } else if(pm){
+    /* Autres villes : positionnement par prix/m² vs médiane nationale */
+    if(pm >= 6000)      q='prestige';
+    else if(pm >= 4000) q='prise';
+    else if(pm >= 2200) q='standard';
+    else                q='peripherie';
+  }
+
+  /* Appliquer la sélection (champ caché) */
+  document.querySelectorAll('#e-quartier .chip').forEach(c=>c.classList.toggle('sel',c.dataset.v===q));
+
+  /* Afficher l'info détectée à l'utilisateur */
+  const info=document.getElementById('quartierInfo');
+  const lbl=document.getElementById('quartierLabel');
+  if(info&&lbl){
+    lbl.textContent=' '+QUARTIER_LABELS[q];
+    info.style.display='block';
   }
 }
 
@@ -685,7 +705,7 @@ function pickAddr(idx){
       ${pm?`<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>`:'<span class="cb-pm" style="color:var(--texte-doux);font-size:.8rem">Ville non référencée</span>'}
       <span class="cb-chg" onclick="clearCity()">Changer</span>
     </div>`;
-  if(selKey) autoQuartier(selKey, p.postcode);
+  autoQuartier(selKey, p.postcode, selKey?DB[selKey]?.pm:null);
   debLive();
 }
 
@@ -705,6 +725,7 @@ function hideDrop(){document.getElementById('sDrop').style.display='none';dFi=-1
 function pickCity(k){
   selKey=k;selAddr=null;selCoords=null;
   const c=DB[k];
+  autoQuartier(k, null, c.pm);
   document.getElementById('cInput').value=c.n;
   document.getElementById('clrBtn').style.display='block';
   hideDrop();

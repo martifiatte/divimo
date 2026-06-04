@@ -481,8 +481,8 @@ function adjRow(num,label,k,note){
   </div>`;
 }
 const baseRow = tv==='appt'
-  ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
-  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2024<span class="adj-note">Prix spécifique aux ${typeL.toLowerCase()}s — source Notaires de France</span></span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
+  ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2025</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
+  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2025<span class="adj-note">Prix spécifique aux ${typeL.toLowerCase()}s — source Notaires de France</span></span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
 
 document.getElementById('adjTable').innerHTML =
   baseRow
@@ -682,7 +682,7 @@ function buildChart(scale){
   const pmRefLine=labels.map(()=>pmF);
 
   const src=document.getElementById('chartSource');
-  if(src) src.textContent=isProjMode?'* Prévisions 2025–2027 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). Non contractuel.':'Source : Notaires de France / DVF — données annuelles réelles '+(scale==='2ans'?'2023-2024':'2015-2024');
+  if(src) src.textContent=isProjMode?'* Prévisions 2026–2028 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). Non contractuel.':'Source : Notaires de France / DVF — données annuelles réelles '+(scale==='2ans'?'2023-2025':'2015-2025');
 
   const ds=[
     /* Bande haute (invisible, pour fill) */
