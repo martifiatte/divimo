@@ -215,16 +215,17 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <!-- Étape 0 -->
         <div class="est-step active" data-s="0">
           <div class="field">
-            <label>Commune ou arrondissement</label>
+            <label>Adresse du bien <span class="hint">— numéro, rue, ville</span></label>
             <div class="search-wrap">
               <div class="search-bar" id="sBar" onclick="document.getElementById('cInput').focus()">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="cInput" class="search-input" placeholder="Paris, Lyon, Annecy, Paris 16e…" autocomplete="off" spellcheck="false" oninput="onCI(this.value)" onkeydown="onCK(event)">
+                <input type="text" id="cInput" class="search-input" placeholder="15 rue de la Paix, Paris — ou ville seule" autocomplete="off" spellcheck="false" oninput="onCI(this.value)" onkeydown="onCK(event)">
                 <button class="search-clear" id="clrBtn" onclick="clearCity()" title="Effacer">✕</button>
               </div>
               <div class="search-dd" id="sDrop"></div>
             </div>
             <div class="city-badge" id="cBadge"></div>
+            <p class="note" style="margin-top:5px">Source : Base Adresse Nationale — api-adresse.data.gouv.fr (gouvernement français)</p>
           </div>
           <div class="field">
             <label>Type de bien</label>
@@ -233,6 +234,19 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
               <div class="chip" data-v="maison">Maison</div>
               <div class="chip" data-v="terrain">Terrain</div>
               <div class="chip" data-v="local">Local commercial</div>
+            </div>
+          </div>
+          <!-- Quartier auto-calculé depuis l'adresse — champ caché -->
+          <div id="e-quartier" style="display:none">
+            <div class="chip" data-v="prestige" data-k="0.10"></div>
+            <div class="chip" data-v="prise" data-k="0.05"></div>
+            <div class="chip sel" data-v="standard" data-k="0"></div>
+            <div class="chip" data-v="peripherie" data-k="-0.06"></div>
+          </div>
+          <div class="field">
+            <div id="quartierInfo" style="font-size:.78rem;color:var(--texte-doux);background:var(--gris-clair);border-radius:8px;padding:7px 11px;display:none">
+              <span style="font-family:'Montserrat';font-weight:700;color:var(--navy)">Quartier détecté automatiquement :</span>
+              <span id="quartierLabel">—</span>
             </div>
           </div>
           <div class="step-nav">
@@ -316,6 +330,27 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
             <div class="tog" id="e-parking">
               <div class="chip" data-v="oui">Oui</div>
               <div class="chip sel" data-v="non">Non</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Extérieur <span class="hint">— jardin, terrasse, balcon</span></label>
+            <div class="chips" id="e-exterieur">
+              <div class="chip sel" data-v="aucun" data-k="0">Aucun</div>
+              <div class="chip" data-v="balcon" data-k="0.03">Balcon</div>
+              <div class="chip" data-v="terrasse" data-k="0.06">Terrasse</div>
+              <div class="chip" data-v="jardin-s" data-k="0.10">Jardin &lt; 100 m²</div>
+              <div class="chip" data-v="jardin-m" data-k="0.15">Jardin 100–300 m²</div>
+              <div class="chip" data-v="jardin-l" data-k="0.20">Grand jardin &gt; 300 m²</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Vue depuis le bien</label>
+            <div class="chips" id="e-vue">
+              <div class="chip" data-v="genante" data-k="-0.07">Vue gênante</div>
+              <div class="chip sel" data-v="standard" data-k="0">Vue standard</div>
+              <div class="chip" data-v="degagee" data-k="0.05">Vue dégagée</div>
+              <div class="chip" data-v="parc" data-k="0.09">Vue parc / forêt</div>
+              <div class="chip" data-v="mer" data-k="0.20">Vue mer / lac / fleuve</div>
             </div>
           </div>
           <div class="step-nav">
@@ -468,6 +503,9 @@ initChips('e-etage', ()=>debLive());
 initChips('e-annee', ()=>debLive());
 initChips('e-etat', ()=>debLive());
 initChips('e-parking', ()=>debLive());
+/* e-quartier : auto-calculé, pas de listener manuel */
+initChips('e-exterieur', ()=>debLive());
+initChips('e-vue', ()=>debLive());
 initChips('e-herite', ()=>debLive());
 initChips('e-conflit', ()=>debLive());
 initChips('e-coi-nb', ()=>debLive());
@@ -482,28 +520,28 @@ function goStep(i){
 
 /* ── BASE DE DONNÉES ── */
 const DB = {
-  'paris':      {n:'Paris (intramuros)',  pm:9700, maison:11500,trend:[8500,9200,9800,9900,9600,9700],r15:.065,proj:[-.03,.00,.01],ma:'paris-75056'},
-  'paris 1':    {n:'Paris 1er',           pm:11200,maison:13000,trend:[9800,10500,11200,11500,11100,11200],r15:.07, proj:[-.04,.00,.01],ma:'paris-75001'},
-  'paris 2':    {n:'Paris 2e',            pm:10800,maison:12500,trend:[9400,10100,10700,11000,10700,10800],r15:.068,proj:[-.03,.00,.01],ma:'paris-75002'},
-  'paris 3':    {n:'Paris 3e',            pm:11300,maison:13200,trend:[9900,10600,11200,11600,11200,11300],r15:.07, proj:[-.03,.00,.01],ma:'paris-75003'},
-  'paris 4':    {n:'Paris 4e',            pm:12000,maison:14000,trend:[10500,11200,11800,12300,11900,12000],r15:.07,proj:[-.04,.00,.01],ma:'paris-75004'},
-  'paris 5':    {n:'Paris 5e',            pm:11400,maison:13500,trend:[10000,10700,11300,11700,11300,11400],r15:.07,proj:[-.04,.00,.01],ma:'paris-75005'},
-  'paris 6':    {n:'Paris 6e',            pm:13200,maison:16000,trend:[11500,12200,12800,13400,13000,13200],r15:.072,proj:[-.04,.00,.01],ma:'paris-75006'},
-  'paris 7':    {n:'Paris 7e',            pm:13800,maison:17000,trend:[12000,12800,13400,14000,13600,13800],r15:.072,proj:[-.04,.00,.01],ma:'paris-75007'},
-  'paris 8':    {n:'Paris 8e',            pm:11500,maison:14000,trend:[10000,10700,11200,11700,11300,11500],r15:.07, proj:[-.03,.00,.01],ma:'paris-75008'},
-  'paris 9':    {n:'Paris 9e',            pm:10900,maison:12800,trend:[9500,10200,10800,11200,10800,10900],r15:.068,proj:[-.03,.01,.01],ma:'paris-75009'},
-  'paris 10':   {n:'Paris 10e',           pm:10100,maison:11800,trend:[8700,9300,9800,10200,9900,10100],r15:.065,proj:[-.02,.01,.02],ma:'paris-75010'},
-  'paris 11':   {n:'Paris 11e',           pm:10200,maison:11900,trend:[8800,9400,9900,10300,10000,10200],r15:.065,proj:[-.02,.01,.02],ma:'paris-75011'},
-  'paris 12':   {n:'Paris 12e',           pm:9400, maison:11000,trend:[8100,8700,9200,9600,9300,9400],r15:.062,proj:[-.02,.01,.02],ma:'paris-75012'},
-  'paris 13':   {n:'Paris 13e',           pm:8900, maison:10400,trend:[7700,8300,8700,9100,8800,8900],r15:.06, proj:[-.02,.01,.02],ma:'paris-75013'},
-  'paris 14':   {n:'Paris 14e',           pm:9600, maison:11200,trend:[8300,8900,9400,9800,9500,9600],r15:.063,proj:[-.02,.01,.02],ma:'paris-75014'},
-  'paris 15':   {n:'Paris 15e',           pm:10200,maison:12000,trend:[8900,9500,10000,10400,10100,10200],r15:.065,proj:[-.03,.00,.01],ma:'paris-75015'},
-  'paris 16':   {n:'Paris 16e',           pm:11000,maison:13500,trend:[9500,10200,10800,11200,10900,11000],r15:.07, proj:[-.04,.00,.01],ma:'paris-75016'},
-  'paris 17':   {n:'Paris 17e',           pm:10500,maison:12500,trend:[9100,9700,10200,10700,10400,10500],r15:.067,proj:[-.03,.00,.01],ma:'paris-75017'},
-  'paris 18':   {n:'Paris 18e',           pm:9200, maison:10800,trend:[7900,8500,9000,9500,9100,9200],r15:.062,proj:[-.02,.01,.02],ma:'paris-75018'},
-  'paris 19':   {n:'Paris 19e',           pm:8600, maison:10000,trend:[7400,7900,8300,8800,8500,8600],r15:.06, proj:[-.02,.01,.02],ma:'paris-75019'},
-  'paris 20':   {n:'Paris 20e',           pm:8800, maison:10200,trend:[7600,8100,8600,9000,8700,8800],r15:.061,proj:[-.02,.01,.02],ma:'paris-75020'},
-  'neuilly':    {n:'Neuilly-sur-Seine',   pm:10800,maison:12500,trend:[9400,10000,10600,11000,10700,10800],r15:.07,proj:[-.03,.00,.01],ma:'neuilly-sur-seine-92051'},
+  'paris':      {n:'Paris (intramuros)',  pm:9500, maison:11200,trend:[8500,9200,9800,9900,9400,9200,9500],r15:.065,proj:[.00,.01,.02],ma:'paris-75056'},
+  'paris 1':    {n:'Paris 1er',           pm:10900,maison:12700,trend:[9800,10500,11200,11500,11100,11200,10900],r15:.07, proj:[-.04,.00,.01],ma:'paris-75001'},
+  'paris 2':    {n:'Paris 2e',            pm:10500,maison:12200,trend:[9400,10100,10700,11000,10700,10800,10500],r15:.068,proj:[-.03,.00,.01],ma:'paris-75002'},
+  'paris 3':    {n:'Paris 3e',            pm:11000,maison:12900,trend:[9900,10600,11200,11600,11200,11300,11000],r15:.07, proj:[-.03,.00,.01],ma:'paris-75003'},
+  'paris 4':    {n:'Paris 4e',            pm:11700,maison:13700,trend:[10500,11200,11800,12300,11900,12000,11700],r15:.07,proj:[-.04,.00,.01],ma:'paris-75004'},
+  'paris 5':    {n:'Paris 5e',            pm:11100,maison:13200,trend:[10000,10700,11300,11700,11300,11400,11100],r15:.07,proj:[-.04,.00,.01],ma:'paris-75005'},
+  'paris 6':    {n:'Paris 6e',            pm:12900,maison:15700,trend:[11500,12200,12800,13400,13000,13200,12900],r15:.072,proj:[-.04,.00,.01],ma:'paris-75006'},
+  'paris 7':    {n:'Paris 7e',            pm:13500,maison:16600,trend:[12000,12800,13400,14000,13600,13800,13500],r15:.072,proj:[-.04,.00,.01],ma:'paris-75007'},
+  'paris 8':    {n:'Paris 8e',            pm:11200,maison:13700,trend:[10000,10700,11200,11700,11300,11500,11200],r15:.07, proj:[-.03,.00,.01],ma:'paris-75008'},
+  'paris 9':    {n:'Paris 9e',            pm:10600,maison:12500,trend:[9500,10200,10800,11200,10800,10900,10600],r15:.068,proj:[-.03,.01,.01],ma:'paris-75009'},
+  'paris 10':   {n:'Paris 10e',           pm:9800,maison:11500,trend:[8700,9300,9800,10200,9900,10100,9800],r15:.065,proj:[-.02,.01,.02],ma:'paris-75010'},
+  'paris 11':   {n:'Paris 11e',           pm:9900,maison:11600,trend:[8800,9400,9900,10300,10000,10200,9900],r15:.065,proj:[-.02,.01,.02],ma:'paris-75011'},
+  'paris 12':   {n:'Paris 12e',           pm:9100, maison:10700,trend:[8100,8700,9200,9600,9300,9400,9100],r15:.062,proj:[-.02,.01,.02],ma:'paris-75012'},
+  'paris 13':   {n:'Paris 13e',           pm:8600, maison:10100,trend:[7700,8300,8700,9100,8800,8900,8600],r15:.06, proj:[-.02,.01,.02],ma:'paris-75013'},
+  'paris 14':   {n:'Paris 14e',           pm:9300, maison:10900,trend:[8300,8900,9400,9800,9500,9600,9300],r15:.063,proj:[-.02,.01,.02],ma:'paris-75014'},
+  'paris 15':   {n:'Paris 15e',           pm:9900,maison:11700,trend:[8900,9500,10000,10400,10100,10200,9900],r15:.065,proj:[-.03,.00,.01],ma:'paris-75015'},
+  'paris 16':   {n:'Paris 16e',           pm:10700,maison:13200,trend:[9500,10200,10800,11200,10900,11000,10700],r15:.07, proj:[-.04,.00,.01],ma:'paris-75016'},
+  'paris 17':   {n:'Paris 17e',           pm:10200,maison:12200,trend:[9100,9700,10200,10700,10400,10500,10200],r15:.067,proj:[-.03,.00,.01],ma:'paris-75017'},
+  'paris 18':   {n:'Paris 18e',           pm:8900, maison:10500,trend:[7900,8500,9000,9500,9100,9200,8900],r15:.062,proj:[-.02,.01,.02],ma:'paris-75018'},
+  'paris 19':   {n:'Paris 19e',           pm:8300, maison:9700,trend:[7400,7900,8300,8800,8500,8600,8300],r15:.06, proj:[-.02,.01,.02],ma:'paris-75019'},
+  'paris 20':   {n:'Paris 20e',           pm:8500, maison:9900,trend:[7600,8100,8600,9000,8700,8800,8500],r15:.061,proj:[-.02,.01,.02],ma:'paris-75020'},
+  'neuilly':    {n:'Neuilly-sur-Seine',   pm:10500,maison:12200,trend:[9400,10000,10600,11000,10700,10800,10500],r15:.07,proj:[-.03,.00,.01],ma:'neuilly-sur-seine-92051'},
   'versailles': {n:'Versailles',          pm:6200, maison:7000, trend:[5200,5600,6000,6400,6100,6200],r15:.05,proj:[-.02,.01,.02],ma:'versailles-78646'},
   'boulogne':   {n:'Boulogne-Billancourt',pm:8200, maison:9500, trend:[7000,7600,8000,8400,8100,8200],r15:.065,proj:[-.02,.01,.02],ma:'boulogne-billancourt-92012'},
   'levallois':  {n:'Levallois-Perret',    pm:8000, maison:9200, trend:[6800,7300,7700,8100,7900,8000],r15:.06,proj:[-.02,.01,.02],ma:'levallois-perret-92044'},
@@ -534,57 +572,257 @@ const DB = {
   'la rochelle':{n:'La Rochelle',    pm:3500, maison:3700, trend:[2800,3100,3400,3700,3500,3500],r15:.056,proj:[-.01,.01,.02],ma:'la-rochelle-17300'},
   'cannes':     {n:'Cannes',         pm:6200, maison:7000, trend:[5200,5600,6000,6500,6300,6200],r15:.04,proj:[.01,.02,.03],ma:'cannes-06029'},
   'antibes':    {n:'Antibes',        pm:4800, maison:5200, trend:[4000,4300,4600,5000,4800,4800],r15:.035,proj:[.00,.02,.03],ma:'antibes-06004'},
-  'saint-tropez':{n:'Saint-Tropez',  pm:12500,maison:15000,trend:[10000,11000,12000,13500,13000,12500],r15:.04,proj:[.02,.03,.04],ma:'saint-tropez-83990'},
+  'saint-tropez':{n:'Saint-Tropez',  pm:12800,maison:15400,trend:[10000,11000,12000,13500,13000,12500,12800],r15:.04,proj:[.02,.03,.04],ma:'saint-tropez-83990'},
   'chambery':   {n:'Chambéry',       pm:3600, maison:3400, trend:[2800,3100,3400,3700,3600,3600],r15:.055,proj:[.00,.02,.03],ma:'chambery-73065'},
   'angers':     {n:'Angers',         pm:2900, maison:2700, trend:[2300,2500,2700,3000,2900,2900],r15:.05,proj:[-.01,.01,.02],ma:'angers-49007'},
   'pau':        {n:'Pau',           pm:2100, maison:2000, trend:[1700,1900,2000,2200,2100,2100],r15:.035,proj:[-.01,.01,.02],ma:'pau-64445'},
   'avignon':    {n:'Avignon',       pm:2800, maison:2700, trend:[2200,2400,2600,2900,2800,2800],r15:.04,proj:[-.01,.01,.02],ma:'avignon-84007'},
-  'clermont':   {n:'Clermont-Ferrand',pm:2400,maison:2100,trend:[1900,2100,2300,2500,2400,2400],r15:.038,proj:[-.01,.01,.02],ma:'clermont-ferrand-63113'},
+  'clermont':   {n:'Clermont-Ferrand',pm:2300,maison:2000,trend:[1900,2100,2300,2500,2400,2400,2300],r15:.038,proj:[-.01,.01,.02],ma:'clermont-ferrand-63113'},
   'limoges':    {n:'Limoges',       pm:1900, maison:1700, trend:[1500,1600,1800,2000,1900,1900],r15:.029,proj:[-.01,.00,.01],ma:'limoges-87085'},
-  'saint-etienne':{n:'Saint-Étienne',pm:1700,maison:1500,trend:[1400,1500,1600,1800,1700,1700],r15:.022,proj:[-.02,.00,.01],ma:'saint-etienne-42218'},
+  'saint-etienne':{n:'Saint-Étienne',pm:1650,maison:1450,trend:[1400,1500,1600,1800,1700,1700,1650],r15:.022,proj:[-.02,.00,.01],ma:'saint-etienne-42218'},
   'le mans':    {n:'Le Mans',        pm:2100, maison:1900, trend:[1700,1800,1900,2200,2100,2100],r15:.032,proj:[-.01,.01,.02],ma:'le-mans-72181'},
   'amiens':     {n:'Amiens',         pm:2300, maison:2000, trend:[1800,2000,2100,2400,2300,2300],r15:.035,proj:[-.01,.01,.02],ma:'amiens-80021'},
   'chamonix':   {n:'Chamonix',       pm:8500, maison:9500, trend:[7000,7500,8000,9000,8600,8500],r15:.045,proj:[.02,.03,.04],ma:'chamonix-mont-blanc-74056'},
   'megeve':     {n:'Megève',         pm:8000, maison:9000, trend:[6500,7000,7600,8500,8200,8000],r15:.042,proj:[.02,.03,.04],ma:'megeve-74153'},
+
+  /* ── Île-de-France — communes précises (prix très différents de la médiane dépt.) ── */
+  /* Val-de-Marne (94) */
+  'saint-mande':       {n:'Saint-Mandé',         pm:8200, maison:9500, trend:[6800,7200,7800,8500,8100,7900,8200],r15:.06, proj:[.00,.01,.02],ma:'saint-mande-94277'},
+  'vincennes':         {n:'Vincennes',            pm:7800, maison:9000, trend:[6400,6800,7300,8000,7700,7500,7800],r15:.055,proj:[.00,.01,.02],ma:'vincennes-94080'},
+  'saint-maur':        {n:'Saint-Maur-des-Fossés',pm:6000, maison:6800, trend:[4800,5200,5600,6200,5900,5700,6000],r15:.054,proj:[-.01,.01,.02],ma:'saint-maur-des-fosses-94069'},
+  'nogent':            {n:'Nogent-sur-Marne',     pm:5500, maison:6200, trend:[4400,4700,5100,5600,5300,5200,5500],r15:.056,proj:[-.01,.01,.02],ma:'nogent-sur-marne-94052'},
+  'joinville':         {n:'Joinville-le-Pont',    pm:5200, maison:5800, trend:[4100,4400,4700,5200,5000,4900,5200],r15:.055,proj:[-.01,.01,.02],ma:'joinville-le-pont-94037'},
+  'charenton':         {n:'Charenton-le-Pont',    pm:7200, maison:8200, trend:[5800,6200,6700,7400,7000,6900,7200],r15:.058,proj:[.00,.01,.02],ma:'charenton-le-pont-94018'},
+  'maisons-alfort':    {n:'Maisons-Alfort',       pm:4800, maison:5400, trend:[3800,4100,4400,4900,4700,4600,4800],r15:.054,proj:[-.01,.01,.02],ma:'maisons-alfort-94046'},
+  'ivry':              {n:'Ivry-sur-Seine',        pm:4200, maison:4700, trend:[3400,3600,3900,4300,4100,4000,4200],r15:.053,proj:[-.01,.01,.02],ma:'ivry-sur-seine-94041'},
+  'creteil':           {n:'Créteil',              pm:3500, maison:3800, trend:[2800,3000,3200,3500,3400,3300,3500],r15:.055,proj:[-.01,.01,.02],ma:'creteil-94028'},
+  'vitry':             {n:'Vitry-sur-Seine',      pm:3400, maison:3700, trend:[2700,2900,3100,3400,3300,3200,3400],r15:.056,proj:[-.01,.01,.02],ma:'vitry-sur-seine-94081'},
+  'villejuif':         {n:'Villejuif',            pm:5000, maison:5500, trend:[3900,4200,4500,5000,4800,4700,5000],r15:.062,proj:[.00,.01,.02],ma:'villejuif-94076'},
+  /* Hauts-de-Seine (92) */
+  'issy':              {n:'Issy-les-Moulineaux',  pm:7500, maison:8700, trend:[6100,6600,7100,7700,7300,7100,7500],r15:.059,proj:[.00,.01,.02],ma:'issy-les-moulineaux-92040'},
+  'courbevoie':        {n:'Courbevoie',           pm:7000, maison:8100, trend:[5700,6100,6600,7200,6800,6600,7000],r15:.059,proj:[.00,.01,.02],ma:'courbevoie-92025'},
+  'saint-cloud':       {n:'Saint-Cloud',          pm:7400, maison:8600, trend:[6000,6400,6900,7500,7100,7000,7400],r15:.058,proj:[.00,.01,.02],ma:'saint-cloud-92064'},
+  'meudon':            {n:'Meudon',               pm:5800, maison:6600, trend:[4700,5000,5400,5900,5600,5500,5800],r15:.053,proj:[-.01,.01,.02],ma:'meudon-92048'},
+  'vanves':            {n:'Vanves',               pm:7100, maison:8200, trend:[5800,6200,6700,7300,6900,6800,7100],r15:.058,proj:[.00,.01,.02],ma:'vanves-92075'},
+  'clamart':           {n:'Clamart',              pm:5500, maison:6200, trend:[4400,4700,5100,5600,5300,5200,5500],r15:.056,proj:[-.01,.01,.02],ma:'clamart-92020'},
+  'antony':            {n:'Antony',               pm:4600, maison:5200, trend:[3700,3900,4200,4700,4400,4300,4600],r15:.055,proj:[-.01,.01,.02],ma:'antony-92002'},
+  'colombes':          {n:'Colombes',             pm:5200, maison:5900, trend:[4200,4500,4800,5300,5000,4900,5200],r15:.053,proj:[-.01,.01,.02],ma:'colombes-92022'},
+  'gennevilliers':     {n:'Gennevilliers',        pm:3800, maison:4200, trend:[3000,3200,3500,3900,3700,3600,3800],r15:.054,proj:[-.01,.01,.02],ma:'gennevilliers-92036'},
+  'asnieres':          {n:'Asnières-sur-Seine',   pm:6800, maison:7800, trend:[5500,5900,6400,7000,6600,6400,6800],r15:.059,proj:[.00,.01,.02],ma:'asnieres-sur-seine-92004'},
+  'clichy':            {n:'Clichy',               pm:6500, maison:7400, trend:[5200,5600,6100,6700,6300,6100,6500],r15:.059,proj:[.00,.01,.02],ma:'clichy-92024'},
+  'nanterre':          {n:'Nanterre',             pm:4800, maison:5400, trend:[3800,4100,4400,4900,4700,4600,4800],r15:.055,proj:[-.01,.01,.02],ma:'nanterre-92050'},
+  'rueil':             {n:'Rueil-Malmaison',      pm:5800, maison:6700, trend:[4600,5000,5400,5900,5600,5500,5800],r15:.055,proj:[-.01,.01,.02],ma:'rueil-malmaison-92063'},
+  /* Seine-Saint-Denis (93) */
+  'saint-denis':       {n:'Saint-Denis',          pm:3000, maison:3300, trend:[2400,2600,2800,3100,2900,2800,3000],r15:.055,proj:[-.01,.01,.02],ma:'saint-denis-93066'},
+  'montreuil':         {n:'Montreuil',            pm:5200, maison:5800, trend:[4100,4400,4700,5300,5000,4900,5200],r15:.062,proj:[.00,.01,.02],ma:'montreuil-93048'},
+  'aubervilliers':     {n:'Aubervilliers',        pm:3200, maison:3500, trend:[2500,2700,2900,3200,3100,3000,3200],r15:.054,proj:[-.01,.01,.02],ma:'aubervilliers-93001'},
+  'pantin':            {n:'Pantin',               pm:5000, maison:5600, trend:[3900,4200,4500,5100,4800,4700,5000],r15:.062,proj:[.00,.01,.02],ma:'pantin-93055'},
+  'bagnolet':          {n:'Bagnolet',             pm:4800, maison:5400, trend:[3800,4100,4400,4900,4600,4500,4800],r15:.06, proj:[-.01,.01,.02],ma:'bagnolet-93006'},
+  /* Yvelines (78) */
+  'saint-germain':     {n:'Saint-Germain-en-Laye',pm:6400, maison:7200, trend:[5100,5500,5900,6500,6200,6000,6400],r15:.055,proj:[-.01,.01,.02],ma:'saint-germain-en-laye-78551'},
+  'le-vesinet':        {n:'Le Vésinet',           pm:6800, maison:7600, trend:[5500,5900,6300,6900,6600,6400,6800],r15:.055,proj:[-.01,.01,.02],ma:'le-vesinet-78322'},
+  'marly':             {n:'Marly-le-Roi',         pm:4500, maison:5000, trend:[3600,3800,4100,4600,4300,4200,4500],r15:.052,proj:[-.01,.01,.02],ma:'marly-le-roi-78372'},
+  /* Essonne (91) */
+  'palaiseau':         {n:'Palaiseau',            pm:3800, maison:4200, trend:[3000,3200,3500,3900,3700,3600,3800],r15:.055,proj:[-.01,.01,.02],ma:'palaiseau-91477'},
+  'massy':             {n:'Massy',                pm:3600, maison:4000, trend:[2800,3000,3300,3700,3500,3400,3600],r15:.054,proj:[-.01,.01,.02],ma:'massy-91377'},
+  /* Val-d\'Oise (95) */
+  'cergy':             {n:'Cergy',                pm:2800, maison:3100, trend:[2200,2400,2600,2900,2700,2600,2800],r15:.053,proj:[-.01,.01,.02],ma:'cergy-95127'},
+  'pontoise':          {n:'Pontoise',             pm:3100, maison:3500, trend:[2500,2700,2900,3200,3000,2900,3100],r15:.054,proj:[-.01,.01,.02],ma:'pontoise-95500'},
+  /* Seine-et-Marne (77) */
+  'fontainebleau':     {n:'Fontainebleau',        pm:3500, maison:4000, trend:[2800,3000,3200,3600,3400,3300,3500],r15:.056,proj:[-.01,.01,.02],ma:'fontainebleau-77186'},
+  'meaux':             {n:'Meaux',                pm:2600, maison:2900, trend:[2100,2200,2400,2700,2500,2400,2600],r15:.053,proj:[-.01,.01,.02],ma:'meaux-77284'},
+  /* Autres grandes communes France */
+  'perpignan':         {n:'Perpignan',            pm:2100, maison:2000, trend:[1700,1800,1900,2100,2100,2000,2100],r15:.028,proj:[-.02,.00,.01],ma:'perpignan-66136'},
+  'saint-nazaire':     {n:'Saint-Nazaire',        pm:2600, maison:2400, trend:[2100,2300,2500,2700,2600,2500,2600],r15:.04, proj:[-.01,.01,.02],ma:'saint-nazaire-44184'},
+  'quimper':           {n:'Quimper',              pm:2200, maison:2000, trend:[1800,2000,2100,2300,2200,2100,2200],r15:.038,proj:[-.01,.01,.02],ma:'quimper-29232'},
+  'lorient':           {n:'Lorient',              pm:2400, maison:2200, trend:[1900,2100,2300,2500,2400,2300,2400],r15:.038,proj:[-.01,.01,.02],ma:'lorient-56121'},
 };
 
-/* ── RECHERCHE ── */
-let selKey=null, dFi=-1;
+/* ── RECHERCHE — API Adresse (gouvernement) + fallback DB ── */
+let selKey=null, selAddr=null, selCoords=null, dFi=-1, _ciT;
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-function hl(txt,q){ const i=norm(txt).indexOf(q); return i<0?txt:txt.slice(0,i)+'<mark>'+txt.slice(i,i+q.length)+'</mark>'+txt.slice(i+q.length); }
+function hl(txt,q){const i=norm(txt).indexOf(q);return i<0?txt:txt.slice(0,i)+'<mark>'+txt.slice(i,i+q.length)+'</mark>'+txt.slice(i+q.length);}
 
-function onCI(v){
+/* Mapping INSEE → clé DB (pour Paris arrondissements et grandes villes) */
+/* ── PRIX PAR DÉPARTEMENT — fallback pour toutes communes françaises ──
+   Source : Notaires de France / DVF — données 2025 par département    */
+const DEPT = {
+  '01':2400,'02':1700,'03':1400,'04':2200,'05':2500,'06':4900,'07':2000,'08':1400,
+  '09':1500,'10':1700,'11':2000,'12':1600,'13':3300,'14':2500,'15':1300,'16':1700,
+  '17':3400,'18':1400,'19':1600,'2a':3200,'2b':2800,'21':2700,'22':2000,'23':1000,
+  '24':1800,'25':2300,'26':2400,'27':1900,'28':1900,'29':2400,'30':2200,'31':3400,
+  '32':1600,'33':3800,'34':3200,'35':3700,'36':1200,'37':2700,'38':2700,'39':1800,
+  '40':3000,'41':1700,'42':1700,'43':1400,'44':3500,'45':2200,'46':1700,'47':1700,
+  '48':1500,'49':2800,'50':1900,'51':2200,'52':1300,'53':1600,'54':2400,'55':1200,
+  '56':2800,'57':2000,'58':1300,'59':2800,'60':2000,'61':1600,'62':2000,'63':2300,
+  '64':3200,'65':1700,'66':2700,'67':3700,'68':2800,'69':4400,'70':1500,'71':1700,
+  '72':2000,'73':3800,'74':4900,'76':2400,'77':2700,'78':3400,'79':1600,'80':2000,
+  '81':1800,'82':1700,'83':3600,'84':2700,'85':2500,'86':2000,'87':1900,'88':1600,
+  '89':1600,'90':1800,'91':3100,'92':6500,'93':3400,'94':5000,'95':2900,
+  '971':2200,'972':2500,'973':1800,'974':2400,'976':1500,
+};
+
+function deptFromPostcode(pc){
+  if(!pc) return null;
+  if(pc.startsWith('2a')||pc.startsWith('2A')) return '2a';
+  if(pc.startsWith('2b')||pc.startsWith('2B')) return '2b';
+  const d2=pc.slice(0,2);
+  const d3=pc.slice(0,3);
+  return DEPT[d3]?d3:(DEPT[d2]?d2:null);
+}
+
+function codeToKey(postcode, cityName){
+  /* 1. Paris arrondissements */
+  if(postcode && postcode.startsWith('75')){
+    const arr=parseInt(postcode.slice(-2),10);
+    if(arr>=1&&arr<=20) return 'paris '+arr;
+    return 'paris';
+  }
+  /* 2. Correspondance exacte ou partielle dans la DB */
+  const n=norm(cityName||'');
+  const exact=Object.keys(DB).find(k=>norm(DB[k].n)===n||norm(k)===n);
+  if(exact) return exact;
+  const partial=Object.keys(DB).find(k=>n.includes(norm(k))||norm(k).includes(n.split(' ')[0]));
+  if(partial) return partial;
+  /* 3. Fallback département : crée une entrée temporaire dans DB */
+  const dept=deptFromPostcode(postcode);
+  if(dept && DEPT[dept]){
+    const pm=DEPT[dept];
+    const dKey='dept_'+dept;
+    if(!DB[dKey]) DB[dKey]={
+      n:cityName||('Département '+dept), pm,
+      maison:Math.round(pm*.93),
+      trend:[Math.round(pm*.88),Math.round(pm*.90),Math.round(pm*.93),Math.round(pm*.96),Math.round(pm*.98),pm,pm],
+      r15:.04, proj:[-.02,.01,.02], ma:null, deptLevel:true
+    };
+    return dKey;
+  }
+  return null;
+}
+
+/* Auto-détecte le type de quartier pour toute la France */
+const QUARTIER_LABELS = {prestige:'Centre historique / Prestige',prise:'Quartier prisé',standard:'Résidentiel standard',peripherie:'Périphérie / Éloigné'};
+
+function autoQuartier(key, postcode, pm){
+  let q = 'standard';
+
+  if(key && key.startsWith('paris ')){
+    /* Paris : précision arrondissement */
+    const arr=parseInt(key.replace('paris ',''),10);
+    if([1,4,5,6,7].includes(arr))      q='prestige';
+    else if([2,3,8,15,16,17].includes(arr)) q='prise';
+    else if([18,19,20].includes(arr))   q='peripherie';
+    else                                q='standard';
+  } else if(pm){
+    /* Autres villes : positionnement par prix/m² vs médiane nationale */
+    if(pm >= 6000)      q='prestige';
+    else if(pm >= 4000) q='prise';
+    else if(pm >= 2200) q='standard';
+    else                q='peripherie';
+  }
+
+  /* Appliquer la sélection (champ caché) */
+  document.querySelectorAll('#e-quartier .chip').forEach(c=>c.classList.toggle('sel',c.dataset.v===q));
+
+  /* Afficher l'info détectée à l'utilisateur */
+  const info=document.getElementById('quartierInfo');
+  const lbl=document.getElementById('quartierLabel');
+  if(info&&lbl){
+    lbl.textContent=' '+QUARTIER_LABELS[q];
+    info.style.display='block';
+  }
+}
+
+async function onCI(v){
   document.getElementById('clrBtn').style.display=v?'block':'none';
   document.getElementById('cBadge').style.display='none';
-  selKey=null;
-  if(!v.length){hideDrop();liveReset();return;}
-  const q=norm(v);
-  const m=Object.entries(DB).filter(([k,c])=>norm(k).includes(q)||norm(c.n).includes(q))
-    .sort(([a],[b])=>{const as=norm(a).startsWith(q),bs=norm(b).startsWith(q);return as===bs?0:as?-1:1})
-    .slice(0,9);
-  if(!m.length){hideDrop();return;}
-  const inp=document.getElementById('sBar');
-  const r=inp.getBoundingClientRect();
-  const dd=document.getElementById('sDrop');
-  dd.style.left=r.left+'px'; dd.style.top=r.bottom+'px'; dd.style.width=r.width+'px';
-  dd.style.display='block'; dFi=-1;
-  dd.innerHTML=m.map(([k,c])=>
-    `<div class="sug" data-key="${k}" onmousedown="pickCity('${k}')">
-       <span class="sug-name">${hl(c.n,q)}</span>
-       <span class="sug-price">${c.pm.toLocaleString('fr-FR')} €/m² <small>appt. 2024</small></span>
-     </div>`).join('');
+  selKey=null; selAddr=null; selCoords=null;
+  if(v.length<2){hideDrop();liveReset();return;}
+  clearTimeout(_ciT);
+  _ciT=setTimeout(async()=>{
+    try{
+      // Appel API Adresse officielle (Base Adresse Nationale)
+      const url=`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(v)}&limit=8&autocomplete=1`;
+      const res=await fetch(url);
+      const json=await res.json();
+      const features=json.features||[];
+      if(!features.length){hideDrop();return;}
+      const dd=document.getElementById('sDrop');
+      const r=document.getElementById('sBar').getBoundingClientRect();
+      dd.style.left=r.left+'px';dd.style.top=r.bottom+'px';dd.style.width=r.width+'px';
+      dd.style.display='block';dFi=-1;
+      dd.innerHTML=features.map((f,i)=>{
+        const p=f.properties;
+        const dbKey=codeToKey(p.postcode,p.city);
+        const pm=dbKey?DB[dbKey]?.pm:null;
+        return `<div class="sug" data-idx="${i}" onmousedown="pickAddr(${i},${JSON.stringify(f).split('"').join('&quot;')})">
+          <span class="sug-name">${p.label}</span>
+          ${pm?`<span class="sug-price">${pm.toLocaleString('fr-FR')} €/m² <small>médiane</small></span>`:''}
+        </div>`;
+      }).join('');
+      // Stocker les features pour pickAddr
+      window._addrFeatures=features;
+    }catch(e){
+      // Fallback : recherche dans la DB locale
+      const q=norm(v);
+      const m=Object.entries(DB).filter(([k,c])=>norm(k).includes(q)||norm(c.n).includes(q))
+        .sort(([a],[b])=>{const as=norm(a).startsWith(q),bs=norm(b).startsWith(q);return as===bs?0:as?-1:1}).slice(0,8);
+      if(!m.length){hideDrop();return;}
+      const dd=document.getElementById('sDrop');
+      const r=document.getElementById('sBar').getBoundingClientRect();
+      dd.style.left=r.left+'px';dd.style.top=r.bottom+'px';dd.style.width=r.width+'px';
+      dd.style.display='block';dFi=-1;
+      dd.innerHTML=m.map(([k,c])=>`<div class="sug" data-key="${k}" onmousedown="pickCity('${k}')"><span class="sug-name">${hl(c.n,q)}</span><span class="sug-price">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane</small></span></div>`).join('');
+    }
+  },220);
 }
+
+function pickAddr(idx){
+  const f=(window._addrFeatures||[])[idx];if(!f)return;
+  const p=f.properties;
+  const key=codeToKey(p.postcode,p.city);
+  selAddr={label:p.label,postcode:p.postcode,city:p.city,type:p.type};
+  selCoords={lon:f.geometry.coordinates[0],lat:f.geometry.coordinates[1]};
+  if(key){selKey=key;}
+  else{
+    // Ville non trouvée dans la DB — afficher quand même l'adresse
+    selKey=null;
+  }
+  document.getElementById('cInput').value=p.label;
+  document.getElementById('clrBtn').style.display='block';
+  hideDrop();
+  const b=document.getElementById('cBadge');
+  b.style.display='flex';
+  const pm=selKey?DB[selKey]?.pm:null;
+  b.innerHTML=`<div><span class="cb-name">${p.label}</span>${pm?`<span style="display:block;font-size:.72rem;color:var(--texte-doux);margin-top:1px">${p.city}${p.postcode?' · '+p.postcode:''}</span>`:''}</div>
+    <div style="display:flex;align-items:center;gap:5px">
+      ${pm?(DB[selKey||'']?.deptLevel
+        ? `<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane dépt. 2025</small></span>`
+        : `<span class="cb-pm">${pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>`)
+        :'<span class="cb-pm" style="color:var(--texte-doux);font-size:.8rem">Estimation par département</span>'}
+      <span class="cb-chg" onclick="clearCity()">Changer</span>
+    </div>`;
+  autoQuartier(selKey, p.postcode, selKey?DB[selKey]?.pm:null);
+  debLive();
+}
+
 function onCK(e){
   const items=document.getElementById('sDrop').querySelectorAll('.sug');
   if(e.key==='ArrowDown'){e.preventDefault();dFi=Math.min(dFi+1,items.length-1);updFi(items);}
   else if(e.key==='ArrowUp'){e.preventDefault();dFi=Math.max(dFi-1,-1);updFi(items);}
-  else if(e.key==='Enter'&&dFi>=0){e.preventDefault();pickCity(items[dFi].dataset.key);}
+  else if(e.key==='Enter'&&dFi>=0){e.preventDefault();
+    const it=items[dFi];
+    if(it.dataset.key)pickCity(it.dataset.key);
+    else{const idx=parseInt(it.dataset.idx||'0');pickAddr(idx);}
+  }
   else if(e.key==='Escape')hideDrop();
 }
-function updFi(its){ its.forEach((it,i)=>it.classList.toggle('foc',i===dFi)); if(dFi>=0)its[dFi].scrollIntoView({block:'nearest'}); }
-function hideDrop(){ document.getElementById('sDrop').style.display='none'; dFi=-1; }
+function updFi(its){its.forEach((it,i)=>it.classList.toggle('foc',i===dFi));if(dFi>=0)its[dFi].scrollIntoView({block:'nearest'});}
+function hideDrop(){document.getElementById('sDrop').style.display='none';dFi=-1;}
 function pickCity(k){
-  selKey=k; const c=DB[k];
+  selKey=k;selAddr=null;selCoords=null;
+  const c=DB[k];
+  autoQuartier(k, null, c.pm);
   document.getElementById('cInput').value=c.n;
   document.getElementById('clrBtn').style.display='block';
   hideDrop();
@@ -592,18 +830,18 @@ function pickCity(k){
   b.style.display='flex';
   b.innerHTML=`<div><span class="cb-name">${c.n}</span></div>
     <div style="display:flex;align-items:center;gap:5px">
-      <span class="cb-pm">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane 2024</small></span>
+      <span class="cb-pm">${c.pm.toLocaleString('fr-FR')} €/m² <small>médiane 2025</small></span>
       <span class="cb-chg" onclick="clearCity()">Changer</span>
     </div>`;
   debLive();
 }
 function clearCity(){
-  selKey=null;
+  selKey=null;selAddr=null;selCoords=null;
   document.getElementById('cInput').value='';
   document.getElementById('clrBtn').style.display='none';
   document.getElementById('cBadge').style.display='none';
   document.getElementById('cInput').focus();
-  hideDrop(); liveReset();
+  hideDrop();liveReset();
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))hideDrop();});
 window.addEventListener('scroll',hideDrop,{passive:true});
@@ -624,7 +862,9 @@ function liveCalc(){
   const adj=(parseFloat(gS('e-etage')?.dataset.k||0))+(parseFloat(gS('e-annee')?.dataset.k||0))
            +(parseFloat(gS('e-dpe')?.dataset.k||0))+(parseFloat(gS('e-etat')?.dataset.k||0))
            +(gS('e-parking')?.dataset.v==='oui'?.05:0)+(parseFloat(gS('e-herite')?.dataset.k||0))
-           +(parseFloat(gS('e-conflit')?.dataset.k||0))+(parseFloat(gS('e-coi-nb')?.dataset.k||0));
+           +(parseFloat(gS('e-conflit')?.dataset.k||0))+(parseFloat(gS('e-coi-nb')?.dataset.k||0))
+           +(parseFloat(gS('e-quartier')?.dataset.k||0))+(parseFloat(gS('e-exterieur')?.dataset.k||0))
+           +(parseFloat(gS('e-vue')?.dataset.k||0));
   const pmF=Math.round(pmB*(1+adj));
   const val=surf*pmF;
   const mg=(gS('e-herite')?.dataset.k<0||gS('e-conflit')?.dataset.k<0)?.12:.08;
@@ -652,6 +892,11 @@ function openResult(){
     herite:{v:gS('e-herite')?.dataset.v||'oui',k:gS('e-herite')?.dataset.k||'0'},
     conflit:{v:gS('e-conflit')?.dataset.v||'non',k:gS('e-conflit')?.dataset.k||'0'},
     coi:{v:gS('e-coi-nb')?.dataset.v||'3',k:gS('e-coi-nb')?.dataset.k||'0'},
+    quartier:{v:gS('e-quartier')?.dataset.v||'standard',k:gS('e-quartier')?.dataset.k||'0'},
+    exterieur:{v:gS('e-exterieur')?.dataset.v||'aucun',k:gS('e-exterieur')?.dataset.k||'0'},
+    vue:{v:gS('e-vue')?.dataset.v||'standard',k:gS('e-vue')?.dataset.k||'0'},
+    addr: selAddr || null,
+    coords: selCoords || null,
   };
   sessionStorage.setItem('divimo_est',JSON.stringify(data));
   window.location.href='estimation-result.html';

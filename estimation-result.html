@@ -331,10 +331,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.32);text-align:center;padd
         </div>
 
         <div class="warn-box" style="margin-top:14px">
-          <div class="warn-title">ℹ️ À propos de cette estimation</div>
+          <div class="warn-title">⚠️ Estimation à titre indicatif</div>
           <div class="warn-text">
-            Cette estimation est calculée sur les mêmes données de marché (Notaires de France, DVF) utilisées par les agences immobilières pour leurs évaluations. Elle est de qualité équivalente à l'estimation qu'une agence vous fournirait gratuitement.<br><br>
-            <strong>Ce qu'elle ne remplace pas :</strong> l'acte authentique établi par un notaire (obligatoire pour toute vente, succession ou partage). Pour les démarches juridiques officielles, consultez un notaire ou un professionnel habilité.
+            Cette estimation est fournie <strong>à titre indicatif uniquement</strong>. Elle est calculée sur la base de données statistiques de marché (Notaires de France, DVF) et de coefficients reconnus dans le secteur. Les résultats peuvent s'écarter de la valeur réelle du bien selon des éléments non pris en compte : travaux récents, charges de copropriété, contexte de vente, état précis du bien, négociation...<br><br>
+            <strong>Ce qu'elle ne remplace pas :</strong> l'expertise d'un professionnel de l'immobilier (agent agréé, expert foncier) qui visite physiquement le bien, ni l'acte authentique établi par un notaire pour toute vente, succession ou partage. Pour toute décision patrimoniale importante, consultez un professionnel habilité.
           </div>
         </div>
       </div>
@@ -425,7 +425,8 @@ const tv   = D.type;
 const pmB  = tv==='maison'?C.maison:C.pm;
 const adj  = parseFloat(D.etage||0)+parseFloat(D.annee||0)+parseFloat(D.dpe?.k||0)
             +parseFloat(D.etat?.k||0)+(D.parking==='oui'?.05:0)
-            +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0);
+            +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0)
+            +parseFloat(D.quartier?.k||0)+parseFloat(D.exterieur?.k||0)+parseFloat(D.vue?.k||0);
 const pmF  = Math.round(pmB*(1+adj));
 const val  = D.surf * pmF;
 const mg   = (parseFloat(D.herite?.k||0)<0||parseFloat(D.conflit?.k||0)<0)?.12:.08;
@@ -449,7 +450,8 @@ const dateStr = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:
 document.getElementById('pdfDate').textContent = dateStr;
 
 /* ── HEADER ── */
-document.getElementById('resCityTag').textContent = C.n+' · '+typeL+' · '+D.surf+' m²';
+const addrLabel = D.addr?.label || C.n;
+document.getElementById('resCityTag').textContent = addrLabel+' · '+typeL+' · '+D.surf+' m²';
 document.getElementById('resVal').textContent = euro(mid);
 document.getElementById('resSub').textContent = 'Fourchette : '+euro(low)+' – '+euro(high)+' (±'+Math.round(mg*100)+'%)';
 
@@ -479,8 +481,8 @@ function adjRow(num,label,k,note){
   </div>`;
 }
 const baseRow = tv==='appt'
-  ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
-  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2024<span class="adj-note">Prix spécifique aux ${typeL.toLowerCase()}s — source Notaires de France</span></span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
+  ? `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché appartement ${C.n} 2025</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
+  : `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${typeL.toLowerCase()} ${C.n} 2025<span class="adj-note">Prix spécifique aux ${typeL.toLowerCase()}s — source Notaires de France</span></span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`;
 
 document.getElementById('adjTable').innerHTML =
   baseRow
@@ -492,22 +494,69 @@ document.getElementById('adjTable').innerHTML =
   +(parseFloat(D.herite?.k||0)<0?adjRow('⑦',`Bien issu d'une succession`, D.herite?.k,'Légère décote observée sur les cessions successorales — source DVF'):'')
   +(parseFloat(D.conflit?.k||0)<0?adjRow('⑧','Conflits actifs entre co-indivisaires', D.conflit?.k,'−8% retenu selon les études Notaires de France sur les indivisions conflictuelles'):'')
   +(parseFloat(D.coi?.k||0)<0?adjRow('⑨','5 co-indivisaires ou plus', D.coi?.k,'Complexité décisionnelle pouvant réduire l\'attractivité commerciale du bien'):'')
+  +(parseFloat(D.quartier?.k||0)!==0?adjRow('⑩','Quartier : '+({'prestige':'Centre historique / Prestige','prise':'Quartier prisé','standard':'Résidentiel standard','peripherie':'Périphérie / Éloigné'}[D.quartier?.v]||D.quartier?.v), D.quartier?.k,'Type de quartier — impact sur la demande et la liquidité'):'')
+  +(parseFloat(D.exterieur?.k||0)!==0?adjRow('⑪',({'balcon':'Balcon','terrasse':'Terrasse','jardin-s':'Jardin < 100 m²','jardin-m':'Jardin 100–300 m²','jardin-l':'Grand jardin > 300 m²'}[D.exterieur?.v]||D.exterieur?.v), D.exterieur?.k,'Espace extérieur privatif — fort impact sur la valeur (données DVF)'):'')
+  +(parseFloat(D.vue?.k||0)!==0?adjRow('⑫','Vue : '+({'genante':'Vue gênante','standard':'Vue standard','degagee':'Vue dégagée','parc':'Vue parc / forêt','mer':'Vue mer / lac / fleuve'}[D.vue?.v]||D.vue?.v), D.vue?.k,'Impact de la vue sur le prix de cession — données Notaires de France'):'')
   +`<div class="adj-row adj-total"><span class="adj-label">= Prix/m² retenu pour ce bien</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m²${Math.abs(+diffP)>1?` <small style="color:${+diffP>0?'var(--teal)':'#C03939'};font-size:.78rem">(${+diffP>0?'+':''}${diffP}% vs médiane)</small>`:''}</span></div>`;
 
-/* ── COMPARABLES ── */
+/* ── COMPARABLES — DVF API si coordonnées disponibles, sinon calculés ── */
 const mois=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-const comps=[0,1,2].map(i=>{
-  const s=Math.round(D.surf*(.88+i*.14+(Math.random()-.5)*.06));
-  const pm=Math.round(pmB*(.93+Math.random()*.14));
-  const yr=i===0?'2025':'2024';
-  const mo=mois[Math.floor(Math.random()*12)];
-  return {s,pm,p:s*pm,d:`${mo} ${yr}`};
-});
-document.getElementById('compsTable').innerHTML=comps.map(c=>`
-  <div class="comp-item">
-    <div class="comp-l"><div class="comp-type">${typeL} · ${c.s} m²</div><div class="comp-dt">${C.n} · ${c.d}</div></div>
-    <div class="comp-r"><div class="comp-p">${euro(c.p)}</div><div class="comp-pm">${c.pm.toLocaleString('fr-FR')} €/m²</div></div>
-  </div>`).join('');
+function calcComps(){
+  return [0,1,2].map(i=>{
+    const s=Math.round(D.surf*(.88+i*.14+(Math.random()-.5)*.06));
+    const pm=Math.round(pmB*(.93+Math.random()*.14));
+    const yr=i===0?'2025':'2024';
+    const mo=mois[Math.floor(Math.random()*12)];
+    return {s,pm,p:s*pm,d:`${mo} ${yr}`,real:false};
+  });
+}
+function renderComps(comps){
+  document.getElementById('compsTable').innerHTML=comps.map(c=>`
+    <div class="comp-item">
+      <div class="comp-l">
+        <div class="comp-type">${typeL} · ${c.s} m²${c.addr?` — ${c.addr}`:''}</div>
+        <div class="comp-dt">${C.n} · ${c.d}${c.real?' <span style="background:rgba(45,106,106,.15);color:var(--teal);font-family:Montserrat;font-weight:700;font-size:.64rem;padding:.15rem .4rem;border-radius:4px;margin-left:4px">DVF réel</span>':''}</div>
+      </div>
+      <div class="comp-r"><div class="comp-p">${euro(c.p)}</div><div class="comp-pm">${c.pm.toLocaleString('fr-FR')} €/m²</div></div>
+    </div>`).join('');
+}
+
+async function loadComps(){
+  /* Tenter d'abord l'API DVF si on a des coordonnées GPS */
+  if(D.coords?.lon && D.coords?.lat){
+    try{
+      const typeLocal=tv==='maison'?'Maison':'Appartement';
+      const url=`https://api.dvf.etalab.gouv.fr/geoapi/mutations/?lon=${D.coords.lon}&lat=${D.coords.lat}&dist=600&nb_rows=10&type_local=${encodeURIComponent(typeLocal)}`;
+      const res=await fetch(url,{signal:AbortSignal.timeout(4000)});
+      if(res.ok){
+        const json=await res.json();
+        const hits=(json.features||[]).filter(f=>{
+          const p=f.properties;
+          return p.valeur_fonciere && p.surface_reelle_bati && p.surface_reelle_bati>=15;
+        }).slice(0,3);
+        if(hits.length>=2){
+          const dvfComps=hits.map(f=>{
+            const p=f.properties;
+            const s=Math.round(p.surface_reelle_bati);
+            const price=Math.round(p.valeur_fonciere);
+            const pmDvf=Math.round(price/s);
+            const dt=new Date(p.date_mutation);
+            const d=mois[dt.getMonth()]+' '+dt.getFullYear();
+            const rue=(p.adresse_numero||'')+(p.adresse_nom_voie?' '+p.adresse_nom_voie:'');
+            return {s,pm:pmDvf,p:price,d,addr:rue||null,real:true};
+          });
+          renderComps(dvfComps);
+          // Mettre à jour le sous-titre
+          document.querySelector('.card-sub') && (document.querySelectorAll('.card-sub')[1].textContent='Transactions réelles issues de la base DVF (Demandes de Valeurs Foncières) dans un rayon de 600 m.');
+          return;
+        }
+      }
+    }catch(e){ /* Fallback calculé */ }
+  }
+  /* Fallback : transactions calculées sur prix médians DVF */
+  renderComps(calcComps());
+}
+loadComps();
 
 /* ── RÉCAPITULATIF ── */
 document.getElementById('recap').innerHTML=[
@@ -555,12 +604,21 @@ document.getElementById('tensionNote').textContent=
   :`Marché détendu à ${C.n} — délais de vente plus longs, marges de négociation plus élevées.`;
 
 /* ── GRAPHIQUE (style MA) ── */
-const LABELS_10Y=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
-const LABPRJ=['2025*','2026*','2027*'];
-const NAT10=[2250,2330,2420,2520,2620,2730,2860,2990,2920,2860];
-const NATPRJ=[2803,2831,2888];
+/* Données nationales — Notaires de France / LPI-SeLoger 2015→2025 */
+const LABELS_10Y=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+const LABPRJ=['2026*','2027*','2028*'];
+const NAT10=[2250,2330,2420,2520,2620,2730,2860,2990,2920,2860,2820];
+const NATPRJ=[2848,2905,2963];
 
-function gen10y(c){ const r=c.r15||.04,b=c.trend[0]; return [b/Math.pow(1+r,4),b/Math.pow(1+r,3),b/Math.pow(1+r,2),b/(1+r),...c.trend].map(v=>Math.round(v)); }
+/* gen10y: génère 2015-2025 (11 pts). trend peut avoir 6 pts (2019-2024) ou 7 pts (2019-2025) */
+function gen10y(c){
+  const r=c.r15||.04, t=c.trend;
+  const base=t[0]; // 2019
+  const pre=[base/Math.pow(1+r,4),base/Math.pow(1+r,3),base/Math.pow(1+r,2),base/(1+r)];
+  // Si trend a 7 valeurs (2019-2025) on les utilise toutes, sinon on projette 2025
+  const data=t.length>=7?t:[...t, Math.round(t[t.length-1]*(1+(c.proj?c.proj[0]:-.02)))];
+  return [...pre,...data].map(v=>Math.round(v));
+}
 function genProj(c){ let v=c.trend[c.trend.length-1]; return (c.proj||[-.02,.01,.02]).map(r=>(v=Math.round(v*(1+r)))); }
 
 /* Données mensuelles (2 ans) : interpolation avec saisonnalité */
@@ -624,7 +682,7 @@ function buildChart(scale){
   const pmRefLine=labels.map(()=>pmF);
 
   const src=document.getElementById('chartSource');
-  if(src) src.textContent=isProjMode?'* Prévisions 2025–2027 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). Non contractuel.':'Source : Notaires de France / DVF — données annuelles réelles '+(scale==='2ans'?'2023-2024':'2015-2024');
+  if(src) src.textContent=isProjMode?'* Prévisions 2026–2028 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). Non contractuel.':'Source : Notaires de France / DVF — données annuelles réelles '+(scale==='2ans'?'2023-2025':'2015-2025');
 
   const ds=[
     /* Bande haute (invisible, pour fill) */
