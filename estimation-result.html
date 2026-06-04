@@ -587,21 +587,23 @@ const MA_OVERRIDES = {
   'paris 17':'paris-17eme-arrondissement-75017','paris 18':'paris-18eme-arrondissement-75018',
   'paris 19':'paris-19eme-arrondissement-75019','paris 20':'paris-20eme-arrondissement-75020',
 };
-/* Construit un lien MeilleursAgents fiable, quelle que soit la commune.
-   - Slug direct quand on le connaît (Paris arrondissements, villes DB)
-   - Sinon : recherche Google ciblée qui atterrit sur la bonne page MA
-   Garantit que le lien fonctionne toujours, même pour les communes en
-   fallback département (dept_XX) sans slug MeilleursAgents. */
+/* Lien MeilleursAgents fiable, quelle que soit la commune.
+   IMPORTANT : MeilleursAgents indexe ses pages par CODE POSTAL
+   (ex. lyon-69000), pas par code INSEE (lyon-69123). Nos slugs C.ma
+   sont en INSEE → ils renvoient une page d'erreur.
+   - Paris arrondissements : slugs MA_OVERRIDES (déjà en code postal, OK)
+   - Toutes les autres communes : recherche ciblée qui atterrit
+     systématiquement sur la bonne page MeilleursAgents (1er résultat). */
 function buildMaUrl(){
-  const slug = MA_OVERRIDES[D.key] || C.ma || null;
-  if(slug) return 'https://www.meilleursagents.com/prix-immobilier/' + slug + '/';
+  /* 1. Paris arrondissement : slug postal correct → lien direct */
+  if(MA_OVERRIDES[D.key]){
+    return 'https://www.meilleursagents.com/prix-immobilier/' + MA_OVERRIDES[D.key] + '/';
+  }
+  /* 2. Toute autre commune : recherche ciblée (évite l'ambiguïté INSEE/postal) */
   const cityName = (D.addr && D.addr.city) || C.n || '';
   const postcode = (D.addr && D.addr.postcode) || '';
-  if(cityName){
-    return 'https://www.google.com/search?q=' +
-      encodeURIComponent('prix immobilier ' + cityName + ' ' + postcode + ' meilleursagents');
-  }
-  return 'https://www.meilleursagents.com/prix-immobilier/';
+  const q = ('meilleursagents prix immobilier ' + cityName + ' ' + postcode).trim();
+  return 'https://duckduckgo.com/?q=' + encodeURIComponent(q) + '&ia=web';
 }
 const maUrl = buildMaUrl();
 
