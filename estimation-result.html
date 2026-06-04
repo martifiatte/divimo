@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimation immobilière — Divimo</title>
+<script src="auth-required.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F4F6FA;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+/* Header résultat */
+.res-header{background:var(--navy);color:#fff;padding:32px 0 28px}
+.res-header-inner{max-width:920px;margin:0 auto;padding:0 24px}
+.res-back{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.82rem;color:rgba(255,255,255,.5);transition:.15s;margin-bottom:20px;cursor:pointer}
+.res-back:hover{color:#fff}
+.res-title-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
+.res-city{font-size:.75rem;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
+.res-main-val{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(2.4rem,5vw,3.6rem);color:#fff;letter-spacing:-.03em;line-height:1.05}
+.res-fourchette{font-size:.92rem;color:rgba(255,255,255,.5);margin-top:6px}
+.res-pm-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.1);border-radius:8px;padding:.45rem .9rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.86rem;color:#fff;margin-top:10px}
+.res-pm-badge small{font-weight:500;color:rgba(255,255,255,.45);font-size:.74rem;margin-left:4px}
+.res-print-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.82rem;padding:.55rem 1.1rem;border-radius:9px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.18);cursor:pointer;transition:.15s;flex-shrink:0}
+.res-print-btn:hover{background:rgba(255,255,255,.18);color:#fff}
+
+/* Grid 2 colonnes */
+.res-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:24px 0 48px;align-items:start}
+@media(max-width:800px){.res-grid{grid-template-columns:1fr}}
+.res-col-main{display:flex;flex-direction:column;gap:18px}
+.res-col-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
+@media(max-width:800px){.res-col-side{position:static}}
+
+/* Cards */
+.card{background:#fff;border:1px solid var(--gris-bord);border-radius:16px;padding:22px}
+.card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1rem;color:var(--navy);margin-bottom:4px}
+.card-sub{font-size:.82rem;color:var(--texte-doux);margin-bottom:16px}
+
+/* Ajustements */
+.adj-table{display:flex;flex-direction:column;gap:0}
+.adj-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord);font-size:.88rem}
+.adj-row:first-child{border-top:none}
+.adj-label{color:var(--texte-doux);display:flex;align-items:center;gap:.5rem}
+.adj-num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--gris-clair);align-items:center;justify-content:center;font-size:.68rem;font-weight:700;font-family:'Montserrat',sans-serif;color:var(--texte-doux);flex-shrink:0}
+.adj-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.84rem}
+.adj-pos{color:var(--teal)}.adj-neg{color:#C03939}.adj-neu{color:var(--texte-doux)}
+.adj-total{border-top:2px solid var(--gris-bord)!important;padding-top:8px!important;margin-top:2px}
+.adj-total .adj-label{color:var(--navy);font-weight:600}
+.adj-total .adj-val{color:var(--navy);font-size:.92rem}
+
+/* Graphique */
+.chart-controls{display:flex;gap:5px;margin-bottom:12px}
+.cht-btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;padding:.28rem .65rem;border-radius:6px;cursor:pointer;border:1.5px solid var(--gris-bord);background:#fff;color:var(--texte-doux);transition:.14s}
+.cht-btn:hover{border-color:var(--accent-light);color:var(--navy)}
+.cht-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.chart-box{position:relative;height:200px;cursor:pointer}
+.chart-note{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55}
+.chart-rt-link{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.76rem;color:var(--teal);margin-top:6px;transition:.14s}
+.chart-rt-link:hover{color:var(--navy)}
+
+/* Comparables */
+.comp-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-top:1px solid var(--gris-bord)}
+.comp-item:first-child{border-top:none}
+.comp-l .comp-type{font-size:.86rem;font-weight:600;color:var(--navy)}
+.comp-l .comp-dt{font-size:.74rem;color:var(--texte-doux);margin-top:1px}
+.comp-r{text-align:right}
+.comp-r .comp-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy)}
+.comp-r .comp-pm{font-size:.74rem;color:var(--texte-doux);margin-top:1px}
+.comp-dvf{display:inline-flex;align-items:center;gap:.3rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.74rem;color:var(--accent);margin-top:10px}
+.comp-dvf:hover{text-decoration:underline}
+.comp-disclaimer{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55;background:var(--gris-clair);border-radius:8px;padding:8px 10px}
+
+/* Sources */
+.src-item{display:flex;justify-content:space-between;align-items:flex-start;padding:.55rem 0;border-top:1px solid var(--gris-bord);gap:8px}
+.src-item:first-child{border-top:none}
+.src-item a{flex:1}
+.src-name{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.86rem;color:var(--navy)}
+.src-desc{font-size:.76rem;color:var(--texte-doux);margin-top:2px;line-height:1.5}
+.src-badge{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.68rem;padding:.18rem .5rem;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.sb-gov{background:rgba(44,82,130,.1);color:var(--accent)}
+.sb-pro{background:rgba(45,106,106,.1);color:var(--teal)}
+.sb-leg{background:rgba(242,153,74,.15);color:#9A6010}
+
+/* Note DPE */
+.dpe-label{display:inline-block;padding:.22rem .6rem;border-radius:6px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem}
+.dA{background:#009A44;color:#fff}.dB{background:#4CB548;color:#fff}.dC{background:#B3D234;color:#000}
+.dD{background:#FDF100;color:#000}.dE{background:#F5A800;color:#fff}.dF{background:#E8622A;color:#fff}.dG{background:#D42B27;color:#fff}
+
+/* CTA bas */
+.cta-bar{background:var(--navy);border-radius:14px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:4px}
+.cta-bar p{color:rgba(255,255,255,.7);font-size:.88rem;max-width:400px}
+.cta-bar p b{color:#fff;font-family:'Montserrat',sans-serif}
+.btn-cta{display:inline-flex;align-items:center;gap:.4rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem 1.4rem;border-radius:10px;background:#fff;color:var(--navy);cursor:pointer;border:none;transition:.18s}
+.btn-cta:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
+
+footer{background:var(--navy);color:rgba(255,255,255,.35);text-align:center;padding:20px;font-size:.76rem;margin-top:0;border-top:1px solid rgba(255,255,255,.06)}
+
+@media print{
+  .site-header,.res-back,.res-print-btn,.chart-controls,.chart-rt-link,.comp-dvf,.cta-bar,footer{display:none!important}
+  body{background:#fff}
+  .res-header{background:#0F1F3D;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .res-grid{grid-template-columns:1fr;gap:14px}
+  .res-col-side{position:static}
+  .card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand-logo">
+      <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
+      Divimo
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="simulateurs.html" class="active">Simulateurs</a>
+      <a href="offres.html">Nos offres</a>
+      <a href="apropos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="connexion.html" class="hbtn hbtn-ghost">Se connecter</a>
+      <a href="creer-compte.html" class="hbtn hbtn-primary">Créer mon compte</a>
+    </div>
+    <button class="nav-toggle" onclick="this.closest('.site-header').classList.toggle('open')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HEADER RÉSULTAT -->
+<div class="res-header">
+  <div class="res-header-inner">
+    <div class="res-back" onclick="history.back()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour aux simulateurs
+    </div>
+    <div class="res-title-row">
+      <div>
+        <div class="res-city" id="resCity">—</div>
+        <div class="res-main-val" id="resVal">—</div>
+        <div class="res-fourchette" id-resFou id="resFou">—</div>
+        <div class="res-pm-badge" id="resPm">—</div>
+      </div>
+      <button class="res-print-btn" onclick="window.print()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="res-grid">
+
+    <!-- COLONNE PRINCIPALE -->
+    <div class="res-col-main">
+
+      <!-- Détail du calcul -->
+      <div class="card">
+        <div class="card-title">Détail du calcul</div>
+        <div class="card-sub">De la médiane de marché au prix spécifique de ce bien.</div>
+        <div class="adj-table" id="adjTable">—</div>
+      </div>
+
+      <!-- Transactions comparables -->
+      <div class="card">
+        <div class="card-title">Transactions de référence</div>
+        <div class="card-sub">Ventes simulées sur la base des prix médians DVF pour la commune. Variation ±15% sur la surface et ±12% sur le prix/m².</div>
+        <div id="compsTable">—</div>
+        <a class="comp-dvf" href="https://app.dvf.etalab.gouv.fr/" target="_blank">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Vérifier les vraies transactions sur DVF (gouvernement) →
+        </a>
+        <div class="comp-disclaimer">
+          Ces transactions sont <strong>générées à titre illustratif</strong> sur la base des données de marché locales. Pour accéder aux actes de vente réels, utilisez la base DVF officielle du gouvernement français ci-dessus.
+        </div>
+      </div>
+
+      <!-- Sources -->
+      <div class="card">
+        <div class="card-title">Sources et méthodologie</div>
+        <div class="card-sub">Toutes les données utilisées dans cette estimation sont issues de sources officielles ou professionnelles vérifiables.</div>
+        <div id="srcTable">
+          <div class="src-item">
+            <a href="https://www.notaires.fr/fr/immobilier-et-fiscalite/estimer-et-vendre-un-bien/les-indices-notaires-insee" target="_blank">
+              <div class="src-name">Indices Notaires-INSEE</div>
+              <div class="src-desc">Prix médians par commune et par type de bien. Baromètre trimestriel publié conjointement par les Notaires de France et l'INSEE.</div>
+            </a>
+            <span class="src-badge sb-gov">Officiel</span>
+          </div>
+          <div class="src-item">
+            <a href="https://app.dvf.etalab.gouv.fr/" target="_blank">
+              <div class="src-name">DVF — Demandes de Valeurs Foncières</div>
+              <div class="src-desc">Base de données officielle des transactions immobilières en France, publiée par la Direction Générale des Finances Publiques (DGFiP).</div>
+            </a>
+            <span class="src-badge sb-gov">Officiel</span>
+          </div>
+          <div class="src-item">
+            <a id="maLink" href="https://www.meilleursagents.com/prix-immobilier/" target="_blank">
+              <div class="src-name">MeilleursAgents — Prix en temps réel</div>
+              <div class="src-desc">Suivi mensuel des prix au m² par commune, basé sur les annonces et transactions. Référence professionnelle dans le secteur.</div>
+            </a>
+            <span class="src-badge sb-pro">Professionnel</span>
+          </div>
+          <div class="src-item">
+            <a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046013072/" target="_blank">
+              <div class="src-name">Loi Climat et Résilience — Impact DPE</div>
+              <div class="src-desc">Depuis 2023, les logements classés F et G sont soumis à restrictions locatives (gel des loyers, interdiction de location à venir). Cela génère une décote de marché mesurable.</div>
+            </a>
+            <span class="src-badge sb-leg">Légifrance</span>
+          </div>
+          <div class="src-item">
+            <a href="https://www.credit-logement.fr/" target="_blank">
+              <div class="src-name">Crédit Logement/CSA — Prévisions 2025-2027</div>
+              <div class="src-desc">Observatoire de référence pour les prévisions immobilières en France. Les projections affichées dans le graphique sont issues de leurs publications de janvier 2025.</div>
+            </a>
+            <span class="src-badge sb-pro">Professionnel</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;background:#FFF8E7;border:1px solid #F5A800;border-radius:10px;padding:12px 14px">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem;color:#9A6010;margin-bottom:4px">⚠️ Résultat indicatif</div>
+          <div style="font-size:.8rem;color:#6A5010;line-height:1.6">Cette estimation est fournie à titre informatif. Elle ne remplace pas une expertise réalisée par un notaire, un agent immobilier agréé ou un expert foncier. Pour tout acte de vente, acquisition ou succession, consultez un professionnel habilité.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLONNE LATÉRALE -->
+    <div class="res-col-side">
+
+      <!-- Graphique de marché -->
+      <div class="card">
+        <div class="card-title">Évolution du marché</div>
+        <div class="card-sub" id="chartSubtitle">—</div>
+        <div class="chart-controls" id="chartCtrl">
+          <button class="cht-btn" data-scale="5ans" onclick="setScale('5ans')">5 ans</button>
+          <button class="cht-btn active" data-scale="10ans" onclick="setScale('10ans')">10 ans</button>
+          <button class="cht-btn" data-scale="proj" onclick="setScale('proj')">Prévisions</button>
+        </div>
+        <div class="chart-box" id="chartBox" title="Cliquez pour les données en temps réel">
+          <canvas id="mChart"></canvas>
+        </div>
+        <div class="chart-note" id="chartNote"></div>
+        <a class="chart-rt-link" id="chartRtLink" href="#" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Prix en temps réel → MeilleursAgents
+        </a>
+      </div>
+
+      <!-- Récapitulatif -->
+      <div class="card">
+        <div class="card-title">Récapitulatif</div>
+        <div id="recap" style="display:flex;flex-direction:column;gap:0">—</div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-bar">
+        <p><b>Besoin d'un avis d'expert ?</b><br>Nos notaires et avocats spécialisés en indivision peuvent affiner cette estimation.</p>
+        <a href="services-juridiques.html" class="btn-cta">Consulter un expert →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Divimo · Données Notaires de France, DVF, MeilleursAgents · Résultats indicatifs</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="header-auth.js"></script>
+<script>
+'use strict';
+const euro = n => isFinite(n) ? n.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €':'—';
+
+/* ── Lire les données depuis sessionStorage ── */
+const raw = sessionStorage.getItem('divimo_est');
+if(!raw){ window.location.href='simulateurs.html'; }
+const D = JSON.parse(raw);
+const C = D.city;
+
+/* ── Calcul ── */
+const tv    = D.type;
+const pmB   = tv==='maison'?C.maison:C.pm;
+const adj   = parseFloat(D.etage||0)+parseFloat(D.annee||0)+parseFloat(D.dpe?.k||0)
+             +parseFloat(D.etat?.k||0)+(D.parking==='oui'?.05:0)
+             +parseFloat(D.herite?.k||0)+parseFloat(D.conflit?.k||0)+parseFloat(D.coi?.k||0);
+const pmF   = Math.round(pmB*(1+adj));
+const val   = D.surf * pmF;
+const mg    = (parseFloat(D.herite?.k||0)<0||parseFloat(D.conflit?.k||0)<0)?.12:.08;
+const low   = Math.round(val*(1-mg)/1000)*1000;
+const mid   = Math.round(val/1000)*1000;
+const high  = Math.round(val*(1+mg)/1000)*1000;
+const diffP = ((pmF-pmB)/pmB*100).toFixed(1);
+const typeL = tv==='maison'?'Maison':(tv==='terrain'?'Terrain':(tv==='local'?'Local comm.':'Appartement'));
+
+/* ── Header ── */
+document.getElementById('resCity').textContent = C.n+' · '+typeL+' · '+D.surf+' m²';
+document.getElementById('resVal').textContent  = euro(mid);
+document.getElementById('resFou').textContent  = 'Fourchette : '+euro(low)+' – '+euro(high)+' (±'+Math.round(mg*100)+'%)';
+document.getElementById('resPm').innerHTML     = pmF.toLocaleString('fr-FR')+' €/m² retenu <small>base : '+pmB.toLocaleString('fr-FR')+' €/m²</small>';
+
+/* ── Tableau d'ajustements ── */
+function adjRow(num,label,k,extraHtml){
+  const v=parseFloat(k||0);
+  const cls=Math.abs(v)<.001?'adj-neu':v>0?'adj-pos':'adj-neg';
+  const txt=Math.abs(v)<.001?'neutre':(v>0?'+':'')+Math.round(v*100)+'%';
+  return `<div class="adj-row"><span class="adj-label"><span class="adj-num">${num}</span>${label}${extraHtml||''}</span><span class="adj-val ${cls}">${txt}</span></div>`;
+}
+const adj_html =
+  `<div class="adj-row"><span class="adj-label"><span class="adj-num">①</span>Base marché ${C.n} 2024</span><span class="adj-val adj-neu">${pmB.toLocaleString('fr-FR')} €/m²</span></div>`
+ +(tv!=='appt'?adjRow('②','Type : '+typeL,tv==='maison'?'-0.07':''):`<div class="adj-row"><span class="adj-label"><span class="adj-num">②</span>Type (appartement)</span><span class="adj-val adj-neu">référence</span></div>`)
+ +adjRow('③','État : '+({neuf:'Neuf/rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'}[D.etat?.v]||D.etat?.v), D.etat?.k)
+ +adjRow('④',`DPE <span class="dpe-label d${D.dpe?.v||'D'}">${D.dpe?.v||'D'}</span>`, D.dpe?.k)
+ +adjRow('⑤','Période de construction', D.annee)
+ +(tv==='appt'?adjRow('⑥','Étage', D.etage):'')
+ +(D.parking==='oui'?adjRow('⑦','Parking / box','0.05'):'')
+ +adjRow('⑧','Bien issu d\'une succession', D.herite?.k)
+ +adjRow('⑨','Conflits entre co-indivisaires', D.conflit?.k)
+ +(parseFloat(D.coi?.k||0)<0?adjRow('⑩','Nombre de co-indivisaires ('+D.coi?.v+')', D.coi?.k):'')
+ +`<div class="adj-row adj-total"><span class="adj-label">Prix/m² final</span><span class="adj-val">${pmF.toLocaleString('fr-FR')} €/m² ${Math.abs(+diffP)>1?`<small style="color:${+diffP>0?'var(--teal)':'#C03939'}">(${+diffP>0?'+':''}${diffP}% vs médiane)</small>`:''}</span></div>`;
+document.getElementById('adjTable').innerHTML = adj_html;
+
+/* ── Comparables ── */
+const mois=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const comps=[0,1,2].map(i=>{
+  const s=Math.round(D.surf*(.88+i*.14+(Math.random()-.5)*.06));
+  const pm=Math.round(pmB*(.93+Math.random()*.14));
+  const yr=i===0?'2025':'2024';
+  const mo=mois[Math.floor(Math.random()*12)];
+  return {s,pm,p:s*pm,d:`${mo} ${yr}`};
+});
+document.getElementById('compsTable').innerHTML=comps.map(c=>`
+  <div class="comp-item">
+    <div class="comp-l"><div class="comp-type">${typeL} · ${c.s} m²</div><div class="comp-dt">${C.n} · ${c.d}</div></div>
+    <div class="comp-r"><div class="comp-p">${euro(c.p)}</div><div class="comp-pm">${c.pm.toLocaleString('fr-FR')} €/m²</div></div>
+  </div>`).join('');
+
+/* ── Récapitulatif ── */
+const recap=[
+  ['Commune',C.n],['Type',typeL],['Surface',D.surf+' m²'],
+  ['DPE',D.dpe?.v||'D'],['État',{neuf:'Neuf/rénové','tres-bon':'Très bon état',bon:'Bon état',rafr:'À rafraîchir',renov:'À rénover'}[D.etat?.v]||'—'],
+  ['Succession',D.herite?.v==='oui'?'Oui':'Non'],['Conflits',D.conflit?.v==='oui'?'Oui':'Non'],
+  ['Prix/m² base',pmB.toLocaleString('fr-FR')+' €/m²'],['Prix/m² retenu',pmF.toLocaleString('fr-FR')+' €/m²'],
+];
+document.getElementById('recap').innerHTML=recap.map(([l,v])=>`
+  <div style="display:flex;justify-content:space-between;padding:.38rem 0;border-top:1px solid var(--gris-bord);font-size:.84rem">
+    <span style="color:var(--texte-doux)">${l}</span>
+    <span style="font-family:'Montserrat',sans-serif;font-weight:600;color:var(--navy)">${v}</span>
+  </div>`).join('');
+
+/* ── Lien MeilleursAgents ── */
+const maUrl=C.ma?`https://www.meilleursagents.com/prix-immobilier/${C.ma}/`:'https://www.meilleursagents.com/prix-immobilier/';
+document.getElementById('chartRtLink').href=maUrl;
+document.getElementById('maLink').href=maUrl;
+document.getElementById('chartSubtitle').textContent=C.n+' vs France entière — source : Notaires de France';
+document.getElementById('chartBox').onclick=()=>window.open(maUrl,'_blank');
+
+/* ── Graphique ── */
+const LABELS10=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+const LABPRJ=['2025*','2026*','2027*'];
+const NAT10=[2250,2330,2420,2520,2620,2730,2860,2990,2920,2860];
+const NATPRJ=[Math.round(2860*.98),Math.round(2860*.98*1.01),Math.round(2860*.98*1.01*1.02)];
+function gen10y(c){ const t=c.trend,r=c.r15||.04,b=t[0]; return [b/Math.pow(1+r,4),b/Math.pow(1+r,3),b/Math.pow(1+r,2),b/(1+r),...t].map(v=>Math.round(v)); }
+function genProj(c){ let v=c.trend[c.trend.length-1]; return (c.proj||[-.02,.01,.02]).map(r=>(v=Math.round(v*(1+r)))); }
+const t10=gen10y(C), prj=genProj(C);
+let chartInst=null, curScale='10ans';
+
+function buildChart(scale){
+  if(typeof Chart==='undefined'){setTimeout(()=>buildChart(scale),120);return;}
+  const cv=document.getElementById('mChart');if(!cv)return;
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  let labels,cityD,natD,cityP=null,natP=null;
+  if(scale==='5ans'){labels=LABELS10.slice(5);cityD=t10.slice(5);natD=NAT10.slice(5);}
+  else if(scale==='10ans'){labels=LABELS10;cityD=t10;natD=NAT10;}
+  else{labels=[...LABELS10,...LABPRJ];cityD=t10;natD=NAT10;
+       cityP=[...Array(9).fill(null),t10[9],...prj];
+       natP=[...Array(9).fill(null),NAT10[9],...NATPRJ];}
+  const note=document.getElementById('chartNote');
+  note.textContent=scale==='proj'?'* Prévisions 2025–2027 — Source : Crédit Logement/CSA, FNAIM (janv. 2025). À titre indicatif, non contractuel.':'';
+  const ds=[
+    {label:C.n,data:[...cityD,...(scale==='proj'?[null,null,null]:[])],borderColor:'#2C5282',backgroundColor:'rgba(44,82,130,.08)',borderWidth:2,pointRadius:2.5,tension:.4,fill:true},
+    {label:'France',data:[...natD,...(scale==='proj'?[null,null,null]:[])],borderColor:'rgba(44,82,130,.25)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:1.5,tension:.4,borderDash:[4,3]},
+  ];
+  if(cityP)ds.push({label:C.n+' (prév.)',data:cityP,borderColor:'rgba(44,82,130,.4)',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[5,4],pointStyle:'triangle'});
+  if(natP)ds.push({label:'France (prév.)',data:natP,borderColor:'rgba(44,82,130,.15)',backgroundColor:'transparent',borderWidth:1,pointRadius:2,tension:.3,borderDash:[3,4]});
+  chartInst=new Chart(cv,{type:'line',data:{labels,datasets:ds},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'var(--texte-doux)',font:{family:'Montserrat',size:10},boxWidth:10,boxHeight:2,padding:8}},
+      tooltip:{backgroundColor:'rgba(15,31,61,.92)',titleFont:{family:'Montserrat',size:11},bodyFont:{size:11},callbacks:{label:c=>c.parsed.y!=null?' '+c.parsed.y.toLocaleString('fr-FR')+' €/m²':''}}},
+    scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9}}},
+            y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--texte-doux)',font:{family:'Montserrat',size:9},callback:v=>v.toLocaleString('fr-FR')+'€'}}}
+  }});
+}
+function setScale(s){
+  curScale=s;
+  document.querySelectorAll('#chartCtrl .cht-btn').forEach(b=>b.classList.toggle('active',b.dataset.scale===s));
+  buildChart(s);
+}
+/* Charger le graphique après que Chart.js soit disponible */
+window.addEventListener('load',()=>buildChart('10ans'));
+</script>
+</body>
+</html>
