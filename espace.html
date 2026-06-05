@@ -192,8 +192,24 @@ a { color: inherit; text-decoration: none; }
 .cal-leg { display: flex; align-items: center; gap: .35rem; font-size: .72rem; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 600; }
 .cal-leg .dot { width: 9px; height: 9px; border-radius: 3px; }
 
+/* Colonne latérale (jour + à venir) */
+.cal-side-col { display: flex; flex-direction: column; gap: 16px; }
+
 /* Panneau latéral jour */
 .cal-side { background: #fff; border: 1px solid var(--gris-bord); border-radius: 16px; padding: 18px; }
+
+/* Liste à venir */
+.up-ev { display: flex; gap: 11px; align-items: center; padding: 9px 0; border-top: 1px solid var(--gris-bord); cursor: pointer; transition: .12s; }
+.up-ev:first-child { border-top: none; }
+.up-ev:hover { padding-left: 3px; }
+.up-date { width: 42px; text-align: center; flex-shrink: 0; }
+.up-date .ud-day { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--navy); line-height: 1; }
+.up-date .ud-mon { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .62rem; text-transform: uppercase; color: var(--texte-doux); }
+.up-body { flex: 1; min-width: 0; border-left: 2.5px solid; padding-left: 9px; }
+.up-title { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.up-meta { font-size: .72rem; color: var(--texte-doux); margin-top: 1px; }
+.up-countdown { font-size: .66rem; font-weight: 700; font-family: 'Montserrat', sans-serif; padding: .12rem .45rem; border-radius: 99px; background: var(--gris-clair); color: var(--texte-doux); flex-shrink: 0; }
+.up-countdown.soon { background: rgba(200,130,30,.14); color: #9A6010; }
 .cal-side-date { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1rem; color: var(--navy); text-transform: capitalize; }
 .cal-side-sub { font-size: .78rem; color: var(--texte-doux); margin-top: 2px; margin-bottom: 14px; }
 .cal-ev { display: flex; gap: 10px; padding: 10px; border-radius: 10px; background: var(--gris-clair); margin-bottom: 8px; align-items: flex-start; position: relative; transition: .12s; }
@@ -205,6 +221,8 @@ a { color: inherit; text-decoration: none; }
 .cal-ev-type { font-size: .64rem; font-weight: 700; font-family: 'Montserrat', sans-serif; padding: .1rem .45rem; border-radius: 4px; }
 .cal-ev-del { color: var(--gris-mid); cursor: pointer; font-size: 1.1rem; line-height: 1; flex-shrink: 0; transition: .15s; }
 .cal-ev-del:hover { color: #C03939; }
+.cal-ev-export { color: var(--gris-mid); cursor: pointer; line-height: 1; flex-shrink: 0; transition: .15s; display: flex; }
+.cal-ev-export:hover { color: var(--accent); }
 .cal-side-add { width: 100%; justify-content: center; margin-top: 6px; }
 .cal-side-empty { text-align: center; padding: 24px 10px; color: var(--texte-doux); font-size: .82rem; }
 .cal-side-empty .ic { font-size: 1.8rem; opacity: .35; margin-bottom: 8px; }
@@ -234,24 +252,6 @@ a { color: inherit; text-decoration: none; }
 .type-opt:hover { border-color: var(--accent-light); }
 .type-opt.sel { border-color: var(--navy); background: var(--gris-clair); color: var(--navy); }
 .modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
-
-/* ── ACTIONS ── */
-.action-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-top: 1px solid var(--gris-bord); }
-.action-item:first-child { border-top: none; }
-.action-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--gris-mid); background: #fff; cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: .15s; display: flex; align-items: center; justify-content: center; }
-.action-check.done { background: var(--teal); border-color: var(--teal); color: #fff; font-size: .65rem; }
-.action-item.done .action-title { text-decoration: line-through; color: var(--texte-doux); }
-.action-title { font-weight: 600; font-size: .88rem; color: var(--navy); }
-.action-meta { font-size: .74rem; color: var(--texte-doux); margin-top: 2px; }
-.action-right { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-
-/* ── RÉUNIONS ── */
-.reunion-item { padding: 14px 0; border-top: 1px solid var(--gris-bord); }
-.reunion-item:first-child { border-top: none; }
-.reunion-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
-.reunion-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; color: var(--navy); }
-.reunion-date { font-size: .76rem; color: var(--texte-doux); }
-.reunion-desc { font-size: .82rem; color: var(--texte-doux); line-height: 1.6; }
 
 /* ── INVENTAIRE ── */
 .inv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -324,9 +324,7 @@ a { color: inherit; text-decoration: none; }
     <div class="nav-sep"></div>
     <span class="nav-section-label">Gestion</span>
     <div class="nav-i" data-v="planning"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Planning</div>
-    <div class="nav-i" data-v="actions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Actions</div>
     <div class="nav-i" data-v="budget"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>Budget</div>
-    <div class="nav-i" data-v="reunions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Réunions & AG</div>
     <div class="nav-i" data-v="inventaire"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Inventaire</div>
     <div class="nav-i" data-v="incidents"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidents</div>
 
@@ -385,7 +383,7 @@ a { color: inherit; text-decoration: none; }
           <div class="row-item" onclick="go('estim')" style="cursor:pointer"><div class="r-ic" style="background:rgba(44,82,130,.1)">📊</div><div><b>Lancer une simulation</b><span>Estimation, parts, vente</span></div><span class="mini-link">→</span></div>
           <div class="row-item" onclick="go('juri')" style="cursor:pointer"><div class="r-ic" style="background:rgba(45,106,106,.1)">⚖️</div><div><b>Consulter un expert</b><span>Notaire ou avocat</span></div><span class="mini-link">→</span></div>
           <div class="row-item" onclick="go('docs')" style="cursor:pointer"><div class="r-ic" style="background:rgba(15,31,61,.07)">📄</div><div><b>Déposer un document</b><span>Coffre-fort sécurisé</span></div><span class="mini-link">→</span></div>
-          <div class="row-item" onclick="go('actions')" style="cursor:pointer"><div class="r-ic" style="background:rgba(74,127,181,.1)">✅</div><div><b>Mes actions en cours</b><span>Tâches et décisions</span></div><span class="mini-link">→</span></div>
+          <div class="row-item" onclick="go('planning')" style="cursor:pointer"><div class="r-ic" style="background:rgba(74,127,181,.1)">📅</div><div><b>Voir le planning</b><span>Échéances et rendez-vous</span></div><span class="mini-link">→</span></div>
         </div>
       </div>
     </div>
@@ -418,7 +416,13 @@ a { color: inherit; text-decoration: none; }
     <div class="view" id="v-planning">
       <div class="page-head">
         <div><h1>Planning</h1><p>Calendrier des échéances, réunions et rendez-vous de votre indivision.</p></div>
-        <button class="btn" onclick="openEventModal()">+ Événement</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="exportAllICS()" title="Exporter vers Google / Apple / Outlook Calendar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exporter (.ics)
+          </button>
+          <button class="btn" onclick="openEventModal()">+ Événement</button>
+        </div>
       </div>
       <div class="cal-layout">
         <!-- Calendrier -->
@@ -448,32 +452,19 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
 
-        <!-- Panneau jour sélectionné -->
-        <div class="cal-side">
-          <div class="cal-side-date" id="calSideDate">—</div>
-          <div class="cal-side-sub" id="calSideSub">—</div>
-          <div id="calSideEvents"></div>
-          <button class="btn btn-ghost cal-side-add" onclick="openEventModal(selectedDay)">+ Ajouter ce jour</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="view" id="v-actions">
-      <div class="page-head">
-        <div><h1>Actions</h1><p>Tâches et décisions à traiter.</p></div>
-        <button class="btn" onclick="addAction()">+ Ajouter</button>
-      </div>
-      <div class="cols2">
-        <div class="card">
-          <div class="card-title">En cours</div>
-          <div class="card-sub">Actions à réaliser</div>
-          <div id="actionsList"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Terminées</div>
-          <div class="card-sub">Actions résolues</div>
-          <div id="actionsDone"></div>
+        <!-- Colonne latérale : jour sélectionné + à venir -->
+        <div class="cal-side-col">
+          <div class="cal-side">
+            <div class="cal-side-date" id="calSideDate">—</div>
+            <div class="cal-side-sub" id="calSideSub">—</div>
+            <div id="calSideEvents"></div>
+            <button class="btn btn-ghost cal-side-add" onclick="openEventModal(selectedDay)">+ Ajouter ce jour</button>
+          </div>
+          <div class="cal-side">
+            <div class="cal-side-date" style="font-size:.9rem">À venir</div>
+            <div class="cal-side-sub" id="upcomingSub">Prochains événements</div>
+            <div id="upcomingList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -488,18 +479,6 @@ a { color: inherit; text-decoration: none; }
       <div class="card">
         <div class="card-head"><div class="card-title">Transactions</div></div>
         <div id="transactionsList"></div>
-      </div>
-    </div>
-
-    <!-- RÉUNIONS -->
-    <div class="view" id="v-reunions">
-      <div class="page-head">
-        <div><h1>Réunions & AG</h1><p>Comptes rendus et assemblées générales.</p></div>
-        <button class="btn" onclick="addReunion()">+ Nouvelle réunion</button>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">Réunions enregistrées</div></div>
-        <div id="reunionsList"></div>
       </div>
     </div>
 
@@ -734,24 +713,18 @@ const DEFAULT = {
   coi:[{n:'Marti (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'pill-ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'pill-warn'}],
   estim:[],rdv:[],
   events:[
-    {titre:'Réunion annuelle co-indivisaires',date:'2026-07-15',type:'reunion',lieu:'Annecy'},
-    {titre:'Échéance taxe foncière',date:'2026-10-15',type:'echeance',lieu:''},
-    {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy'},
-  ],
-  actions:[
-    {titre:'Signer le mandat de vente',meta:'Assigné à Marie · Urgent',done:false},
-    {titre:'Régler la facture plomberie',meta:'580 € · Paul',done:false},
-    {titre:'Demander devis toiture',meta:'À chiffrer',done:true},
+    {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy',heure:'10:00'},
+    {titre:'Réunion annuelle co-indivisaires',date:'2026-07-15',type:'reunion',lieu:'Annecy',heure:'18:30'},
+    {titre:'Signature mandat de vente',date:'2026-07-02',type:'echeance',lieu:'Étude notariale',heure:'14:00'},
+    {titre:'Échéance taxe foncière',date:'2026-10-15',type:'echeance',lieu:'',heure:''},
+    {titre:'AG constitutive — Indivision Annecy',date:'2025-11-10',type:'reunion',lieu:'Annecy',heure:'17:00'},
+    {titre:'Réunion entretien toiture',date:'2026-03-22',type:'reunion',lieu:'Visio',heure:'11:00'},
   ],
   transactions:[
     {desc:'Taxe foncière 2025',cat:'Charge',bien:'Maison Annecy',montant:-2400,ic:'🏛'},
     {desc:'Loyer saisonnier',cat:'Revenu',bien:'Maison Annecy',montant:1800,ic:'💰'},
     {desc:'Facture plomberie',cat:'Entretien',bien:'Maison Annecy',montant:-580,ic:'🔧'},
     {desc:'Charges copropriété',cat:'Charge',bien:'Appt. Lyon',montant:-340,ic:'🏢'},
-  ],
-  reunions:[
-    {titre:'AG constitutive — Indivision Annecy',date:'2025-11-10',desc:'Vote à l\'unanimité pour la désignation d\'un gérant. PV signé par les 3 indivisaires.'},
-    {titre:'Réunion entretien toiture',date:'2026-03-22',desc:'Décision de reporter les travaux à l\'automne. Devis demandé à 2 entreprises.'},
   ],
   inventaire:[
     {nom:'Canapé 3 places',val:'800 €',ic:'🛋'},
@@ -779,8 +752,8 @@ const ICONS=['📄','🧾','📊','📑','🖼️'];
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
   renderKpis(); renderPortfolio(); renderDocs(); renderCoi();
-  renderEstim(); renderRdv(); renderEvents(); renderActions();
-  renderBudget(); renderReunions(); renderInventaire(); renderIncidents();
+  renderEstim(); renderRdv(); renderEvents();
+  renderBudget(); renderInventaire(); renderIncidents();
 }
 
 function renderKpis(){
@@ -876,7 +849,39 @@ function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0
 function frDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }
 
 /* renderEvents = point d'entrée appelé par renderAll() et save() */
-function renderEvents(){ renderCalendar(); renderDayPanel(); }
+function renderEvents(){ renderCalendar(); renderDayPanel(); renderUpcoming(); }
+
+function renderUpcoming(){
+  const el = document.getElementById('upcomingList');
+  const sub = document.getElementById('upcomingSub');
+  if(!el) return;
+  const up = S.events
+    .map((e,idx)=>({...e,idx}))
+    .filter(e=>e.date>=_todayISO)
+    .sort((a,b)=>(a.date+ (a.heure||'')).localeCompare(b.date+(b.heure||'')))
+    .slice(0,6);
+  if(sub) sub.textContent = up.length ? up.length+' à venir' : 'Aucun événement à venir';
+  if(!up.length){
+    el.innerHTML = '<div class="cal-side-empty"><div class="ic">🗓️</div>Rien de prévu.</div>';
+    return;
+  }
+  const today = new Date(_todayISO+'T00:00:00');
+  el.innerHTML = up.map(e=>{
+    const t = evType(e.type);
+    const d = new Date(e.date+'T00:00:00');
+    const diff = Math.round((d-today)/86400000);
+    const cd = diff===0?'Auj.':diff===1?'Demain':'J-'+diff;
+    const soon = diff<=3;
+    return `<div class="up-ev" onclick="selectDay('${e.date}');calCursor=new Date('${e.date}T00:00:00');renderCalendar();">
+      <div class="up-date"><div class="ud-day">${d.getDate()}</div><div class="ud-mon">${d.toLocaleString('fr-FR',{month:'short'})}</div></div>
+      <div class="up-body" style="border-color:${t.color}">
+        <div class="up-title">${e.titre}</div>
+        <div class="up-meta">${e.heure?e.heure+' · ':''}${e.lieu||t.label}</div>
+      </div>
+      <span class="up-countdown${soon?' soon':''}">${cd}</span>
+    </div>`;
+  }).join('');
+}
 
 function renderCalendar(){
   const grid = document.getElementById('calGrid');
@@ -947,7 +952,12 @@ function renderDayPanel(){
           ${e.lieu?`<span>📍 ${e.lieu}</span>`:''}
         </div>
       </div>
-      <span class="cal-ev-del" onclick="deleteEvent(${e.idx})" title="Supprimer">×</span>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:center;flex-shrink:0">
+        <span class="cal-ev-export" onclick="exportOneICS(${e.idx})" title="Ajouter à mon agenda (.ics)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
+        </span>
+        <span class="cal-ev-del" onclick="deleteEvent(${e.idx})" title="Supprimer">×</span>
+      </div>
     </div>`;
   }).join('');
 }
@@ -992,17 +1002,67 @@ document.querySelectorAll('#evTypePicker .type-opt').forEach(o=>o.addEventListen
 /* Échap ferme le modal */
 document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeEventModal(); });
 
-function renderActions(){
-  const todo = S.actions.filter(a=>!a.done);
-  const done = S.actions.filter(a=>a.done);
-  const row=(a,i)=>`<div class="action-item${a.done?' done':''}">
-    <div class="action-check${a.done?' done':''}" onclick="S.actions[${i}].done=!S.actions[${i}].done;save()">${a.done?'✓':''}</div>
-    <div><div class="action-title">${a.titre}</div><div class="action-meta">${a.meta}</div></div>
-    <div class="action-right"><span class="del" onclick="S.actions.splice(${i},1);save()">×</span></div>
-  </div>`;
-  const al=document.getElementById('actionsList');const dl=document.getElementById('actionsDone');
-  if(al) al.innerHTML=todo.map((a,i)=>row(a,S.actions.indexOf(a))).join('')||'<div class="empty">Aucune action en cours.</div>';
-  if(dl) dl.innerHTML=done.map((a,i)=>row(a,S.actions.indexOf(a))).join('')||'<div class="empty">Aucune action terminée.</div>';
+/* ── EXPORT CALENDRIER (.ics — Google / Apple / Outlook) ── */
+function icsEscape(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function eventToVEVENT(e){
+  const uid = 'divimo-' + e.date.replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,8) + '@divimo';
+  const stamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+  let dtStart, dtEnd;
+  if(e.heure){
+    const [h,m] = e.heure.split(':').map(Number);
+    const d = e.date.replace(/-/g,'');
+    dtStart = 'DTSTART:' + d + 'T' + pad2(h) + pad2(m) + '00';
+    const endH = (h+1)%24;
+    dtEnd = 'DTEND:' + d + 'T' + pad2(endH) + pad2(m) + '00';
+  } else {
+    const d = e.date.replace(/-/g,'');
+    const nd = new Date(e.date+'T00:00:00'); nd.setDate(nd.getDate()+1);
+    const dn = ymd(nd).replace(/-/g,'');
+    dtStart = 'DTSTART;VALUE=DATE:' + d;
+    dtEnd = 'DTEND;VALUE=DATE:' + dn;
+  }
+  const typeLabel = evType(e.type).label;
+  return [
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + stamp,
+    dtStart,
+    dtEnd,
+    'SUMMARY:' + icsEscape(e.titre),
+    e.lieu ? 'LOCATION:' + icsEscape(e.lieu) : '',
+    'DESCRIPTION:' + icsEscape('[' + typeLabel + '] Indivision · via Divimo'),
+    'END:VEVENT'
+  ].filter(Boolean).join('\r\n');
+}
+function buildICS(events){
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Divimo//Planning Indivision//FR',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Divimo — Planning indivision',
+    ...events.map(eventToVEVENT),
+    'END:VCALENDAR'
+  ].join('\r\n');
+}
+function downloadICS(events, filename){
+  if(!events.length){ toast('Aucun événement à exporter.'); return; }
+  const blob = new Blob([buildICS(events)], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename || 'divimo-planning.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+/* Exporter tout le planning */
+function exportAllICS(){ downloadICS(S.events.slice(), 'divimo-planning.ics'); toast('Calendrier exporté (.ics).'); }
+/* Exporter un seul événement */
+function exportOneICS(idx){
+  const e = S.events[idx]; if(!e) return;
+  downloadICS([e], 'divimo-' + e.titre.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) + '.ics');
+  toast('Événement exporté (.ics).');
 }
 
 function renderBudget(){
@@ -1022,16 +1082,6 @@ function renderBudget(){
       <div class="trans-amount ${t.montant>=0?'pos':'neg'}">${t.montant>=0?'+':''}${t.montant.toLocaleString('fr-FR')} €</div>
       <span class="del" onclick="S.transactions.splice(${i},1);save()">×</span>
     </div>`).join('')||'<div class="empty">Aucune transaction enregistrée.</div>';
-}
-
-function renderReunions(){
-  const el=document.getElementById('reunionsList');
-  if(!el) return;
-  el.innerHTML=S.reunions.map((r,i)=>`
-    <div class="reunion-item">
-      <div class="reunion-head"><div class="reunion-title">${r.titre}</div><div style="display:flex;gap:8px;align-items:center"><span class="reunion-date">${new Date(r.date).toLocaleDateString('fr-FR')}</span><span class="del" onclick="S.reunions.splice(${i},1);save()">×</span></div></div>
-      <div class="reunion-desc">${r.desc}</div>
-    </div>`).join('')||'<div class="empty">Aucune réunion enregistrée.</div>';
 }
 
 function renderInventaire(){
@@ -1085,23 +1135,12 @@ function book(pro){
 }
 /* addEvent() conservé en alias de compatibilité → ouvre le modal */
 function addEvent(){ openEventModal(); }
-function addAction(){
-  const t=prompt('Titre de l\'action :','');if(!t)return;
-  const m=prompt('Assigné à / note :','')||'';
-  S.actions.unshift({titre:t,meta:m,done:false});save();toast('Action ajoutée.');
-}
 function addTransaction(){
   const d=prompt('Description :','');if(!d)return;
   const m=parseFloat(prompt('Montant (négatif = charge, positif = revenu) :','0').replace(',','.'))||0;
   const c=prompt('Catégorie :','Charge')||'Charge';
   const b=S.biens[0]?.nom||'—';
   S.transactions.unshift({desc:d,cat:c,bien:b,montant:m,ic:m>=0?'💰':'💸'});save();toast('Transaction ajoutée.');
-}
-function addReunion(){
-  const t=prompt('Titre de la réunion :','');if(!t)return;
-  const d=prompt('Date (AAAA-MM-JJ) :',new Date().toISOString().slice(0,10))||'';
-  const desc=prompt('Compte rendu / notes :','')||'';
-  S.reunions.unshift({titre:t,date:d,desc});save();toast('Réunion enregistrée.');
 }
 function addInventaire(){
   const n=prompt('Nom de l\'élément :','');if(!n)return;
