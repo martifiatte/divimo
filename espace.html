@@ -132,7 +132,25 @@ a { color: inherit; text-decoration: none; }
 .bien-card-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .96rem; color: var(--navy); margin-bottom: 3px; }
 .bien-card-meta { font-size: .78rem; color: var(--texte-doux); margin-bottom: 14px; }
 .bien-card-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--navy); margin-bottom: 10px; }
-.bien-card-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.bien-card-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+/* Parts par bien */
+.bien-parts { margin: 10px 0; display: flex; flex-direction: column; gap: 5px; }
+.bp-row { display: flex; align-items: center; gap: 7px; font-size: .76rem; }
+.bp-ini { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .6rem; color: #fff; flex-shrink: 0; }
+.bp-name { color: var(--texte-doux); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bp-pct { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--navy); }
+.bien-manage { display: inline-flex; align-items: center; gap: .3rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .74rem; color: var(--accent); cursor: pointer; margin-top: 4px; }
+.bien-manage:hover { color: var(--navy); }
+/* Tag bien sur document */
+.doc-bien-tag { font-size: .66rem; font-weight: 700; font-family: 'Montserrat', sans-serif; padding: .1rem .45rem; border-radius: 4px; background: rgba(44,82,130,.09); color: var(--accent); white-space: nowrap; }
+.doc-bien-tag.all { background: rgba(45,106,106,.12); color: var(--teal); }
+/* Modal parts : lignes éditables */
+.parts-edit-row { display: grid; grid-template-columns: 1fr 78px 32px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.parts-edit-row input { padding: .55rem .7rem; border: 1.5px solid var(--gris-bord); border-radius: 8px; font-size: .88rem; font-family: 'Open Sans', sans-serif; width: 100%; }
+.parts-edit-row input:focus { outline: none; border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+.parts-sum { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; padding: .35rem .7rem; border-radius: 99px; display: inline-block; margin-top: 4px; }
+.parts-sum.ok { background: rgba(45,106,106,.15); color: var(--teal); }
+.parts-sum.bad { background: rgba(192,57,57,.12); color: #C03939; }
 
 /* ── BUDGET ── */
 /* ═══════ BUDGET v2 ═══════ */
@@ -190,6 +208,27 @@ a { color: inherit; text-decoration: none; }
 .tx-amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .95rem; white-space: nowrap; }
 .tx-amount.pos { color: var(--teal); }
 .tx-amount.neg { color: #C0392B; }
+
+/* ═══════ PARTAGE ═══════ */
+.share-card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+.share-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.share-av { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .85rem; color: #fff; flex-shrink: 0; }
+.share-id { flex: 1; min-width: 0; }
+.share-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .95rem; color: var(--navy); }
+.share-name .you { font-weight: 500; font-size: .76rem; color: var(--accent); margin-left: 6px; }
+.share-role { font-size: .76rem; color: var(--texte-doux); margin-top: 1px; }
+.share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:560px) { .share-grid { grid-template-columns: 1fr; } }
+.share-toggle { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1.5px solid var(--gris-bord); border-radius: 10px; transition: .14s; }
+.share-toggle.on { border-color: rgba(45,106,106,.3); background: rgba(45,106,106,.04); }
+.share-toggle .st-ico { font-size: 1rem; }
+.share-toggle .st-label { flex: 1; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--navy); }
+/* Interrupteur */
+.tgl { width: 38px; height: 22px; border-radius: 99px; background: var(--gris-mid); position: relative; cursor: pointer; transition: .2s; flex-shrink: 0; border: none; padding: 0; }
+.tgl::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.tgl.on { background: var(--teal); }
+.tgl.on::after { left: 18px; }
+.share-locked { opacity: .55; pointer-events: none; }
 
 /* ── PLANNING ── */
 /* ═══════ CALENDRIER INTERACTIF ═══════ */
@@ -372,6 +411,7 @@ a { color: inherit; text-decoration: none; }
     <span class="nav-section-label">Ressources</span>
     <div class="nav-i" data-v="docs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Documents</div>
     <div class="nav-i" data-v="coi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Co-indivisaires</div>
+    <div class="nav-i" data-v="partage"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>Partage & accès</div>
     <div class="nav-i" data-v="estim"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Simulations</div>
     <div class="nav-i" data-v="juri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7l14 0M7 7l-3 7a4 4 0 0 0 6 0L7 7zM17 7l-3 7a4 4 0 0 0 6 0L17 7z"/></svg>Conseil juridique</div>
 
@@ -573,14 +613,19 @@ a { color: inherit; text-decoration: none; }
     <!-- DOCUMENTS -->
     <div class="view" id="v-docs">
       <div class="page-head">
-        <div><h1>Documents</h1><p>Coffre-fort numérique de l'indivision.</p></div>
+        <div><h1>Documents</h1><p>Coffre-fort numérique — classez chaque document par bien ou en commun.</p></div>
       </div>
       <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <label style="font-family:'Montserrat';font-weight:600;font-size:.8rem;color:var(--navy)">Déposer dans :</label>
+          <select id="docUploadBien" style="width:auto;min-width:180px;padding:.5rem .8rem;border:1.5px solid var(--gris-bord);border-radius:9px;font-family:'Open Sans';font-size:.86rem"></select>
+        </div>
         <div class="drop-zone" id="dropZone">
           <div class="dz-ico">⬆️</div>
           <b>Glissez un fichier ici</b><br>
           <span style="font-size:.82rem">ou cliquez pour déposer</span>
         </div>
+        <div class="bud-filter" id="docFilterBar" style="margin:14px 0 6px"></div>
         <div id="docsList"></div>
       </div>
     </div>
@@ -592,6 +637,27 @@ a { color: inherit; text-decoration: none; }
         <button class="btn" onclick="inviteCoi()">+ Inviter</button>
       </div>
       <div class="card"><div id="coiList"></div></div>
+    </div>
+
+    <!-- PARTAGE & ACCÈS -->
+    <div class="view" id="v-partage">
+      <div class="page-head">
+        <div><h1>Partage & accès</h1><p>Choisissez ce que chaque co-indivisaire peut consulter dans l'espace partagé.</p></div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(44,82,130,.05),rgba(45,106,106,.05));border-color:rgba(44,82,130,.18)">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:1.6rem">🔗</div>
+          <div style="flex:1;min-width:200px">
+            <div class="card-title" style="margin-bottom:2px">Espace partagé de l'indivision</div>
+            <div style="font-size:.82rem;color:var(--texte-doux)">Chaque co-indivisaire accède uniquement à ce que vous activez ci-dessous.</div>
+          </div>
+          <button class="btn btn-ghost" onclick="copyShareLink()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copier le lien d'invitation
+          </button>
+        </div>
+      </div>
+      <div id="shareList"></div>
     </div>
 
     <!-- SIMULATIONS -->
@@ -763,6 +829,29 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL PARTS (quote-parts par bien) -->
+<div class="modal-overlay" id="partsModal" onclick="if(event.target===this)closePartsModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Quote-parts — <span id="partsBienName">—</span></h3>
+      <button class="modal-close" onclick="closePartsModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field" style="margin-bottom:8px">
+        <label>Répartition de la propriété</label>
+        <div style="font-size:.76rem;color:var(--texte-doux);line-height:1.5;margin-bottom:10px">Indiquez le nom et le % de chaque co-indivisaire pour ce bien. Le total doit faire 100 %.</div>
+        <div id="partsRows"></div>
+        <button class="add-btn" onclick="addPartRow()">+ Ajouter un co-indivisaire</button>
+        <div id="partsSum"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closePartsModal()">Annuler</button>
+        <button class="btn" onclick="savePartsModal()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -824,8 +913,18 @@ document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
 
 /* ━━━━ STATE ━━━━ */
 const DEFAULT = {
-  biens:[{nom:'Maison familiale — Annecy',info:'74000 Annecy · 120 m²',val:'320 000 €',lat:45.8992,lng:6.1294}],
-  docs:[{name:'Acte notarié.pdf',meta:'Marie · 2,4 Mo',ic:'📄'},{name:'Factures travaux 2025',meta:'8 fichiers',ic:'🧾'},{name:'Relevé de charges.xlsx',meta:'Hier',ic:'📊'}],
+  biens:[
+    {nom:'Maison familiale — Annecy',info:'74000 Annecy · 120 m²',val:'320 000 €',lat:45.8992,lng:6.1294,
+     parts:[{ini:'MF',name:'Marti',pct:45},{ini:'PD',name:'Paul',pct:30},{ini:'LM',name:'Léa',pct:25}]},
+    {nom:'Appartement — Lyon',info:'69003 Lyon · 58 m²',val:'265 000 €',lat:45.7640,lng:4.8357,
+     parts:[{ini:'MF',name:'Marti',pct:50},{ini:'PD',name:'Paul',pct:50}]},
+  ],
+  docs:[
+    {name:'Acte notarié.pdf',meta:'Marie · 2,4 Mo',ic:'📄',bien:'Maison familiale — Annecy'},
+    {name:'Factures travaux 2025',meta:'8 fichiers',ic:'🧾',bien:'Maison familiale — Annecy'},
+    {name:'Relevé de charges.xlsx',meta:'Hier',ic:'📊',bien:'__all__'},
+    {name:'Règlement copropriété.pdf',meta:'Lyon · 1,1 Mo',ic:'📕',bien:'Appartement — Lyon'},
+  ],
   coi:[{n:'Marti (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'pill-ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'pill-warn'}],
   estim:[],rdv:[],
   events:[
@@ -855,6 +954,11 @@ const DEFAULT = {
     {titre:'Fuite sous-sol',meta:'Signalé par Paul · 12/03/2026',st:'En cours',ic:'💧',stCls:'pill-warn'},
     {titre:'Gouttière endommagée',meta:'Signalé par Marti · 05/01/2026',st:'Résolu',ic:'🌧',stCls:'pill-ok'},
   ],
+  /* Accès partagés : qui peut voir quoi (le propriétaire/admin a tout) */
+  sharing:{
+    'Paul Dupont':{planning:true, documents:true, budget:true, patrimoine:true},
+    'Léa Martin':{planning:true, documents:true, budget:false, patrimoine:true},
+  },
 };
 let S = load();
 function load(){
@@ -870,7 +974,7 @@ const ICONS=['📄','🧾','📊','📑','🖼️'];
 function renderAll(){
   renderKpis(); renderPortfolio(); renderDocs(); renderCoi();
   renderEstim(); renderRdv(); renderEvents();
-  renderBudget(); renderInventaire(); renderIncidents();
+  renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
 }
 
 function renderKpis(){
@@ -887,32 +991,116 @@ function renderKpis(){
   document.getElementById('ptValeur').textContent = totalStr.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €';
 }
 
+/* Parts d'un bien : utilise bien.parts, sinon les parts globales (coiParts) */
+function bienParts(b){
+  if(b && Array.isArray(b.parts) && b.parts.length) return b.parts;
+  return coiParts().map(p=>({ini:p.ini,name:p.name,pct:p.pct}));
+}
+
 function renderPortfolio(){
   const g = document.getElementById('portfolioGrid');
   if(!g) return;
-  g.innerHTML = S.biens.map((b,i)=>`
-    <div class="bien-card" onclick="toast('${b.nom}')">
+  g.innerHTML = S.biens.map((b,i)=>{
+    const parts = bienParts(b);
+    const sum = parts.reduce((a,p)=>a+(+p.pct||0),0);
+    const nDocs = S.docs.filter(d=>d.bien===b.nom || d.bien==='__all__').length;
+    return `<div class="bien-card">
       <div class="bien-card-ico">🏠</div>
       <div class="bien-card-name">${b.nom}</div>
       <div class="bien-card-meta">${b.info}</div>
       <div class="bien-card-val">${b.val}</div>
-      <div class="bien-card-pills">
-        <span class="pill pill-ok">${S.coi.length} indivisaires</span>
-        <span class="pill pill-info">${S.docs.length} docs</span>
-        ${i>0?`<span class="del" onclick="event.stopPropagation();S.biens.splice(${i},1);save()" title="Supprimer">×</span>`:''}
+      <div class="bien-parts">
+        ${parts.map((p,j)=>`<div class="bp-row">
+          <span class="bp-ini" style="background:${PAL[j%PAL.length]}">${p.ini}</span>
+          <span class="bp-name">${p.name}</span>
+          <span class="bp-pct">${p.pct}%</span>
+        </div>`).join('')}
       </div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien. Ajoutez votre premier bien ci-dessus.</div>';
+      <div class="bien-card-pills">
+        <span class="pill ${sum===100?'pill-ok':'pill-warn'}">${parts.length} part${parts.length>1?'s':''} · ${sum}%</span>
+        <span class="pill pill-info">${nDocs} doc${nDocs>1?'s':''}</span>
+        ${i>0?`<span class="del" onclick="S.biens.splice(${i},1);save()" title="Supprimer" style="margin-left:auto">×</span>`:''}
+      </div>
+      <div class="bien-manage" onclick="openPartsModal(${i})">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        Gérer les parts
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien. Ajoutez votre premier bien ci-dessus.</div>';
 }
 
+/* ── MODAL QUOTE-PARTS PAR BIEN ── */
+let partsEditIdx = -1, partsDraft = [];
+function openPartsModal(idx){
+  partsEditIdx = idx;
+  const b = S.biens[idx];
+  document.getElementById('partsBienName').textContent = b.nom;
+  partsDraft = bienParts(b).map(p=>({ini:p.ini||'',name:p.name||'',pct:+p.pct||0}));
+  renderPartsRows();
+  document.getElementById('partsModal').classList.add('open');
+}
+function closePartsModal(){ document.getElementById('partsModal').classList.remove('open'); }
+function renderPartsRows(){
+  document.getElementById('partsRows').innerHTML = partsDraft.map((p,i)=>`
+    <div class="parts-edit-row">
+      <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="partsDraft[${i}].name=this.value;refreshIni(${i})">
+      <div style="position:relative"><input type="number" min="0" max="100" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:24px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
+      <button class="del-btn" onclick="partsDraft.splice(${i},1);renderPartsRows()">×</button>
+    </div>`).join('');
+  updatePartsSum();
+}
+function refreshIni(i){
+  const n=(partsDraft[i].name||'').trim();
+  partsDraft[i].ini = n.split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase() || '?';
+}
+function addPartRow(){ partsDraft.push({ini:'?',name:'',pct:0}); renderPartsRows(); }
+function updatePartsSum(){
+  const sum = partsDraft.reduce((a,p)=>a+(+p.pct||0),0);
+  document.getElementById('partsSum').innerHTML = `<span class="parts-sum ${sum===100?'ok':'bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+}
+function savePartsModal(){
+  const sum = partsDraft.reduce((a,p)=>a+(+p.pct||0),0);
+  if(sum!==100){ toast('Le total des parts doit faire 100%.'); return; }
+  if(partsDraft.some(p=>!p.name.trim())){ toast('Renseignez tous les prénoms.'); return; }
+  partsDraft.forEach(p=>{ if(!p.ini||p.ini==='?'){ p.ini=p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'; }});
+  S.biens[partsEditIdx].parts = partsDraft.map(p=>({ini:p.ini,name:p.name.trim(),pct:+p.pct}));
+  closePartsModal(); save(); toast('Quote-parts mises à jour.');
+}
+
+/* ── DOCUMENTS (filtrables par bien) ── */
+let docFilter = '__all_filter__';
 function renderDocs(){
   const el = document.getElementById('docsList');
   if(!el) return;
-  el.innerHTML = S.docs.map((d,i)=>`
-    <div class="row-item">
+  /* Sélecteur d'upload (garde la valeur courante) */
+  const up = document.getElementById('docUploadBien');
+  if(up){
+    const cur = up.value;
+    up.innerHTML = `<option value="__all__">📋 Tous les biens (commun)</option>`
+      + S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('');
+    if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur;
+  }
+  /* Barre de filtres par bien */
+  const fb = document.getElementById('docFilterBar');
+  if(fb){
+    fb.innerHTML = `<span class="bf-chip${docFilter==='__all_filter__'?' sel':''}" onclick="docFilter='__all_filter__';renderDocs()">Tous</span>`
+      + S.biens.map(b=>`<span class="bf-chip${docFilter===b.nom?' sel':''}" onclick="docFilter='${b.nom.replace(/'/g,"\\'")}';renderDocs()">${b.nom.split('—')[0].trim()}</span>`).join('')
+      + `<span class="bf-chip${docFilter==='__all__'?' sel':''}" onclick="docFilter='__all__';renderDocs()">📋 Communs</span>`;
+  }
+  const list = S.docs.map((d,i)=>({...d,i})).filter(d=>{
+    if(docFilter==='__all_filter__') return true;
+    if(docFilter==='__all__') return d.bien==='__all__';
+    return d.bien===docFilter || d.bien==='__all__';
+  });
+  el.innerHTML = list.map(d=>{
+    const isAll = d.bien==='__all__';
+    const bienLabel = isAll ? '📋 Tous les biens' : (d.bien? d.bien.split('—')[0].trim() : '—');
+    return `<div class="row-item">
       <div class="r-ic" style="background:rgba(44,82,130,.08)">${d.ic||'📄'}</div>
-      <div><b>${d.name}</b><span>${d.meta}</span></div>
-      <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="S.docs.splice(${i},1);save()">×</span></div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">📁</div>Aucun document. Déposez votre premier fichier.</div>';
+      <div style="flex:1;min-width:0"><b>${d.name}</b><span>${d.meta} · <span class="doc-bien-tag ${isAll?'all':''}">${bienLabel}</span></span></div>
+      <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="S.docs.splice(${d.i},1);save()">×</span></div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">📁</div>Aucun document pour ce filtre.</div>';
 }
 
 function renderCoi(){
@@ -924,6 +1112,55 @@ function renderCoi(){
       <div><b>${c.n}</b><span>${c.r}</span></div>
       <div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="S.coi.splice(${i},1);save()">×</span>`:''}</div>
     </div>`).join('');
+}
+
+/* ── PARTAGE & ACCÈS ── */
+const SHARE_ITEMS = [
+  {key:'planning',   ico:'📅', label:'Planning'},
+  {key:'documents',  ico:'📁', label:'Documents'},
+  {key:'budget',     ico:'💶', label:'Budget'},
+  {key:'patrimoine', ico:'🏠', label:'Patrimoine'},
+];
+function renderSharing(){
+  const el = document.getElementById('shareList');
+  if(!el) return;
+  if(!S.sharing) S.sharing = {};
+  el.innerHTML = S.coi.map((c,i)=>{
+    const isOwner = /vous/i.test(c.n) || i===0;
+    const conf = S.sharing[c.n] || (isOwner ? {planning:true,documents:true,budget:true,patrimoine:true} : {planning:true,documents:true,budget:false,patrimoine:true});
+    return `<div class="share-card">
+      <div class="share-head">
+        <div class="share-av" style="background:linear-gradient(135deg,${PAL[i%PAL.length]},${PAL[(i+1)%PAL.length]})">${c.ini}</div>
+        <div class="share-id">
+          <div class="share-name">${c.n.replace(/\s*\(vous\)/i,'')}${isOwner?'<span class="you">vous · propriétaire</span>':''}</div>
+          <div class="share-role">${c.r}</div>
+        </div>
+        ${!isOwner?`<span class="pill ${c.cls}">${c.st}</span>`:''}
+      </div>
+      <div class="share-grid ${isOwner?'share-locked':''}">
+        ${SHARE_ITEMS.map(it=>{
+          const on = isOwner ? true : !!conf[it.key];
+          return `<div class="share-toggle ${on?'on':''}">
+            <span class="st-ico">${it.ico}</span>
+            <span class="st-label">${it.label}</span>
+            <button class="tgl ${on?'on':''}" ${isOwner?'disabled':`onclick="toggleShare('${c.n.replace(/'/g,"\\'")}','${it.key}')"`}></button>
+          </div>`;
+        }).join('')}
+      </div>
+      ${isOwner?'<div style="font-size:.74rem;color:var(--texte-doux);margin-top:8px">En tant que propriétaire, vous avez accès à tout.</div>':''}
+    </div>`;
+  }).join('');
+}
+function toggleShare(name, key){
+  if(!S.sharing[name]) S.sharing[name] = {planning:true,documents:true,budget:false,patrimoine:true};
+  S.sharing[name][key] = !S.sharing[name][key];
+  save();
+  toast(S.sharing[name][key] ? 'Accès activé.' : 'Accès retiré.');
+}
+function copyShareLink(){
+  const link = 'https://divimo.vercel.app/invitation/' + Math.random().toString(36).slice(2,10);
+  if(navigator.clipboard){ navigator.clipboard.writeText(link).then(()=>toast('Lien d\'invitation copié.')); }
+  else { toast('Lien : ' + link); }
 }
 
 function renderEstim(){
@@ -1234,23 +1471,38 @@ function renderBudget(){
       <div class="bs-sub">${solde>=0?'Le bien est positif':'Charges supérieures aux revenus'}</div>
     </div>`;
 
-  /* ── Répartition par co-indivisaire ── */
-  const parts = coiParts();
-  const totalPct = parts.reduce((a,b)=>a+b.pct,0) || 100;
+  /* ── Répartition par co-indivisaire (selon les parts de CHAQUE bien) ── */
+  /* Chaque charge est répartie selon les quote-parts du bien concerné,
+     puis on agrège par personne. */
+  const agg = {}; // name -> {name, ini, amount}
+  let colorIdx = {};
+  txs.filter(t=>t.montant<0).forEach(t=>{
+    const bien = S.biens.find(b=>b.nom===t.bien);
+    const parts = bienParts(bien); // parts du bien, ou globales si commun/inconnu
+    const sumP = parts.reduce((a,p)=>a+(+p.pct||0),0) || 100;
+    parts.forEach(p=>{
+      const key = p.name;
+      if(!agg[key]) agg[key] = {name:p.name, ini:p.ini, amount:0};
+      agg[key].amount += Math.abs(t.montant) * (+p.pct||0) / sumP;
+    });
+  });
+  const aggList = Object.values(agg).sort((a,b)=>b.amount-a.amount);
+  const maxAmt = aggList.length ? aggList[0].amount : 1;
   const sp = document.getElementById('budSplit');
-  if(sp) sp.innerHTML = parts.map(p=>{
-    const share = chargesAbs * p.pct / totalPct;
+  if(sp) sp.innerHTML = aggList.map((p,i)=>{
+    const col = PAL[i%PAL.length];
+    const pctOfTotal = chargesAbs ? Math.round(p.amount/chargesAbs*100) : 0;
     return `<div class="split-row">
-      <div class="split-av" style="background:linear-gradient(135deg,${p.color},${p.color}cc)">${p.ini}</div>
+      <div class="split-av" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</div>
       <div class="split-body">
         <div class="split-top">
-          <span class="split-name">${p.name}<span class="pct">${p.pct}%</span></span>
-          <span class="split-amount">${eur(share)}</span>
+          <span class="split-name">${p.name}<span class="pct">${pctOfTotal}% des charges</span></span>
+          <span class="split-amount">${eur(p.amount)}</span>
         </div>
-        <div class="split-bar"><div class="split-fill" style="width:${p.pct/totalPct*100}%;background:${p.color}"></div></div>
+        <div class="split-bar"><div class="split-fill" style="width:${maxAmt?p.amount/maxAmt*100:0}%;background:${col}"></div></div>
       </div>
     </div>`;
-  }).join('') || '<div class="empty">Aucun co-indivisaire.</div>';
+  }).join('') || '<div class="empty">Aucune charge à répartir.</div>';
 
   /* ── Charges par catégorie (donut) ── */
   const byCat = {};
@@ -1350,9 +1602,13 @@ function updateTxSplitInfo(){
     info.innerHTML='💡 Les revenus sont répartis entre indivisaires selon les quote-parts.';
     return;
   }
-  if(!m){ info.innerHTML='💡 La charge sera répartie automatiquement selon les quote-parts de chaque co-indivisaire.'; return; }
-  const parts=coiParts(); const tot=parts.reduce((a,b)=>a+b.pct,0)||100;
-  info.innerHTML='<b style="color:var(--navy)">Répartition automatique :</b><br>'+parts.map(p=>`${p.name} (${p.pct}%) → <b>${eur(m*p.pct/tot)}</b>`).join(' · ');
+  if(!m){ info.innerHTML='💡 La charge sera répartie automatiquement selon les quote-parts du bien sélectionné.'; return; }
+  const bienNom = document.getElementById('txBien').value;
+  const bien = S.biens.find(b=>b.nom===bienNom);
+  const parts = bienParts(bien);
+  const tot = parts.reduce((a,b)=>a+(+b.pct||0),0)||100;
+  const src = (bien && bien.parts) ? bien.nom.split('—')[0].trim() : 'parts globales';
+  info.innerHTML=`<b style="color:var(--navy)">Répartition (${src}) :</b><br>`+parts.map(p=>`${p.name} (${p.pct}%) → <b>${eur(m*p.pct/tot)}</b>`).join(' · ');
 }
 function saveTx(){
   const desc=document.getElementById('txDesc').value.trim();
@@ -1372,6 +1628,7 @@ document.querySelectorAll('#txTypePicker .type-opt').forEach(o=>o.addEventListen
 }));
 /* Mise à jour de l'aperçu de répartition en saisissant le montant */
 document.getElementById('txMontant')?.addEventListener('input', updateTxSplitInfo);
+document.getElementById('txBien')?.addEventListener('change', updateTxSplitInfo);
 
 function renderInventaire(){
   const el=document.getElementById('inventaireGrid');
@@ -1439,11 +1696,13 @@ function addBienOnMap(){go('carte');setTimeout(()=>{placing=true;if(map)map.getC
 
 /* ━━━━ DOCUMENTS DROP ━━━━ */
 let di=0;
+function uploadBienValue(){ return document.getElementById('docUploadBien')?.value || '__all__'; }
+function addDoc(name, meta){ S.docs.unshift({name, meta, ic:ICONS[di++%ICONS.length], bien:uploadBienValue()}); }
 const dz=document.getElementById('dropZone');
-dz.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.onchange=()=>{[...inp.files].forEach(f=>{S.docs.unshift({name:f.name,meta:'Ajouté à l\'instant',ic:ICONS[di++%ICONS.length]});});save();toast('Document(s) ajouté(s).');};inp.click();});
+dz.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.onchange=()=>{[...inp.files].forEach(f=>addDoc(f.name,'Ajouté à l\'instant'));save();toast('Document(s) ajouté(s).');};inp.click();});
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');[...e.dataTransfer.files].forEach(f=>{S.docs.unshift({name:f.name,meta:'Glissé-déposé',ic:ICONS[di++%ICONS.length]});});save();toast('Document(s) déposé(s).');});
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');[...e.dataTransfer.files].forEach(f=>addDoc(f.name,'Glissé-déposé'));save();toast('Document(s) déposé(s).');});
 
 /* ━━━━ CARTE ━━━━ */
 let map=null,markersLayer=null,placing=false;
