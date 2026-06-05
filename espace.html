@@ -48,6 +48,34 @@ a { color: inherit; text-decoration: none; }
 .nav-sep { height: 1px; background: var(--gris-bord); margin: 6px 4px; }
 @media(max-width:860px) { .nav-sep { display: none; } }
 
+/* ── SÉLECTEUR DE GROUPE ── */
+.group-selector { position: relative; margin-bottom: 10px; }
+@media(max-width:860px) { .group-selector { min-width: 200px; flex-shrink: 0; margin-bottom: 0; margin-right: 6px; } }
+.gs-current { width: 100%; display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1.5px solid var(--gris-bord); border-radius: 11px; background: #fff; cursor: pointer; transition: .15s; text-align: left; }
+.gs-current:hover { border-color: var(--accent-light); background: var(--gris-clair); }
+.gs-current.open { border-color: var(--navy); }
+.gs-ico { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,var(--navy),var(--accent)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+.gs-info { flex: 1; min-width: 0; }
+.gs-label { font-size: .6rem; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--texte-leger, #8896A7); }
+.gs-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-chev { color: var(--texte-doux); flex-shrink: 0; transition: .2s; }
+.gs-current.open .gs-chev { transform: rotate(180deg); }
+.gs-menu { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--gris-bord); border-radius: 12px; box-shadow: 0 12px 30px rgba(15,31,61,.16); z-index: 200; overflow: hidden; display: none; }
+.gs-menu.open { display: block; }
+.gs-item { display: flex; align-items: center; gap: 9px; padding: 10px 12px; cursor: pointer; transition: .12s; border-top: 1px solid var(--gris-clair); }
+.gs-item:first-child { border-top: none; }
+.gs-item:hover { background: var(--gris-clair); }
+.gs-item.active { background: rgba(44,82,130,.06); }
+.gs-item-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .78rem; color: #fff; flex-shrink: 0; font-family: 'Montserrat', sans-serif; font-weight: 700; }
+.gs-item-name { flex: 1; min-width: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-item-check { color: var(--teal); flex-shrink: 0; }
+.gs-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.gs-mini { background: none; border: none; cursor: pointer; color: var(--gris-mid); padding: 3px; border-radius: 5px; display: flex; transition: .12s; }
+.gs-mini:hover { background: var(--gris-bord); color: var(--navy); }
+.gs-mini.del:hover { color: #C03939; }
+.gs-create { display: flex; align-items: center; gap: 8px; padding: 11px 12px; cursor: pointer; transition: .12s; border-top: 1px solid var(--gris-bord); font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--accent); background: var(--gris-clair); }
+.gs-create:hover { background: rgba(44,82,130,.08); }
+
 /* ── MAIN VIEWS ── */
 .view { display: none; }
 .view.active { display: block; animation: fadein .3s ease; }
@@ -396,6 +424,8 @@ a { color: inherit; text-decoration: none; }
 
   <!-- ── SIDEBAR ── -->
   <aside class="side-nav">
+    <!-- Sélecteur de groupe (indivision) -->
+    <div class="group-selector" id="groupSelector"></div>
     <div class="nav-i active" data-v="dash"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</div>
     <div class="nav-i" data-v="portfolio"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/><path d="M9 7h6"/></svg>Mon patrimoine</div>
     <div class="nav-i" data-v="carte"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg>Carte des biens</div>
@@ -852,6 +882,29 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL NOUVEAU GROUPE -->
+<div class="modal-overlay" id="groupModal" onclick="if(event.target===this)closeGroupModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Nouveau groupe</h3>
+      <button class="modal-close" onclick="closeGroupModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:.82rem;color:var(--texte-doux);line-height:1.5;margin-bottom:14px">
+        Un groupe = une indivision distincte, avec ses propres biens, co-indivisaires, documents et budget. Pratique quand vous êtes en indivision avec des personnes différentes selon les biens.
+      </div>
+      <div class="modal-field">
+        <label>Nom du groupe</label>
+        <input type="text" id="groupName" placeholder="Ex : Héritage parents, SCI Dupont…" autocomplete="off">
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeGroupModal()">Annuler</button>
+        <button class="btn" onclick="saveGroupModal()">Créer le groupe</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -960,12 +1013,161 @@ const DEFAULT = {
     'Léa Martin':{planning:true, documents:true, budget:false, patrimoine:true},
   },
 };
-let S = load();
-function load(){
-  try{return Object.assign(JSON.parse(JSON.stringify(DEFAULT)),JSON.parse(ssGet(STATE_KEY)||'{}'));}
-  catch(e){return JSON.parse(JSON.stringify(DEFAULT));}
+/* ═══════ GROUPES (multi-indivisions) ═══════
+   S pointe toujours vers les données du groupe ACTIF → tout le code
+   existant (S.biens, S.coi, …) fonctionne sans changement. */
+const GROUPES_KEY = 'divimo_groupes';
+const ACTIVE_KEY  = 'divimo_active';
+
+/* Deuxième groupe de démonstration (autres personnes, autre indivision) */
+const DEFAULT_GROUPE_2 = {
+  nom:'SCI Les Oliviers — Marseille',
+  biens:[
+    {nom:'Villa — Marseille 8e',info:'13008 Marseille · 160 m²',val:'620 000 €',lat:43.2700,lng:5.3850,
+     parts:[{ini:'MF',name:'Marti',pct:34},{ini:'SG',name:'Sophie',pct:33},{ini:'KR',name:'Karim',pct:33}]},
+  ],
+  docs:[
+    {name:'Statuts SCI.pdf',meta:'2,0 Mo',ic:'📜',bien:'__all__'},
+    {name:'Bail commercial.pdf',meta:'Villa Marseille',ic:'📄',bien:'Villa — Marseille 8e'},
+  ],
+  coi:[
+    {n:'Marti (vous)',r:'34% · Gérant',ini:'MF',st:'Actif',cls:'pill-ok'},
+    {n:'Sophie Garnier',r:'33% · Associée',ini:'SG',st:'Actif',cls:'pill-ok'},
+    {n:'Karim Rabah',r:'33% · Associé',ini:'KR',st:'Actif',cls:'pill-ok'},
+  ],
+  estim:[], rdv:[],
+  events:[
+    {titre:'AG annuelle SCI',date:'2026-09-30',type:'reunion',lieu:'Marseille',heure:'15:00'},
+    {titre:'Échéance CFE',date:'2026-12-15',type:'echeance',lieu:'',heure:''},
+  ],
+  transactions:[
+    {desc:'Loyer commercial T3',cat:'loyer',bien:'Villa — Marseille 8e',montant:2600,date:'2026-07-01'},
+    {desc:'Taxe foncière',cat:'taxe',bien:'Villa — Marseille 8e',montant:-3100,date:'2026-10-15'},
+  ],
+  inventaire:[], incidents:[],
+  sharing:{
+    'Sophie Garnier':{planning:true,documents:true,budget:true,patrimoine:true},
+    'Karim Rabah':{planning:true,documents:false,budget:true,patrimoine:true},
+  },
+};
+
+function mkGroupe1(){ return Object.assign({nom:'Indivision familiale — Annecy & Lyon'}, JSON.parse(JSON.stringify(DEFAULT))); }
+function defaultGroupes(){ return { g1: mkGroupe1(), g2: JSON.parse(JSON.stringify(DEFAULT_GROUPE_2)) }; }
+
+function loadGroupes(){
+  try{
+    const raw = ssGet(GROUPES_KEY);
+    if(raw){ const g = JSON.parse(raw); if(g && Object.keys(g).length) return g; }
+    /* Migration : ancien état plat (1 seule indivision) → groupe g1 */
+    const old = ssGet(STATE_KEY);
+    if(old){
+      const data = Object.assign(JSON.parse(JSON.stringify(DEFAULT)), JSON.parse(old));
+      if(!data.nom) data.nom = 'Mon indivision';
+      return { g1: data };
+    }
+  }catch(e){}
+  return defaultGroupes();
 }
-function save(){ssSet(STATE_KEY,JSON.stringify(S));renderAll();}
+
+let GROUPES = loadGroupes();
+let activeId = (function(){ try{ const a=ssGet(ACTIVE_KEY); if(a && GROUPES[a]) return a; }catch(e){} return Object.keys(GROUPES)[0]; })();
+let S = GROUPES[activeId];
+
+function save(){
+  GROUPES[activeId] = S;
+  ssSet(GROUPES_KEY, JSON.stringify(GROUPES));
+  ssSet(ACTIVE_KEY, activeId);
+  renderAll();
+}
+function switchGroupe(id){
+  if(!GROUPES[id] || id===activeId){ closeGroupMenu(); return; }
+  GROUPES[activeId] = S;
+  activeId = id; S = GROUPES[id];
+  ssSet(ACTIVE_KEY, id);
+  closeGroupMenu();
+  go('dash');
+  renderAll(); renderGroupSelector();
+  toast('Groupe : ' + (S.nom||'—'));
+}
+function createGroupe(nom){
+  const id = 'g' + Date.now().toString(36);
+  GROUPES[id] = {
+    nom: nom,
+    biens:[], docs:[],
+    coi:[{n:'Marti (vous)',r:'100% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'}],
+    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}
+  };
+  GROUPES[activeId] = S;
+  activeId = id; S = GROUPES[id];
+  ssSet(ACTIVE_KEY, id);
+  save(); renderAll(); renderGroupSelector(); go('portfolio');
+}
+function deleteGroupe(id){
+  if(Object.keys(GROUPES).length<=1){ toast('Vous devez garder au moins un groupe.'); return; }
+  if(!confirm('Supprimer ce groupe et toutes ses données ?')) return;
+  delete GROUPES[id];
+  if(activeId===id){ activeId=Object.keys(GROUPES)[0]; S=GROUPES[activeId]; }
+  save(); renderAll(); renderGroupSelector();
+  toast('Groupe supprimé.');
+}
+function renameGroupe(id){
+  const n = prompt('Renommer le groupe :', GROUPES[id]?.nom||''); if(!n)return;
+  GROUPES[id].nom = n.trim();
+  if(id===activeId) S.nom = n.trim();
+  save(); renderGroupSelector();
+}
+
+/* ── UI sélecteur de groupe ── */
+function groupInitials(nom){ return (nom||'?').split(/[\s—-]+/).filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?'; }
+function renderGroupSelector(){
+  const el = document.getElementById('groupSelector');
+  if(!el) return;
+  const ids = Object.keys(GROUPES);
+  const cur = GROUPES[activeId] || {};
+  el.innerHTML = `
+    <button class="gs-current" id="gsCurrent" onclick="toggleGroupMenu()">
+      <span class="gs-ico">${groupInitials(cur.nom)}</span>
+      <span class="gs-info">
+        <span class="gs-label">Indivision</span>
+        <span class="gs-name">${cur.nom||'—'}</span>
+      </span>
+      <svg class="gs-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="gs-menu" id="gsMenu">
+      ${ids.map((id,i)=>{
+        const g=GROUPES[id]; const act=id===activeId;
+        return `<div class="gs-item ${act?'active':''}" onclick="switchGroupe('${id}')">
+          <span class="gs-item-ico" style="background:${PAL[i%PAL.length]}">${groupInitials(g.nom)}</span>
+          <span class="gs-item-name">${g.nom||'—'}</span>
+          ${act?'<svg class="gs-item-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>':''}
+          <span class="gs-item-actions">
+            <button class="gs-mini" title="Renommer" onclick="event.stopPropagation();renameGroupe('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+            ${ids.length>1?`<button class="gs-mini del" title="Supprimer" onclick="event.stopPropagation();deleteGroupe('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`:''}
+          </span>
+        </div>`;
+      }).join('')}
+      <div class="gs-create" onclick="openGroupModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+        Nouveau groupe
+      </div>
+    </div>`;
+}
+function toggleGroupMenu(){
+  document.getElementById('gsCurrent')?.classList.toggle('open');
+  document.getElementById('gsMenu')?.classList.toggle('open');
+}
+function closeGroupMenu(){
+  document.getElementById('gsCurrent')?.classList.remove('open');
+  document.getElementById('gsMenu')?.classList.remove('open');
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('#groupSelector'))closeGroupMenu(); });
+function openGroupModal(){ closeGroupMenu(); document.getElementById('groupName').value=''; document.getElementById('groupModal').classList.add('open'); setTimeout(()=>document.getElementById('groupName').focus(),60); }
+function closeGroupModal(){ document.getElementById('groupModal').classList.remove('open'); }
+function saveGroupModal(){
+  const n=document.getElementById('groupName').value.trim();
+  if(!n){ toast('Donnez un nom au groupe.'); return; }
+  closeGroupModal(); createGroupe(n); renderGroupSelector(); toast('Groupe « '+n+' » créé.');
+}
 
 const PAL=['#2C5282','#2D6A6A','#4A7FB5','#4A9B8E','#1E3A5F','#3D7A7A'];
 const ICONS=['📄','🧾','📊','📑','🖼️'];
@@ -1354,7 +1556,7 @@ document.querySelectorAll('#evTypePicker .type-opt').forEach(o=>o.addEventListen
   o.classList.add('sel'); evEditType = o.dataset.v;
 }));
 /* Échap ferme les modals */
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEventModal(); if(typeof closeTxModal==='function')closeTxModal(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEventModal(); if(typeof closeTxModal==='function')closeTxModal(); if(typeof closePartsModal==='function')closePartsModal(); if(typeof closeGroupModal==='function')closeGroupModal(); } });
 
 /* ── EXPORT CALENDRIER (.ics — Google / Apple / Outlook) ── */
 function icsEscape(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
@@ -1755,6 +1957,7 @@ async function loadAdminData(){
   }
 }
 
+renderGroupSelector();
 renderAll();
 </script>
 </body>
