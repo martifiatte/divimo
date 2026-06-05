@@ -152,15 +152,88 @@ a { color: inherit; text-decoration: none; }
 .trans-amount.pos { color: var(--teal); }
 
 /* ── PLANNING ── */
-.planning-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(max-width:700px) { .planning-grid { grid-template-columns: 1fr; } }
-.event-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--gris-bord); align-items: flex-start; }
-.event-item:first-child { border-top: none; }
-.event-date { width: 42px; text-align: center; flex-shrink: 0; }
-.event-date .day { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--navy); line-height: 1; }
-.event-date .month { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .65rem; text-transform: uppercase; color: var(--texte-doux); }
-.event-info b { font-weight: 600; font-size: .88rem; color: var(--navy); display: block; margin-bottom: 2px; }
-.event-info span { font-size: .76rem; color: var(--texte-doux); }
+/* ═══════ CALENDRIER INTERACTIF ═══════ */
+.cal-layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+@media(max-width:900px) { .cal-layout { grid-template-columns: 1fr; } }
+
+/* Carte calendrier */
+.cal-card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 16px; padding: 18px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+.cal-title { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--navy); text-transform: capitalize; min-width: 160px; }
+.cal-nav { display: flex; align-items: center; gap: 6px; }
+.cal-nav-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--gris-bord); background: #fff; color: var(--navy); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .15s; }
+.cal-nav-btn:hover { background: var(--gris-clair); border-color: var(--accent-light); }
+.cal-today-btn { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .78rem; padding: .42rem .85rem; border-radius: 8px; border: 1px solid var(--gris-bord); background: #fff; color: var(--navy); cursor: pointer; transition: .15s; }
+.cal-today-btn:hover { background: var(--gris-clair); border-color: var(--accent-light); }
+
+/* Grille */
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+.cal-wd { text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texte-leger, #8896A7); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-cell { aspect-ratio: 1 / .92; border-radius: 9px; border: 1.5px solid transparent; padding: 5px 6px; cursor: pointer; transition: .12s; display: flex; flex-direction: column; gap: 3px; overflow: hidden; background: var(--gris-clair); }
+.cal-cell:hover { border-color: var(--accent-light); background: #fff; }
+.cal-cell.other { background: transparent; opacity: .4; }
+.cal-cell.today { background: rgba(44,82,130,.07); }
+.cal-cell.today .cal-num { background: var(--navy); color: #fff; }
+.cal-cell.selected { border-color: var(--navy); background: #fff; box-shadow: 0 2px 10px rgba(15,31,61,.1); }
+.cal-num { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; color: var(--navy); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cal-cell.other .cal-num { color: var(--texte-leger, #8896A7); }
+.cal-events { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.cal-chip { font-size: .64rem; font-weight: 600; font-family: 'Montserrat', sans-serif; padding: 1px 5px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+.cal-more { font-size: .6rem; font-weight: 700; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; padding-left: 2px; }
+@media(max-width:560px) {
+  .cal-cell { padding: 3px; gap: 2px; }
+  .cal-num { width: 18px; height: 18px; font-size: .72rem; }
+  .cal-chip { font-size: 0; padding: 0; height: 4px; border-radius: 99px; }
+}
+
+/* Légende types */
+.cal-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--gris-bord); }
+.cal-leg { display: flex; align-items: center; gap: .35rem; font-size: .72rem; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 600; }
+.cal-leg .dot { width: 9px; height: 9px; border-radius: 3px; }
+
+/* Panneau latéral jour */
+.cal-side { background: #fff; border: 1px solid var(--gris-bord); border-radius: 16px; padding: 18px; }
+.cal-side-date { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1rem; color: var(--navy); text-transform: capitalize; }
+.cal-side-sub { font-size: .78rem; color: var(--texte-doux); margin-top: 2px; margin-bottom: 14px; }
+.cal-ev { display: flex; gap: 10px; padding: 10px; border-radius: 10px; background: var(--gris-clair); margin-bottom: 8px; align-items: flex-start; position: relative; transition: .12s; }
+.cal-ev:hover { background: #EEF2F8; }
+.cal-ev-bar { width: 3px; border-radius: 99px; flex-shrink: 0; align-self: stretch; }
+.cal-ev-body { flex: 1; min-width: 0; }
+.cal-ev-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--navy); }
+.cal-ev-meta { font-size: .73rem; color: var(--texte-doux); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.cal-ev-type { font-size: .64rem; font-weight: 700; font-family: 'Montserrat', sans-serif; padding: .1rem .45rem; border-radius: 4px; }
+.cal-ev-del { color: var(--gris-mid); cursor: pointer; font-size: 1.1rem; line-height: 1; flex-shrink: 0; transition: .15s; }
+.cal-ev-del:hover { color: #C03939; }
+.cal-side-add { width: 100%; justify-content: center; margin-top: 6px; }
+.cal-side-empty { text-align: center; padding: 24px 10px; color: var(--texte-doux); font-size: .82rem; }
+.cal-side-empty .ic { font-size: 1.8rem; opacity: .35; margin-bottom: 8px; }
+
+/* Liste à venir (sous le calendrier sur mobile) */
+.cal-upcoming-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; color: var(--navy); margin: 16px 0 10px; }
+
+/* ═══════ MODAL ÉVÉNEMENT ═══════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,31,61,.45); backdrop-filter: blur(3px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; animation: modalFade .2s ease; }
+.modal-overlay.open { display: flex; }
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: #fff; border-radius: 18px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(15,31,61,.3); animation: modalUp .25s cubic-bezier(.2,.7,.2,1); max-height: 90vh; overflow-y: auto; }
+@keyframes modalUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.modal-head { padding: 20px 22px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-head h3 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--navy); }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--texte-doux); font-size: 1.4rem; line-height: 1; padding: 2px 6px; border-radius: 6px; transition: .15s; }
+.modal-close:hover { background: var(--gris-clair); color: var(--navy); }
+.modal-body { padding: 16px 22px 22px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .8rem; color: var(--navy); margin-bottom: 6px; }
+.modal-field input[type=text], .modal-field input[type=date], .modal-field input[type=time] { width: 100%; padding: .65rem .8rem; border: 1.5px solid var(--gris-bord); border-radius: 9px; font-family: 'Open Sans', sans-serif; font-size: .9rem; color: var(--texte); transition: .15s; }
+.modal-field input:focus { outline: none; border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.type-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.type-opt { display: flex; align-items: center; gap: .4rem; padding: .45rem .7rem; border: 1.5px solid var(--gris-bord); border-radius: 8px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .78rem; color: var(--texte-doux); transition: .15s; }
+.type-opt .dot { width: 9px; height: 9px; border-radius: 3px; }
+.type-opt:hover { border-color: var(--accent-light); }
+.type-opt.sel { border-color: var(--navy); background: var(--gris-clair); color: var(--navy); }
+.modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
 
 /* ── ACTIONS ── */
 .action-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-top: 1px solid var(--gris-bord); }
@@ -341,22 +414,46 @@ a { color: inherit; text-decoration: none; }
       <div class="card"><div id="map"></div></div>
     </div>
 
-    <!-- PLANNING -->
+    <!-- PLANNING — CALENDRIER INTERACTIF -->
     <div class="view" id="v-planning">
       <div class="page-head">
-        <div><h1>Planning</h1><p>Échéances, réunions et dates importantes.</p></div>
-        <button class="btn" onclick="addEvent()">+ Ajouter</button>
+        <div><h1>Planning</h1><p>Calendrier des échéances, réunions et rendez-vous de votre indivision.</p></div>
+        <button class="btn" onclick="openEventModal()">+ Événement</button>
       </div>
-      <div class="planning-grid">
-        <div class="card">
-          <div class="card-title">À venir</div>
-          <div class="card-sub">Prochains événements</div>
-          <div id="eventsUpcoming"></div>
+      <div class="cal-layout">
+        <!-- Calendrier -->
+        <div class="cal-card">
+          <div class="cal-head">
+            <div class="cal-title" id="calTitle">—</div>
+            <div class="cal-nav">
+              <button class="cal-today-btn" onclick="calToday()">Aujourd'hui</button>
+              <button class="cal-nav-btn" onclick="calShift(-1)" aria-label="Mois précédent">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="cal-nav-btn" onclick="calShift(1)" aria-label="Mois suivant">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="cal-weekdays">
+            <div class="cal-wd">Lun</div><div class="cal-wd">Mar</div><div class="cal-wd">Mer</div>
+            <div class="cal-wd">Jeu</div><div class="cal-wd">Ven</div><div class="cal-wd">Sam</div><div class="cal-wd">Dim</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <span class="cal-leg"><span class="dot" style="background:#2C5282"></span>Réunion</span>
+            <span class="cal-leg"><span class="dot" style="background:#C8821E"></span>Échéance</span>
+            <span class="cal-leg"><span class="dot" style="background:#2D6A6A"></span>Visite</span>
+            <span class="cal-leg"><span class="dot" style="background:#6B7280"></span>Autre</span>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-title">Passés</div>
-          <div class="card-sub">Historique</div>
-          <div id="eventsPast"></div>
+
+        <!-- Panneau jour sélectionné -->
+        <div class="cal-side">
+          <div class="cal-side-date" id="calSideDate">—</div>
+          <div class="cal-side-sub" id="calSideSub">—</div>
+          <div id="calSideEvents"></div>
+          <button class="btn btn-ghost cal-side-add" onclick="openEventModal(selectedDay)">+ Ajouter ce jour</button>
         </div>
       </div>
     </div>
@@ -527,6 +624,49 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <div id="toast"></div>
+
+<!-- MODAL ÉVÉNEMENT -->
+<div class="modal-overlay" id="eventModal" onclick="if(event.target===this)closeEventModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="evModalTitle">Nouvel événement</h3>
+      <button class="modal-close" onclick="closeEventModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Titre</label>
+        <input type="text" id="evTitle" placeholder="Ex : Réunion co-indivisaires" autocomplete="off">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Date</label>
+          <input type="date" id="evDate">
+        </div>
+        <div class="modal-field">
+          <label>Heure <span style="font-weight:400;color:var(--texte-doux)">(option.)</span></label>
+          <input type="time" id="evTime">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Type</label>
+        <div class="type-picker" id="evTypePicker">
+          <div class="type-opt sel" data-v="reunion"><span class="dot" style="background:#2C5282"></span>Réunion</div>
+          <div class="type-opt" data-v="echeance"><span class="dot" style="background:#C8821E"></span>Échéance</div>
+          <div class="type-opt" data-v="visite"><span class="dot" style="background:#2D6A6A"></span>Visite</div>
+          <div class="type-opt" data-v="autre"><span class="dot" style="background:#6B7280"></span>Autre</div>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Lieu <span style="font-weight:400;color:var(--texte-doux)">(option.)</span></label>
+        <input type="text" id="evLieu" placeholder="Ex : Annecy, étude notariale…" autocomplete="off">
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeEventModal()">Annuler</button>
+        <button class="btn" onclick="saveEvent()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ━━━━ AUTH ━━━━ */
@@ -718,16 +858,139 @@ function renderRdv(){
     </div>`).join('') || '<div class="empty"><div class="empty-ic">⚖️</div>Aucun rendez-vous planifié.</div>';
 }
 
-function renderEvents(){
-  const now = new Date().toISOString().slice(0,10);
-  const up = S.events.filter(e=>e.date>=now).sort((a,b)=>a.date.localeCompare(b.date));
-  const ps = S.events.filter(e=>e.date<now).sort((a,b)=>b.date.localeCompare(a.date));
-  const fmt = d=>{const dt=new Date(d);return {day:dt.getDate(),month:dt.toLocaleString('fr-FR',{month:'short'})}};
-  const row = (e,i,arr)=>{const f=fmt(e.date);return`<div class="event-item"><div class="event-date"><div class="day">${f.day}</div><div class="month">${f.month}</div></div><div class="event-info"><b>${e.titre}</b><span>${e.lieu||'—'} <span class="pill pill-info" style="margin-left:4px">${e.type}</span></span></div><span class="del" onclick="S.events.splice(${i+(arr===ps?up.length:0)},1);save()">×</span></div>`;};
-  const uel=document.getElementById('eventsUpcoming');const pel=document.getElementById('eventsPast');
-  if(uel) uel.innerHTML = up.map((e,i)=>row(e,i,up)).join('') || '<div class="empty">Aucun événement à venir.</div>';
-  if(pel) pel.innerHTML = ps.map((e,i)=>row(e,i,ps)).join('') || '<div class="empty">Aucun événement passé.</div>';
+/* ═══════ CALENDRIER ═══════ */
+const EVTYPES = {
+  reunion:  {label:'Réunion',  color:'#2C5282', bg:'rgba(44,82,130,.12)'},
+  echeance: {label:'Échéance', color:'#C8821E', bg:'rgba(200,130,30,.14)'},
+  visite:   {label:'Visite',   color:'#2D6A6A', bg:'rgba(45,106,106,.13)'},
+  autre:    {label:'Autre',    color:'#6B7280', bg:'rgba(107,114,128,.13)'},
+};
+function evType(t){ return EVTYPES[t] || EVTYPES.autre; }
+
+const _todayISO = new Date().toISOString().slice(0,10);
+let calCursor = new Date();           // mois affiché
+let selectedDay = _todayISO;          // jour sélectionné (YYYY-MM-DD)
+let evEditType = 'reunion';           // type courant dans le modal
+
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function frDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }
+
+/* renderEvents = point d'entrée appelé par renderAll() et save() */
+function renderEvents(){ renderCalendar(); renderDayPanel(); }
+
+function renderCalendar(){
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  if(!grid || !title) return;
+
+  const year = calCursor.getFullYear(), month = calCursor.getMonth();
+  title.textContent = calCursor.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+
+  /* Premier lundi de la grille */
+  const first = new Date(year, month, 1);
+  let startDow = (first.getDay()+6)%7;          // 0 = lundi
+  const start = new Date(year, month, 1 - startDow);
+
+  /* Compter les événements par jour */
+  const byDay = {};
+  S.events.forEach(e => { (byDay[e.date] = byDay[e.date] || []).push(e); });
+
+  let cells = '';
+  for(let i=0; i<42; i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const iso = ymd(d);
+    const isOther = d.getMonth() !== month;
+    const isToday = iso === _todayISO;
+    const isSel = iso === selectedDay;
+    const evs = (byDay[iso]||[]).slice().sort((a,b)=>(a.heure||'').localeCompare(b.heure||''));
+
+    let chips = '';
+    evs.slice(0,3).forEach(e => {
+      const t = evType(e.type);
+      chips += `<div class="cal-chip" style="background:${t.bg};color:${t.color}" title="${e.titre.replace(/"/g,'&quot;')}">${e.heure?e.heure+' ':''}${e.titre}</div>`;
+    });
+    if(evs.length>3) chips += `<div class="cal-more">+${evs.length-3}</div>`;
+
+    cells += `<div class="cal-cell${isOther?' other':''}${isToday?' today':''}${isSel?' selected':''}" onclick="selectDay('${iso}')">
+      <div class="cal-num">${d.getDate()}</div>
+      <div class="cal-events">${chips}</div>
+    </div>`;
+  }
+  grid.innerHTML = cells;
 }
+
+function renderDayPanel(){
+  const dateEl = document.getElementById('calSideDate');
+  const subEl = document.getElementById('calSideSub');
+  const listEl = document.getElementById('calSideEvents');
+  if(!dateEl||!listEl) return;
+
+  dateEl.textContent = frDate(selectedDay);
+  const evs = S.events.map((e,idx)=>({...e,idx}))
+    .filter(e=>e.date===selectedDay)
+    .sort((a,b)=>(a.heure||'').localeCompare(b.heure||''));
+  subEl.textContent = evs.length ? evs.length+' événement'+(evs.length>1?'s':'') : 'Aucun événement ce jour';
+
+  if(!evs.length){
+    listEl.innerHTML = '<div class="cal-side-empty"><div class="ic">📅</div>Rien de prévu.<br>Ajoutez un événement ci-dessous.</div>';
+    return;
+  }
+  listEl.innerHTML = evs.map(e=>{
+    const t = evType(e.type);
+    return `<div class="cal-ev">
+      <div class="cal-ev-bar" style="background:${t.color}"></div>
+      <div class="cal-ev-body">
+        <div class="cal-ev-title">${e.titre}</div>
+        <div class="cal-ev-meta">
+          <span class="cal-ev-type" style="background:${t.bg};color:${t.color}">${t.label}</span>
+          ${e.heure?`<span>🕐 ${e.heure}</span>`:''}
+          ${e.lieu?`<span>📍 ${e.lieu}</span>`:''}
+        </div>
+      </div>
+      <span class="cal-ev-del" onclick="deleteEvent(${e.idx})" title="Supprimer">×</span>
+    </div>`;
+  }).join('');
+}
+
+function selectDay(iso){ selectedDay = iso; renderCalendar(); renderDayPanel(); }
+function calShift(n){ calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()+n, 1); renderCalendar(); }
+function calToday(){ calCursor = new Date(); selectedDay = _todayISO; renderCalendar(); renderDayPanel(); }
+function deleteEvent(idx){ S.events.splice(idx,1); save(); toast('Événement supprimé.'); }
+
+/* ── MODAL ── */
+function openEventModal(presetDate){
+  document.getElementById('evModalTitle').textContent = 'Nouvel événement';
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evDate').value = presetDate || selectedDay || _todayISO;
+  document.getElementById('evTime').value = '';
+  document.getElementById('evLieu').value = '';
+  evEditType = 'reunion';
+  document.querySelectorAll('#evTypePicker .type-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v==='reunion'));
+  document.getElementById('eventModal').classList.add('open');
+  setTimeout(()=>document.getElementById('evTitle').focus(),60);
+}
+function closeEventModal(){ document.getElementById('eventModal').classList.remove('open'); }
+function saveEvent(){
+  const titre = document.getElementById('evTitle').value.trim();
+  const date = document.getElementById('evDate').value;
+  if(!titre){ toast('Indiquez un titre.'); document.getElementById('evTitle').focus(); return; }
+  if(!date){ toast('Choisissez une date.'); return; }
+  const heure = document.getElementById('evTime').value || '';
+  const lieu = document.getElementById('evLieu').value.trim();
+  S.events.push({titre, date, type:evEditType, lieu, heure});
+  selectedDay = date;
+  calCursor = new Date(date+'T00:00:00');
+  closeEventModal();
+  save();
+  toast('Événement ajouté.');
+}
+/* Sélecteur de type dans le modal */
+document.querySelectorAll('#evTypePicker .type-opt').forEach(o=>o.addEventListener('click',()=>{
+  document.querySelectorAll('#evTypePicker .type-opt').forEach(x=>x.classList.remove('sel'));
+  o.classList.add('sel'); evEditType = o.dataset.v;
+}));
+/* Échap ferme le modal */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeEventModal(); });
 
 function renderActions(){
   const todo = S.actions.filter(a=>!a.done);
@@ -820,12 +1083,8 @@ function book(pro){
   const w=prompt('Créneau souhaité :','');if(!w)return;
   S.rdv.unshift({pro,when:w});save();toast('Demande envoyée.');go('juri');
 }
-function addEvent(){
-  const t=prompt('Titre de l\'événement :','');if(!t)return;
-  const d=prompt('Date (AAAA-MM-JJ) :',new Date().toISOString().slice(0,10))||'';
-  const l=prompt('Lieu (optionnel) :','')||'';
-  S.events.push({titre:t,date:d,type:'autre',lieu:l});save();toast('Événement ajouté.');
-}
+/* addEvent() conservé en alias de compatibilité → ouvre le modal */
+function addEvent(){ openEventModal(); }
 function addAction(){
   const t=prompt('Titre de l\'action :','');if(!t)return;
   const m=prompt('Assigné à / note :','')||'';
