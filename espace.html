@@ -135,21 +135,61 @@ a { color: inherit; text-decoration: none; }
 .bien-card-pills { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* ── BUDGET ── */
-.budget-total { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-@media(max-width:600px) { .budget-total { grid-template-columns: 1fr 1fr; } }
-.bt-card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 12px; padding: 14px 16px; }
-.bt-card .label { font-size: .72rem; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--texte-leger); margin-bottom: 4px; }
-.bt-card .amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--navy); }
-.bt-card.green .amount { color: var(--teal); }
-.bt-card.red .amount { color: #C0392B; }
-.trans-row { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--gris-bord); font-size: .85rem; }
-.trans-row:first-child { border-top: none; }
-.trans-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
-.trans-desc b { font-weight: 600; color: var(--navy); font-size: .88rem; display: block; }
-.trans-desc span { font-size: .74rem; color: var(--texte-doux); }
-.trans-amount { margin-left: auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; }
-.trans-amount.neg { color: #C0392B; }
-.trans-amount.pos { color: var(--teal); }
+/* ═══════ BUDGET v2 ═══════ */
+/* Cartes résumé */
+.bud-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+@media(max-width:640px) { .bud-stats { grid-template-columns: 1fr; } }
+.bud-stat { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 18px; position: relative; overflow: hidden; }
+.bud-stat .bs-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 12px; }
+.bud-stat .bs-label { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texte-leger, #8896A7); margin-bottom: 3px; }
+.bud-stat .bs-amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.6rem; letter-spacing: -.02em; line-height: 1.1; }
+.bud-stat .bs-sub { font-size: .74rem; color: var(--texte-doux); margin-top: 3px; }
+.bud-stat.rev .bs-amount { color: var(--teal); }
+.bud-stat.chg .bs-amount { color: #C0392B; }
+.bud-stat.sol .bs-amount { color: var(--navy); }
+
+/* Layout 2 colonnes */
+.bud-cols { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; margin-bottom: 16px; }
+@media(max-width:860px) { .bud-cols { grid-template-columns: 1fr; } }
+
+/* Répartition par co-indivisaire */
+.split-intro { font-size: .8rem; color: var(--texte-doux); background: var(--gris-clair); border-radius: 9px; padding: 9px 12px; margin-bottom: 14px; line-height: 1.5; }
+.split-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.split-row:first-child { border-top: none; }
+.split-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .78rem; color: #fff; flex-shrink: 0; }
+.split-body { flex: 1; min-width: 0; }
+.split-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; gap: 8px; }
+.split-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .88rem; color: var(--navy); }
+.split-name .pct { color: var(--texte-doux); font-weight: 500; font-size: .8rem; margin-left: 4px; }
+.split-amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .92rem; color: #C0392B; white-space: nowrap; }
+.split-bar { height: 7px; border-radius: 99px; background: var(--gris-clair); overflow: hidden; }
+.split-fill { height: 100%; border-radius: 99px; }
+
+/* Charges par catégorie (donut) */
+.cat-chart { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cat-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.cat-leg-row { display: flex; align-items: center; gap: 8px; font-size: .82rem; }
+.cat-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.cat-leg-name { color: var(--texte-doux); flex: 1; }
+.cat-leg-val { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--navy); }
+
+/* Liste transactions v2 */
+.bud-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.bud-filter { display: flex; gap: 5px; flex-wrap: wrap; }
+.bf-chip { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .76rem; padding: .35rem .75rem; border-radius: 99px; border: 1.5px solid var(--gris-bord); background: #fff; color: var(--texte-doux); cursor: pointer; transition: .14s; }
+.bf-chip:hover { border-color: var(--accent-light); }
+.bf-chip.sel { background: var(--navy); border-color: var(--navy); color: #fff; }
+.tx-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.tx-row:first-child { border-top: none; }
+.tx-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.tx-body { flex: 1; min-width: 0; }
+.tx-desc { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .89rem; color: var(--navy); }
+.tx-meta { font-size: .74rem; color: var(--texte-doux); margin-top: 1px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tx-tag { font-size: .66rem; font-weight: 700; font-family: 'Montserrat', sans-serif; padding: .1rem .45rem; border-radius: 4px; background: var(--gris-clair); color: var(--texte-doux); }
+.tx-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.tx-amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .95rem; white-space: nowrap; }
+.tx-amount.pos { color: var(--teal); }
+.tx-amount.neg { color: #C0392B; }
 
 /* ── PLANNING ── */
 /* ═══════ CALENDRIER INTERACTIF ═══════ */
@@ -469,16 +509,46 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
-    <!-- BUDGET -->
+    <!-- BUDGET v2 -->
     <div class="view" id="v-budget">
       <div class="page-head">
-        <div><h1>Budget</h1><p>Revenus, charges et solde par bien.</p></div>
-        <button class="btn" onclick="addTransaction()">+ Transaction</button>
+        <div><h1>Budget</h1><p>Charges communes réparties automatiquement entre co-indivisaires selon les quote-parts.</p></div>
+        <button class="btn" onclick="openTxModal()">+ Transaction</button>
       </div>
-      <div class="budget-total" id="budgetTotals"></div>
+
+      <!-- Résumé -->
+      <div class="bud-stats" id="budStats"></div>
+
+      <!-- Répartition + catégories -->
+      <div class="bud-cols">
+        <div class="card">
+          <div class="card-title">Qui doit combien ?</div>
+          <div class="card-sub">Répartition des charges communes par co-indivisaire.</div>
+          <div class="split-intro">
+            Total des charges réparti selon les quote-parts de chacun. Exemple : une charge de 1 000 € → 450 € pour une part de 45 %.
+          </div>
+          <div id="budSplit"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Charges par catégorie</div>
+          <div class="card-sub">Où part l'argent.</div>
+          <div id="budCats"></div>
+        </div>
+      </div>
+
+      <!-- Transactions -->
       <div class="card">
-        <div class="card-head"><div class="card-title">Transactions</div></div>
-        <div id="transactionsList"></div>
+        <div class="card-head">
+          <div><div class="card-title">Transactions</div><div class="card-sub" id="txCount">—</div></div>
+        </div>
+        <div class="bud-toolbar">
+          <div class="bud-filter" id="txFilter">
+            <span class="bf-chip sel" data-f="all">Tout</span>
+            <span class="bf-chip" data-f="charge">Charges</span>
+            <span class="bf-chip" data-f="revenu">Revenus</span>
+          </div>
+        </div>
+        <div id="txList" style="margin-top:8px"></div>
       </div>
     </div>
 
@@ -647,6 +717,52 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL TRANSACTION -->
+<div class="modal-overlay" id="txModal" onclick="if(event.target===this)closeTxModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Nouvelle transaction</h3>
+      <button class="modal-close" onclick="closeTxModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Type</label>
+        <div class="type-picker" id="txTypePicker">
+          <div class="type-opt sel" data-v="charge"><span class="dot" style="background:#C0392B"></span>Charge (dépense)</div>
+          <div class="type-opt" data-v="revenu"><span class="dot" style="background:#2D6A6A"></span>Revenu (entrée)</div>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Description</label>
+        <input type="text" id="txDesc" placeholder="Ex : Taxe foncière 2025" autocomplete="off">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Montant</label>
+          <input type="text" id="txMontant" inputmode="decimal" placeholder="2400" autocomplete="off">
+        </div>
+        <div class="modal-field">
+          <label>Date</label>
+          <input type="date" id="txDate">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Catégorie</label>
+        <div class="type-picker" id="txCatPicker"></div>
+      </div>
+      <div class="modal-field">
+        <label>Bien concerné</label>
+        <select id="txBien"></select>
+      </div>
+      <div class="modal-field" id="txSplitInfo" style="background:var(--gris-clair);border-radius:9px;padding:10px 12px;font-size:.78rem;color:var(--texte-doux);line-height:1.5"></div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeTxModal()">Annuler</button>
+        <button class="btn" onclick="saveTx()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -721,10 +837,11 @@ const DEFAULT = {
     {titre:'Réunion entretien toiture',date:'2026-03-22',type:'reunion',lieu:'Visio',heure:'11:00'},
   ],
   transactions:[
-    {desc:'Taxe foncière 2025',cat:'Charge',bien:'Maison Annecy',montant:-2400,ic:'🏛'},
-    {desc:'Loyer saisonnier',cat:'Revenu',bien:'Maison Annecy',montant:1800,ic:'💰'},
-    {desc:'Facture plomberie',cat:'Entretien',bien:'Maison Annecy',montant:-580,ic:'🔧'},
-    {desc:'Charges copropriété',cat:'Charge',bien:'Appt. Lyon',montant:-340,ic:'🏢'},
+    {desc:'Taxe foncière 2025',cat:'taxe',bien:'Maison Annecy',montant:-2400,date:'2026-10-15'},
+    {desc:'Loyer saisonnier été',cat:'loyer',bien:'Maison Annecy',montant:1800,date:'2026-08-05'},
+    {desc:'Facture plomberie',cat:'travaux',bien:'Maison Annecy',montant:-580,date:'2026-05-20'},
+    {desc:'Charges copropriété T2',cat:'copro',bien:'Appt. Lyon',montant:-340,date:'2026-04-01'},
+    {desc:'Assurance habitation',cat:'assurance',bien:'Maison Annecy',montant:-420,date:'2026-03-12'},
   ],
   inventaire:[
     {nom:'Canapé 3 places',val:'800 €',ic:'🛋'},
@@ -999,8 +1116,8 @@ document.querySelectorAll('#evTypePicker .type-opt').forEach(o=>o.addEventListen
   document.querySelectorAll('#evTypePicker .type-opt').forEach(x=>x.classList.remove('sel'));
   o.classList.add('sel'); evEditType = o.dataset.v;
 }));
-/* Échap ferme le modal */
-document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeEventModal(); });
+/* Échap ferme les modals */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEventModal(); if(typeof closeTxModal==='function')closeTxModal(); } });
 
 /* ── EXPORT CALENDRIER (.ics — Google / Apple / Outlook) ── */
 function icsEscape(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
@@ -1065,24 +1182,196 @@ function exportOneICS(idx){
   toast('Événement exporté (.ics).');
 }
 
-function renderBudget(){
-  const revenus=S.transactions.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
-  const charges=S.transactions.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0);
-  const solde=revenus+charges;
-  const el=document.getElementById('budgetTotals');
-  if(el) el.innerHTML=`
-    <div class="bt-card green"><div class="label">Revenus</div><div class="amount">+${revenus.toLocaleString('fr-FR')} €</div></div>
-    <div class="bt-card red"><div class="label">Charges</div><div class="amount">${charges.toLocaleString('fr-FR')} €</div></div>
-    <div class="bt-card ${solde>=0?'green':'red'}"><div class="label">Solde</div><div class="amount">${solde>=0?'+':''}${solde.toLocaleString('fr-FR')} €</div></div>`;
-  const tl=document.getElementById('transactionsList');
-  if(tl) tl.innerHTML=S.transactions.map((t,i)=>`
-    <div class="trans-row">
-      <div class="trans-ico" style="background:${t.montant>=0?'rgba(45,106,106,.1)':'rgba(180,60,60,.08)'}">${t.ic}</div>
-      <div class="trans-desc"><b>${t.desc}</b><span>${t.cat} · ${t.bien}</span></div>
-      <div class="trans-amount ${t.montant>=0?'pos':'neg'}">${t.montant>=0?'+':''}${t.montant.toLocaleString('fr-FR')} €</div>
-      <span class="del" onclick="S.transactions.splice(${i},1);save()">×</span>
-    </div>`).join('')||'<div class="empty">Aucune transaction enregistrée.</div>';
+/* ═══════ BUDGET v2 ═══════ */
+const eur = n => (isFinite(n)?Math.round(n).toLocaleString('fr-FR'):'0') + ' €';
+const TX_CATS = {
+  taxe:      {label:'Taxe foncière', ic:'🏛', color:'#2C5282'},
+  travaux:   {label:'Travaux',       ic:'🔧', color:'#C8821E'},
+  copro:     {label:'Charges copro', ic:'🏢', color:'#2D6A6A'},
+  assurance: {label:'Assurance',     ic:'🛡', color:'#7A4FBF'},
+  energie:   {label:'Énergie',       ic:'⚡', color:'#E0843D'},
+  loyer:     {label:'Loyer',         ic:'💰', color:'#19A974'},
+  autre:     {label:'Autre',         ic:'📌', color:'#6B7280'},
+};
+function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'📌', color:'#6B7280'}; }
+
+/* Quote-parts des co-indivisaires (parse "45% · ...") */
+function coiParts(){
+  return S.coi.map((c,i)=>{
+    const m=(c.r||'').match(/(\d+(?:[.,]\d+)?)\s*%/);
+    return { name:(c.n||'').replace(/\s*\(vous\)/i,''), full:c.n, ini:c.ini,
+             pct: m?parseFloat(m[1].replace(',','.')):0, color: PAL[i%PAL.length] };
+  });
 }
+
+let txFilter = 'all';
+
+function renderBudget(){
+  const txs = S.transactions;
+  const revenus = txs.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
+  const chargesAbs = Math.abs(txs.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0));
+  const solde = revenus - chargesAbs;
+
+  /* ── Cartes résumé ── */
+  const st = document.getElementById('budStats');
+  if(st) st.innerHTML = `
+    <div class="bud-stat rev">
+      <div class="bs-ico" style="background:rgba(45,106,106,.12)">📈</div>
+      <div class="bs-label">Revenus</div>
+      <div class="bs-amount">+${eur(revenus)}</div>
+      <div class="bs-sub">${txs.filter(t=>t.montant>0).length} entrée(s)</div>
+    </div>
+    <div class="bud-stat chg">
+      <div class="bs-ico" style="background:rgba(192,57,57,.1)">📉</div>
+      <div class="bs-label">Charges</div>
+      <div class="bs-amount">−${eur(chargesAbs)}</div>
+      <div class="bs-sub">${txs.filter(t=>t.montant<0).length} dépense(s)</div>
+    </div>
+    <div class="bud-stat sol">
+      <div class="bs-ico" style="background:rgba(44,82,130,.1)">⚖️</div>
+      <div class="bs-label">Solde net</div>
+      <div class="bs-amount" style="color:${solde>=0?'var(--teal)':'#C0392B'}">${solde>=0?'+':'−'}${eur(Math.abs(solde))}</div>
+      <div class="bs-sub">${solde>=0?'Le bien est positif':'Charges supérieures aux revenus'}</div>
+    </div>`;
+
+  /* ── Répartition par co-indivisaire ── */
+  const parts = coiParts();
+  const totalPct = parts.reduce((a,b)=>a+b.pct,0) || 100;
+  const sp = document.getElementById('budSplit');
+  if(sp) sp.innerHTML = parts.map(p=>{
+    const share = chargesAbs * p.pct / totalPct;
+    return `<div class="split-row">
+      <div class="split-av" style="background:linear-gradient(135deg,${p.color},${p.color}cc)">${p.ini}</div>
+      <div class="split-body">
+        <div class="split-top">
+          <span class="split-name">${p.name}<span class="pct">${p.pct}%</span></span>
+          <span class="split-amount">${eur(share)}</span>
+        </div>
+        <div class="split-bar"><div class="split-fill" style="width:${p.pct/totalPct*100}%;background:${p.color}"></div></div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty">Aucun co-indivisaire.</div>';
+
+  /* ── Charges par catégorie (donut) ── */
+  const byCat = {};
+  txs.filter(t=>t.montant<0).forEach(t=>{ const k=t.cat||'autre'; byCat[k]=(byCat[k]||0)+Math.abs(t.montant); });
+  const cats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const cc = document.getElementById('budCats');
+  if(cc){
+    if(!cats.length){ cc.innerHTML='<div class="empty">Aucune charge.</div>'; }
+    else {
+      const total = cats.reduce((a,[,v])=>a+v,0);
+      let off=0; const circ=2*Math.PI*15.9;
+      const segs = cats.map(([k,v])=>{
+        const col=catInfo(k).color, frac=v/total, dash=frac*circ;
+        const s=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${col}" stroke-width="6" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-off}"/>`;
+        off+=dash; return s;
+      }).join('');
+      cc.innerHTML = `<div class="cat-chart">
+        <svg width="130" height="130" viewBox="0 0 42 42" style="transform:rotate(-90deg)"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF2F8" stroke-width="6"/>${segs}</svg>
+        <div class="cat-legend">${cats.map(([k,v])=>{
+          const ci=catInfo(k);
+          return `<div class="cat-leg-row"><span class="cat-leg-dot" style="background:${ci.color}"></span><span class="cat-leg-name">${ci.ic} ${ci.label}</span><span class="cat-leg-val">${eur(v)}</span></div>`;
+        }).join('')}</div>
+      </div>`;
+    }
+  }
+
+  /* ── Liste des transactions (filtrée) ── */
+  const filtered = txs.map((t,i)=>({...t,i})).filter(t=>{
+    if(txFilter==='charge') return t.montant<0;
+    if(txFilter==='revenu') return t.montant>0;
+    return true;
+  });
+  const cnt = document.getElementById('txCount');
+  if(cnt) cnt.textContent = `${txs.length} transaction(s) · ${eur(revenus)} de revenus, ${eur(chargesAbs)} de charges`;
+  const tl = document.getElementById('txList');
+  if(tl) tl.innerHTML = filtered.map(t=>{
+    const ci = catInfo(t.cat);
+    const pos = t.montant>=0;
+    return `<div class="tx-row">
+      <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?'💰':ci.ic}</div>
+      <div class="tx-body">
+        <div class="tx-desc">${t.desc}</div>
+        <div class="tx-meta">
+          <span class="tx-tag">${ci.label}</span>
+          ${t.bien?`<span>📍 ${t.bien}</span>`:''}
+          ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR')}</span>`:''}
+        </div>
+      </div>
+      <div class="tx-right">
+        <span class="tx-amount ${pos?'pos':'neg'}">${pos?'+':'−'}${eur(Math.abs(t.montant))}</span>
+        <span class="del" onclick="S.transactions.splice(${t.i},1);save()">×</span>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty">Aucune transaction.</div>';
+}
+
+/* Filtre */
+document.querySelectorAll('#txFilter .bf-chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('#txFilter .bf-chip').forEach(x=>x.classList.remove('sel'));
+  c.classList.add('sel'); txFilter=c.dataset.f; renderBudget();
+}));
+
+/* ── MODAL TRANSACTION ── */
+let txEditType='charge', txEditCat='taxe';
+function openTxModal(){
+  txEditType='charge'; txEditCat='taxe';
+  document.getElementById('txDesc').value='';
+  document.getElementById('txMontant').value='';
+  document.getElementById('txDate').value=_todayISO;
+  document.querySelectorAll('#txTypePicker .type-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v==='charge'));
+  /* Catégories selon le type */
+  buildTxCats();
+  /* Sélecteur de bien */
+  const sel=document.getElementById('txBien');
+  sel.innerHTML=S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')+'<option value="Commun">Tous les biens</option>';
+  updateTxSplitInfo();
+  document.getElementById('txModal').classList.add('open');
+  setTimeout(()=>document.getElementById('txDesc').focus(),60);
+}
+function closeTxModal(){ document.getElementById('txModal').classList.remove('open'); }
+function buildTxCats(){
+  const keys = txEditType==='revenu' ? ['loyer','autre'] : ['taxe','travaux','copro','assurance','energie','autre'];
+  if(!keys.includes(txEditCat)) txEditCat=keys[0];
+  document.getElementById('txCatPicker').innerHTML = keys.map(k=>{
+    const ci=TX_CATS[k];
+    return `<div class="type-opt${k===txEditCat?' sel':''}" data-v="${k}"><span class="dot" style="background:${ci.color}"></span>${ci.ic} ${ci.label}</div>`;
+  }).join('');
+  document.querySelectorAll('#txCatPicker .type-opt').forEach(o=>o.addEventListener('click',()=>{
+    document.querySelectorAll('#txCatPicker .type-opt').forEach(x=>x.classList.remove('sel'));
+    o.classList.add('sel'); txEditCat=o.dataset.v;
+  }));
+}
+function updateTxSplitInfo(){
+  const info=document.getElementById('txSplitInfo');
+  const m=parseFloat((document.getElementById('txMontant').value||'').replace(',','.'))||0;
+  if(txEditType==='revenu'){
+    info.innerHTML='💡 Les revenus sont répartis entre indivisaires selon les quote-parts.';
+    return;
+  }
+  if(!m){ info.innerHTML='💡 La charge sera répartie automatiquement selon les quote-parts de chaque co-indivisaire.'; return; }
+  const parts=coiParts(); const tot=parts.reduce((a,b)=>a+b.pct,0)||100;
+  info.innerHTML='<b style="color:var(--navy)">Répartition automatique :</b><br>'+parts.map(p=>`${p.name} (${p.pct}%) → <b>${eur(m*p.pct/tot)}</b>`).join(' · ');
+}
+function saveTx(){
+  const desc=document.getElementById('txDesc').value.trim();
+  let m=parseFloat((document.getElementById('txMontant').value||'').replace(',','.'));
+  if(!desc){ toast('Indiquez une description.'); document.getElementById('txDesc').focus(); return; }
+  if(!m||m<=0){ toast('Indiquez un montant valide.'); document.getElementById('txMontant').focus(); return; }
+  const date=document.getElementById('txDate').value||_todayISO;
+  const bien=document.getElementById('txBien').value||'—';
+  const montant = txEditType==='revenu' ? Math.abs(m) : -Math.abs(m);
+  S.transactions.unshift({desc, cat:txEditCat, bien, montant, date});
+  closeTxModal(); save(); toast('Transaction ajoutée.');
+}
+/* Type picker du modal transaction */
+document.querySelectorAll('#txTypePicker .type-opt').forEach(o=>o.addEventListener('click',()=>{
+  document.querySelectorAll('#txTypePicker .type-opt').forEach(x=>x.classList.remove('sel'));
+  o.classList.add('sel'); txEditType=o.dataset.v; buildTxCats(); updateTxSplitInfo();
+}));
+/* Mise à jour de l'aperçu de répartition en saisissant le montant */
+document.getElementById('txMontant')?.addEventListener('input', updateTxSplitInfo);
 
 function renderInventaire(){
   const el=document.getElementById('inventaireGrid');
@@ -1135,13 +1424,8 @@ function book(pro){
 }
 /* addEvent() conservé en alias de compatibilité → ouvre le modal */
 function addEvent(){ openEventModal(); }
-function addTransaction(){
-  const d=prompt('Description :','');if(!d)return;
-  const m=parseFloat(prompt('Montant (négatif = charge, positif = revenu) :','0').replace(',','.'))||0;
-  const c=prompt('Catégorie :','Charge')||'Charge';
-  const b=S.biens[0]?.nom||'—';
-  S.transactions.unshift({desc:d,cat:c,bien:b,montant:m,ic:m>=0?'💰':'💸'});save();toast('Transaction ajoutée.');
-}
+/* addTransaction conservé en alias → ouvre le modal */
+function addTransaction(){ openTxModal(); }
 function addInventaire(){
   const n=prompt('Nom de l\'élément :','');if(!n)return;
   const v=prompt('Valeur estimée :','0 €')||'—';
