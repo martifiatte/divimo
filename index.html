@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Divimo — Gestion d'indivision pour particuliers et professionnels</title>
 <meta name="description" content="Divimo centralise la gestion de vos biens en indivision : simulateurs financiers, documents, suivi des parts, conseil juridique. Pour particuliers patrimoniaux et administrateurs de biens.">
+<script>
+/* Redirection instantanée (avant rendu) : connecté → espace, pas la landing */
+(function(){
+  try{
+    var p=JSON.parse(localStorage.getItem('sb-anrwoxsibhabivtkepqt-auth-token')||'');
+    var u=p&&(p.user||(p.currentSession&&p.currentSession.user));
+    var e=p&&(p.expires_at||(p.currentSession&&p.currentSession.expires_at));
+    if(u&&(!e||Date.now()/1000<e)){ window.location.replace('espace.html'); }
+  }catch(err){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">

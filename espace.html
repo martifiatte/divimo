@@ -11,6 +11,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
+<script src="header-auth.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -542,16 +543,21 @@ function applyUser(user){
   const initials = ((prenom[0]||'')+(nom[0]||'')).toUpperCase() || name.slice(0,2).toUpperCase();
   const isAdmin = m.role === 'admin';
 
-  document.getElementById('chipAv').textContent = initials;
-  document.getElementById('chipName').textContent = name + (isAdmin?' 👑':'');
+  /* Le header est géré par header-auth.js — on met à jour uniquement l'intérieur */
   document.getElementById('greet').textContent = 'Bonjour, ' + name + ' 👋';
-  document.getElementById('profilAv').textContent = initials;
-  document.getElementById('profilName').textContent = [prenom,nom].filter(Boolean).join(' ') || name;
-  document.getElementById('profilEmail').textContent = user.email;
+  const profilAv = document.getElementById('profilAv');
+  if(profilAv) profilAv.textContent = initials;
+  const profilName = document.getElementById('profilName');
+  if(profilName) profilName.textContent = [prenom,nom].filter(Boolean).join(' ') || name;
+  const profilEmail = document.getElementById('profilEmail');
+  if(profilEmail) profilEmail.textContent = user.email;
   if(isAdmin){
-    document.getElementById('nav-admin').style.display = 'flex';
-    document.getElementById('adminName').textContent = name;
-    document.getElementById('bannerTitle').textContent = 'Espace Administrateur';
+    const navAdmin = document.getElementById('nav-admin');
+    if(navAdmin) navAdmin.style.display = 'flex';
+    const adminName = document.getElementById('adminName');
+    if(adminName) adminName.textContent = name;
+    const bannerTitle = document.getElementById('bannerTitle');
+    if(bannerTitle) bannerTitle.textContent = 'Espace Administrateur';
   }
 }
 
