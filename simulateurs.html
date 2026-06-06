@@ -449,6 +449,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="panel-head"><h2>Vente / rachat de parts</h2><p>Un ou plusieurs indivisaires rachètent les parts de ceux qui sortent. Soulte nette, droit de partage ou de mutation et frais de notaire — barèmes officiels.</p></div>
     <div class="sim-body">
       <div class="form-col">
+        <div class="field" id="rc-load-wrap" style="display:none"><label>📂 Charger un bien enregistré</label><select id="rc-load" onchange="rcLoadBien()"><option value="">— Choisir un bien —</option></select><p class="note">Pré-remplit la valeur et les co-indivisaires depuis votre espace.</p></div>
         <div class="field"><label>Valeur du bien</label><div class="sfx-wrap"><input type="number" id="rc-val" value="320000" oninput="rcCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
         <div class="field"><label>Crédit restant dû <span class="hint">(repris par les acheteurs)</span></label><div class="sfx-wrap"><input type="number" id="rc-dette" value="0" oninput="rcCompute()"><span class="sfx">€</span></div></div>
         <div class="field two">
@@ -461,6 +462,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <div><label>Taux du droit</label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-taux" value="2.5" oninput="rcCompute()"><span class="sfx">%</span></div></div>
         </div>
         <p class="note" id="rc-regime-note">Succession, divorce, indivision familiale → droit de partage 2,5 % sur l'actif net.</p>
+        <div class="field"><label>Frais de notaire <span class="hint">(émoluments + débours + CSI)</span></label><div class="sfx-wrap"><input type="number" id="rc-frais" value="0" oninput="rcCompute()" disabled><span class="sfx">€</span></div><label class="rc-check"><input type="checkbox" id="rc-frais-auto" checked onchange="rcFraisAutoToggle()"> Calcul automatique (barème). Décochez pour saisir un montant.</label></div>
         <div class="field"><label>Indivisaires <span class="hint">— nom, % et rôle</span></label><div id="rc-rows"></div><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><div id="rc-sum"></div></div>
         <label class="rc-check"><input type="checkbox" id="rc-fees-buyer" checked onchange="rcCompute()"> Frais et droits à la charge des acheteurs</label>
       </div>
@@ -943,6 +945,30 @@ function rcRender(){
   rcCompute();
 }
 function rcAdd(){ rcoi.push({n:'',p:0,role:'ceder'}); rcRender(); }
+function rcFraisAutoToggle(){ document.getElementById('rc-frais').disabled = document.getElementById('rc-frais-auto').checked; rcCompute(); }
+/* Charger un bien enregistré dans l'espace (localStorage) */
+function rcInitBiens(){
+  let groups=null; try{ groups=JSON.parse(localStorage.getItem('divimo_groupes')||'null'); }catch(e){}
+  window._rcBiens=[];
+  if(groups && typeof groups==='object'){
+    Object.values(groups).forEach(g=>{ (g&&g.biens||[]).forEach(b=>{ window._rcBiens.push({label:((g.nom?g.nom+' · ':'')+(b.nom||'Bien')), val:b.val, parts:b.parts||[]}); }); });
+  }
+  if(window._rcBiens.length){
+    const sel=document.getElementById('rc-load');
+    sel.innerHTML='<option value="">— Choisir un bien —</option>'+window._rcBiens.map((b,i)=>`<option value="${i}">${(b.label||'').replace(/</g,'&lt;')}</option>`).join('');
+    document.getElementById('rc-load-wrap').style.display='';
+  }
+}
+function rcLoadBien(){
+  const i=document.getElementById('rc-load').value; if(i==='')return;
+  const b=window._rcBiens[+i]; if(!b)return;
+  const v=parseFloat(String(b.val||'').replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0;
+  if(v) document.getElementById('rc-val').value=v;
+  if(Array.isArray(b.parts) && b.parts.length){
+    rcoi=b.parts.map((p,idx)=>({n:p.name||p.ini||'—', p:+p.pct||0, role: idx===0?'buyer':'ceder'}));
+  }
+  rcRender();
+}
 function rcRegimeChange(){
   const r=document.getElementById('rc-regime').value;
   document.getElementById('rc-taux').value = r==='partage' ? '2.5' : '5.8';
@@ -984,7 +1010,10 @@ function rcCompute(){
   const droitLabel = (regime==='partage'?'Droit de partage':'Droits de mutation')+` (${tauxPct.toLocaleString('fr-FR')} %)`;
   const emolTTC=emolNotaire(assiette)*1.2;
   const csi=0.001*assiette, debours=400;
-  const fraisNotaire=emolTTC+csi+debours;
+  const fraisAuto=document.getElementById('rc-frais-auto').checked;
+  let fraisNotaire;
+  if(fraisAuto){ fraisNotaire=emolTTC+csi+debours; document.getElementById('rc-frais').value=Math.round(fraisNotaire); }
+  else { fraisNotaire=+document.getElementById('rc-frais').value||0; }
   const coutTotal=soulteTotal+droit+fraisNotaire;
   /* Cédants : chacun reçoit sa part nette */
   const perCeder=ceders.map(m=>({n:m.n||'—', p:+m.p||0, montant:actifNet*(+m.p||0)/sum}));
@@ -1021,11 +1050,11 @@ function rcCompute(){
       <div class="res-line tot"><span>Coût total de l'opération</span><b>${euro(coutTotal)}</b></div>
     </div>
 
-    <div class="res-note"><b>Hypothèses :</b> barème réglementé des émoluments de notaire (3,870 / 1,596 / 1,064 / 0,799 % par tranches) + TVA 20 %, CSI 0,10 %, débours 400 €. Droit calculé au taux saisi (${tauxPct.toLocaleString('fr-FR')} %) sur ${regime==='partage'?"l'actif net partagé":'la valeur des parts cédées'}. Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts au prorata de leurs quote-parts actuelles. Résultat indicatif — à confirmer avec votre notaire.</div>
+    <div class="res-note"><b>Hypothèses :</b> ${fraisAuto?'frais de notaire calculés au barème réglementé (émoluments 3,870 / 1,596 / 1,064 / 0,799 % par tranches + TVA 20 %, CSI 0,10 %, débours 400 €)':'frais de notaire saisis manuellement'}. Droit calculé au taux saisi (${tauxPct.toLocaleString('fr-FR')} %) sur ${regime==='partage'?"l'actif net partagé":'la valeur des parts cédées'}. Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts au prorata de leurs quote-parts actuelles. Résultat indicatif — à confirmer avec votre notaire.</div>
     <button class="btn pdf-btn" onclick="window.print()">Télécharger en PDF</button>`;
 }
 
-renderCoi(); rcRender();
+renderCoi(); rcInitBiens(); rcRender();
 </script>
 </body>
 </html>
