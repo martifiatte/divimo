@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentions légales — Divimo</title>
+<meta name="description" content="Mentions légales du site Divimo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#fff;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.lg-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gris-bord)}
+.lg-header-in{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;justify-content:space-between}
+.lg-logo{display:flex;align-items:center;gap:.5rem;font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.25rem;color:var(--navy)}
+.lg-back{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.9rem;color:var(--navy)}
+.lg-hero{background:var(--navy);color:#fff;padding:56px 0}
+.lg-hero-in{max-width:760px;margin:0 auto;padding:0 24px}
+.lg-hero h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,2.5rem)}
+.lg-hero p{color:rgba(255,255,255,.7);margin-top:8px}
+.lg-body{max-width:760px;margin:0 auto;padding:48px 24px 80px}
+.lg-body h2{font-family:'Montserrat',sans-serif;font-weight:800;color:var(--navy);font-size:1.18rem;margin:30px 0 10px}
+.lg-body h2:first-of-type{margin-top:0}
+.lg-body p{color:var(--texte);margin-bottom:12px}
+.lg-body b{color:var(--navy)}
+.lg-note{background:var(--gris-clair);border-radius:10px;padding:14px 16px;font-size:.9rem;color:var(--texte-doux);margin-bottom:28px}
+.lg-foot{border-top:1px solid var(--gris-bord);padding:24px;text-align:center;font-size:.82rem;color:var(--texte-doux)}
+</style>
+</head>
+<body>
+<header class="lg-header">
+  <div class="lg-header-in">
+    <a href="index.html" class="lg-logo"><svg width="28" height="28" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>Divimo</a>
+    <a href="index.html" class="lg-back">← Retour à l'accueil</a>
+  </div>
+</header>
+
+<section class="lg-hero"><div class="lg-hero-in"><h1>Mentions légales</h1><p>Dernière mise à jour : juin 2026</p></div></section>
+
+<main class="lg-body">
+  <div class="lg-note">Ce document est un modèle fourni à titre indicatif. Les informations légales (raison sociale, SIRET, directeur de publication…) doivent être complétées par l'éditeur du site avant toute mise en production.</div>
+
+  <h2>Éditeur du site</h2>
+  <p>Le site Divimo est édité par <b>[Raison sociale]</b>, [forme juridique] au capital de [montant] €, immatriculée au RCS de [ville] sous le numéro [SIRET].<br>Siège social : [adresse].<br>Adresse e-mail : <a href="mailto:contact@divimo.fr">contact@divimo.fr</a></p>
+
+  <h2>Directeur de la publication</h2>
+  <p>[Nom et prénom du directeur de la publication].</p>
+
+  <h2>Hébergement</h2>
+  <p>Le site est hébergé par <b>Vercel Inc.</b> (340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis). Les données applicatives sont gérées via <b>Supabase</b>, avec un hébergement des données situé dans l'Union européenne.</p>
+
+  <h2>Propriété intellectuelle</h2>
+  <p>L'ensemble des contenus du site (textes, logos, interface, éléments graphiques) est protégé par le droit de la propriété intellectuelle. Toute reproduction ou représentation, totale ou partielle, sans autorisation préalable est interdite.</p>
+
+  <h2>Responsabilité</h2>
+  <p>Divimo est un outil d'aide à la gestion de l'indivision. Les simulations, estimations et informations fournies sont indicatives et ne sauraient remplacer l'avis d'un professionnel compétent (notaire, avocat, expert-comptable).</p>
+
+  <h2>Contact</h2>
+  <p>Pour toute question relative au site : <a href="mailto:contact@divimo.fr">contact@divimo.fr</a>.</p>
+</main>
+
+<footer class="lg-foot">© 2026 Divimo · <a href="index.html">Accueil</a> · <a href="politique-confidentialite.html">Politique de confidentialité</a></footer>
+</body>
+</html>
