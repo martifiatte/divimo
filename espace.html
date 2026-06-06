@@ -494,6 +494,24 @@ a { color: inherit; text-decoration: none; }
 .payhist-main { font-size: .82rem; color: var(--navy); overflow-wrap: anywhere; }
 .payhist-meta { font-size: .72rem; color: var(--texte-doux); margin-top: 1px; }
 .payhist-amt { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--teal); white-space: nowrap; }
+
+/* ── INVENTAIRE : par bien, édition, suppression ── */
+.inv-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.inv-group { margin-bottom: 16px; }
+.inv-item { position: relative; }
+.inv-item-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.inv-item-head .inv-ico { margin-bottom: 0; }
+.inv-acts { display: flex; gap: 4px; opacity: 0; transition: .14s; }
+.inv-item:hover .inv-acts { opacity: 1; }
+@media(hover: none) { .inv-acts { opacity: 1; } }
+.inv-act { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--gris-bord); background: #fff; cursor: pointer; font-size: .8rem; line-height: 1; color: var(--texte-doux); display: flex; align-items: center; justify-content: center; transition: .14s; }
+.inv-act:hover { border-color: var(--accent-light); color: var(--navy); }
+.inv-act.del:hover { border-color: #C0392B; color: #C0392B; }
+#invIconPicker { display: flex; flex-wrap: wrap; gap: 6px; }
+.inv-emoji { width: 38px; height: 38px; border: 1.5px solid var(--gris-bord); border-radius: 9px; background: #fff; cursor: pointer; font-size: 1.1rem; transition: .14s; }
+.inv-emoji:hover { border-color: var(--accent-light); }
+.inv-emoji.sel { border-color: var(--navy); background: var(--gris-clair); }
+.modal-field select { width: 100%; padding: .65rem .8rem; border: 1.5px solid var(--gris-bord); border-radius: 9px; font-family: 'Open Sans', sans-serif; font-size: .9rem; color: var(--texte); background: #fff; }
 </style>
 </head>
 <body>
@@ -730,10 +748,12 @@ a { color: inherit; text-decoration: none; }
     <!-- INVENTAIRE -->
     <div class="view" id="v-inventaire">
       <div class="page-head">
-        <div><h1>Inventaire</h1><p>Mobilier, équipements et objets de valeur.</p></div>
-        <button class="btn" onclick="addInventaire()">+ Ajouter un élément</button>
+        <div><h1>Inventaire</h1><p>Mobilier, équipements et objets de valeur, classés par bien.</p></div>
+        <button class="btn" onclick="openInvModal()">+ Ajouter un élément</button>
       </div>
-      <div class="card"><div class="inv-grid" id="inventaireGrid"></div></div>
+      <div class="inv-stats" id="invStats"></div>
+      <div class="bud-toolbar" style="margin-bottom:14px"><div class="bud-filter" id="invFilter"></div></div>
+      <div id="inventaireBody"></div>
     </div>
 
     <!-- INCIDENTS -->
@@ -1087,6 +1107,43 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL INVENTAIRE (ajout / modification) -->
+<div class="modal-overlay" id="invModal" onclick="if(event.target===this)closeInvModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="invModalTitle">Ajouter un élément</h3>
+      <button class="modal-close" onclick="closeInvModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Nom de l'objet</label>
+        <input type="text" id="invNom" placeholder="Ex : Canapé d'angle" autocomplete="off">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Valeur estimée</label>
+          <div class="wiz-money">
+            <input type="text" id="invVal" inputmode="numeric" placeholder="800" autocomplete="off" oninput="formatBienVal(this)" style="font-size:1rem;padding:.65rem 2rem .65rem .8rem">
+            <span class="wiz-money-cur" style="font-size:1rem">€</span>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>Bien</label>
+          <select id="invBien"></select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Icône</label>
+        <div id="invIconPicker"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeInvModal()">Annuler</button>
+        <button class="btn" onclick="saveInv()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -1178,12 +1235,12 @@ const DEFAULT = {
     {desc:'Assurance habitation',cat:'assurance',bien:'Maison Annecy',montant:-420,date:'2026-03-12'},
   ],
   inventaire:[
-    {nom:'Canapé 3 places',val:'800 €',ic:'🛋'},
-    {nom:'Réfrigérateur',val:'650 €',ic:'🧊'},
-    {nom:'Table de jardin',val:'320 €',ic:'🌿'},
-    {nom:'Lit king size',val:'1 200 €',ic:'🛏'},
-    {nom:'Télévision 65"',val:'900 €',ic:'📺'},
-    {nom:'Lave-linge',val:'480 €',ic:'🫧'},
+    {nom:'Canapé 3 places',val:'800 €',ic:'🛋',bien:'Maison familiale — Annecy'},
+    {nom:'Table de jardin',val:'320 €',ic:'🌿',bien:'Maison familiale — Annecy'},
+    {nom:'Lit king size',val:'1 200 €',ic:'🛏',bien:'Maison familiale — Annecy'},
+    {nom:'Télévision 65"',val:'900 €',ic:'📺',bien:'Appartement — Lyon'},
+    {nom:'Réfrigérateur',val:'650 €',ic:'🧊',bien:'Appartement — Lyon'},
+    {nom:'Lave-linge',val:'480 €',ic:'🫧',bien:'Appartement — Lyon'},
   ],
   incidents:[
     {titre:'Fuite sous-sol',meta:'Signalé par Paul · 12/03/2026',st:'En cours',ic:'💧',stCls:'pill-warn'},
@@ -2244,15 +2301,99 @@ document.querySelectorAll('#txTypePicker .type-opt').forEach(o=>o.addEventListen
 document.getElementById('txMontant')?.addEventListener('input', updateTxSplitInfo);
 document.getElementById('txBien')?.addEventListener('change', updateTxSplitInfo);
 
+/* ── INVENTAIRE ── */
+let invFilter='all', invTargets=[];
+function invNum(v){ return parseFloat(String(v||'0').replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0; }
+/* bien effectif d'un objet (rattaché à 'Commun' si bien inconnu/absent) */
+function invBienOf(it){ const names=S.biens.map(b=>b.nom); return names.includes(it.bien)?it.bien:'Commun'; }
+function setInvFilterIdx(k){ invFilter=invTargets[k]; renderInventaire(); }
+
 function renderInventaire(){
-  const el=document.getElementById('inventaireGrid');
-  if(!el) return;
-  el.innerHTML=S.inventaire.map((it,i)=>`
-    <div class="inv-item">
-      <div class="inv-ico">${it.ic}</div>
-      <div class="inv-name">${it.nom}</div>
-      <div class="inv-val">${it.val} <span class="del" style="float:right" onclick="S.inventaire.splice(${i},1);save()">×</span></div>
-    </div>`).join('')||'<div class="empty" style="grid-column:1/-1">Aucun élément dans l\'inventaire.</div>';
+  const body=document.getElementById('inventaireBody');
+  if(!body) return;
+
+  /* Vue globale : nb d'objets + valeur totale */
+  const totalCount=S.inventaire.length;
+  const totalVal=S.inventaire.reduce((a,it)=>a+invNum(it.val),0);
+  const stEl=document.getElementById('invStats');
+  if(stEl) stEl.innerHTML=`
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(44,82,130,.1)">📦</div><div class="bs-label">Objets</div><div class="bs-amount" style="color:var(--navy)">${totalCount}</div><div class="bs-sub">dans l'inventaire</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(45,106,106,.12)">💰</div><div class="bs-label">Valeur totale</div><div class="bs-amount" style="color:var(--teal)">${eur(totalVal)}</div><div class="bs-sub">tous biens confondus</div></div>`;
+
+  /* Filtre par bien */
+  const bienNames=S.biens.map(b=>b.nom);
+  const hasCommun=S.inventaire.some(it=>invBienOf(it)==='Commun');
+  invTargets=['all', ...bienNames.filter(n=>S.inventaire.some(it=>it.bien===n)), ...(hasCommun?['Commun']:[])];
+  if(!invTargets.includes(invFilter)) invFilter='all';
+  const fEl=document.getElementById('invFilter');
+  if(fEl) fEl.innerHTML=invTargets.map((t,k)=>{
+    const label = t==='all'?'Tous' : (t==='Commun'?'Commun' : t);
+    const cnt = t==='all'?totalCount : S.inventaire.filter(it=>invBienOf(it)===t).length;
+    return `<span class="bf-chip ${invFilter===t?'sel':''}" onclick="setInvFilterIdx(${k})">${label} <span style="opacity:.55">${cnt}</span></span>`;
+  }).join('');
+
+  /* Groupes affichés */
+  const groupNames = invFilter==='all'
+    ? invTargets.filter(t=>t!=='all')
+    : [invFilter];
+
+  body.innerHTML = groupNames.map(gn=>{
+    const items=S.inventaire.map((it,i)=>({it,i})).filter(x=>invBienOf(x.it)===gn);
+    if(!items.length) return '';
+    const sub=items.reduce((a,x)=>a+invNum(x.it.val),0);
+    return `<div class="card inv-group">
+      <div class="card-head">
+        <div><div class="card-title">${gn==='Commun'?'🗂 Commun (aucun bien)':'🏠 '+gn}</div><div class="card-sub">${items.length} objet(s) · ${eur(sub)}</div></div>
+      </div>
+      <div class="inv-grid">${items.map(x=>`
+        <div class="inv-item">
+          <div class="inv-item-head">
+            <span class="inv-ico">${x.it.ic||'📦'}</span>
+            <span class="inv-acts">
+              <button class="inv-act" onclick="openInvModal(${x.i})" title="Modifier">✎</button>
+              <button class="inv-act del" onclick="deleteInv(${x.i})" title="Supprimer">×</button>
+            </span>
+          </div>
+          <div class="inv-name">${x.it.nom}</div>
+          <div class="inv-val">${x.it.val}</div>
+        </div>`).join('')}</div>
+    </div>`;
+  }).join('') || '<div class="empty">Aucun élément dans l\'inventaire. Ajoutez votre premier objet.</div>';
+}
+
+/* ── MODAL INVENTAIRE (ajout / modification) ── */
+const INV_ICONS=['📦','🛋','🛏','📺','🧊','🌿','🫧','🪑','🖥','🚿','🍽','🧺','🖼','🔧'];
+let invEditIdx=-1, invIcon='📦';
+function openInvModal(idx){
+  invEditIdx = (typeof idx==='number') ? idx : -1;
+  const it = invEditIdx>-1 ? S.inventaire[invEditIdx] : null;
+  document.getElementById('invModalTitle').textContent = it ? "Modifier l'élément" : 'Ajouter un élément';
+  document.getElementById('invNom').value = it ? it.nom : '';
+  document.getElementById('invVal').value = it ? String(invNum(it.val)||'').replace(/\B(?=(\d{3})+(?!\d))/g,' ') : '';
+  invIcon = it ? (it.ic||'📦') : '📦';
+  const sel=document.getElementById('invBien');
+  sel.innerHTML = S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')+'<option value="Commun">Commun (aucun bien)</option>';
+  sel.value = it ? (S.biens.some(b=>b.nom===it.bien)?it.bien:'Commun') : (S.biens[0]?S.biens[0].nom:'Commun');
+  document.getElementById('invIconPicker').innerHTML = INV_ICONS.map(e=>`<button type="button" class="inv-emoji${e===invIcon?' sel':''}" onclick="selectInvIcon('${e}')">${e}</button>`).join('');
+  document.getElementById('invModal').classList.add('open');
+  setTimeout(()=>document.getElementById('invNom').focus(),60);
+}
+function closeInvModal(){ document.getElementById('invModal').classList.remove('open'); }
+function selectInvIcon(e){ invIcon=e; document.querySelectorAll('#invIconPicker .inv-emoji').forEach(b=>b.classList.toggle('sel',b.textContent===e)); }
+function saveInv(){
+  const nom=document.getElementById('invNom').value.trim();
+  if(!nom){ toast('Indiquez un nom.'); document.getElementById('invNom').focus(); return; }
+  const digits=document.getElementById('invVal').value.replace(/[^\d]/g,'');
+  const val = digits ? (Number(digits).toLocaleString('fr-FR').replace(/\s/g,' ')+' €') : '—';
+  const bien=document.getElementById('invBien').value||'Commun';
+  const obj={nom, val, ic:invIcon, bien};
+  if(invEditIdx>-1) S.inventaire[invEditIdx]=obj; else S.inventaire.push(obj);
+  closeInvModal(); save(); toast(invEditIdx>-1?'Élément modifié.':'Élément ajouté.');
+}
+function deleteInv(idx){
+  const it=S.inventaire[idx]; if(!it) return;
+  if(!confirm('Supprimer « '+it.nom+' » de l\'inventaire ?')) return;
+  S.inventaire.splice(idx,1); save(); toast('Élément supprimé.');
 }
 
 function renderIncidents(){
@@ -2391,11 +2532,8 @@ function book(pro){
 function addEvent(){ openEventModal(); }
 /* addTransaction conservé en alias → ouvre le modal */
 function addTransaction(){ openTxModal(); }
-function addInventaire(){
-  const n=prompt('Nom de l\'élément :','');if(!n)return;
-  const v=prompt('Valeur estimée :','0 €')||'—';
-  S.inventaire.push({nom:n,val:v,ic:'📦'});save();toast('Élément ajouté.');
-}
+/* alias de compatibilité → ouvre le modal */
+function addInventaire(){ openInvModal(); }
 function addIncident(){
   const t=prompt('Description de l\'incident :','');if(!t)return;
   S.incidents.unshift({titre:t,meta:'Signalé à l\'instant',st:'Ouvert',ic:'⚠️',stCls:'pill-warn'});save();toast('Incident déclaré.');
