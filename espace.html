@@ -390,6 +390,25 @@ a { color: inherit; text-decoration: none; }
 
 /* ── ADMIN ── */
 .admin-links .row-item a { color: var(--accent-light); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .82rem; }
+
+/* ── TABLEAU DE BORD : vue globale des biens ── */
+.dash-totals { display: flex; gap: 10px; margin: 4px 0 14px; flex-wrap: wrap; }
+.dt-box { flex: 1; min-width: 130px; background: var(--gris-clair); border-radius: 11px; padding: 11px 13px; }
+.dt-mine { background: rgba(45,106,106,.08); }
+.dt-lbl { font-size: .62rem; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--texte-leger, #8896A7); }
+.dt-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.18rem; color: var(--navy); margin-top: 3px; overflow-wrap: anywhere; }
+.dt-mine .dt-val { color: var(--teal); }
+.dt-sub { font-size: .72rem; color: var(--texte-doux); margin-top: 2px; }
+.dash-biens { display: flex; flex-direction: column; gap: 8px; }
+.db-row { display: flex; align-items: center; gap: 11px; padding: 10px 11px; border: 1px solid var(--gris-bord); border-radius: 11px; cursor: pointer; transition: .14s; }
+.db-row:hover { border-color: var(--accent-light); background: var(--gris-clair); }
+.db-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(15,31,61,.06); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.db-main { flex: 1; min-width: 0; }
+.db-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .85rem; color: var(--navy); overflow-wrap: anywhere; word-break: break-word; }
+.db-meta { font-size: .74rem; color: var(--texte-doux); overflow-wrap: anywhere; word-break: break-word; }
+.db-fig { text-align: right; flex-shrink: 0; }
+.db-val { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .86rem; color: var(--navy); }
+.db-share { font-size: .72rem; color: var(--teal); font-weight: 600; margin-top: 1px; }
 </style>
 </head>
 <body>
@@ -472,20 +491,15 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="cols2">
         <div class="card">
-          <div class="card-head"><div><div class="card-title" id="bien-dash-title">Maison familiale — Annecy</div><div class="card-sub">Indivision successorale · 3 parts</div></div></div>
-          <div class="donut-wrap">
-            <svg width="130" height="130" viewBox="0 0 42 42" style="transform:rotate(-90deg);flex-shrink:0">
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF2F8" stroke-width="5.5"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2C5282" stroke-width="5.5" stroke-dasharray="44.9 55.1"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2D6A6A" stroke-width="5.5" stroke-dasharray="30 70" stroke-dashoffset="-44.9"/>
-              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#4A7FB5" stroke-width="5.5" stroke-dasharray="25.1 74.9" stroke-dashoffset="-74.9"/>
-            </svg>
-            <div class="legend">
-              <span><i style="background:#2C5282"></i>Marti (45%) <b id="p1">144 000 €</b></span>
-              <span><i style="background:#2D6A6A"></i>Paul (30%) <b id="p2">96 000 €</b></span>
-              <span><i style="background:#4A7FB5"></i>Léa (25%) <b id="p3">80 000 €</b></span>
-            </div>
+          <div class="card-head">
+            <div><div class="card-title">Patrimoine de l'indivision</div><div class="card-sub">Tous les biens, leur valeur et votre quote-part</div></div>
+            <button class="btn btn-sm" onclick="go('portfolio')">Gérer →</button>
           </div>
+          <div class="dash-totals">
+            <div class="dt-box"><div class="dt-lbl">Valeur totale</div><div class="dt-val" id="dashTotalVal">—</div></div>
+            <div class="dt-box dt-mine"><div class="dt-lbl">Ma quote-part</div><div class="dt-val" id="dashMyVal">—</div><div class="dt-sub" id="dashMyPct"></div></div>
+          </div>
+          <div class="dash-biens" id="dashBiens"></div>
         </div>
         <div class="card">
           <div class="card-title">Raccourcis</div>
@@ -1175,7 +1189,7 @@ const ICONS=['📄','🧾','📊','📑','🖼️'];
 
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
-  renderKpis(); renderPortfolio(); renderDocs(); renderCoi();
+  renderKpis(); renderDashBiens(); renderPortfolio(); renderDocs(); renderCoi();
   renderEstim(); renderRdv(); renderEvents();
   renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
 }
@@ -1192,6 +1206,43 @@ function renderKpis(){
   // valeur totale (somme grossière)
   const totalStr = S.biens.map(b=>(b.val||'0').replace(/\s|€/g,'').replace(',','.')).reduce((a,b)=>a+(parseFloat(b)||0),0);
   document.getElementById('ptValeur').textContent = totalStr.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €';
+}
+
+/* Valeur numérique d'un bien à partir de sa chaîne "320 000 €" */
+function bienVal(b){ return parseFloat(String(b?.val||'0').replace(/[\s€]/g,'').replace(',','.'))||0; }
+/* Co-indivisaire correspondant à l'utilisateur connecté (marqué "(vous)") */
+function meCoi(){ return S.coi.find(c=>/\(vous\)/i.test(c.n||'')) || S.coi[0] || null; }
+
+/* Tableau de bord : vue globale de TOUS les biens + ma quote-part par bien */
+function renderDashBiens(){
+  const el = document.getElementById('dashBiens'); if(!el) return;
+  const me = meCoi();
+  const meIni = me ? me.ini : null;
+  const meName = me ? (me.n||'').replace(/\s*\(vous\)/i,'').trim().toLowerCase() : '';
+  let total = 0, myTotal = 0;
+  const rows = S.biens.map(b=>{
+    const val = bienVal(b); total += val;
+    const part = bienParts(b).find(p =>
+      (meIni && p.ini===meIni) || (meName && (p.name||'').trim().toLowerCase()===meName));
+    const pct = part ? (+part.pct||0) : 0;
+    const myVal = val*pct/100; myTotal += myVal;
+    return `<div class="db-row" onclick="go('portfolio')" title="Voir le détail du bien">
+      <div class="db-ico">🏠</div>
+      <div class="db-main">
+        <div class="db-name">${b.nom||'Bien'}</div>
+        <div class="db-meta">${b.info||''}</div>
+      </div>
+      <div class="db-fig">
+        <div class="db-val">${eur(val)}</div>
+        <div class="db-share">${pct ? ('ma part '+pct+'% · '+eur(myVal)) : 'pas de part'}</div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien dans cette indivision.</div>';
+  el.innerHTML = rows;
+  const tv=document.getElementById('dashTotalVal'); if(tv) tv.textContent = eur(total);
+  const mv=document.getElementById('dashMyVal');   if(mv) mv.textContent = eur(myTotal);
+  const mp=document.getElementById('dashMyPct');
+  if(mp) mp.textContent = total>0 ? ('soit '+Math.round(myTotal/total*100)+'% du patrimoine') : '';
 }
 
 /* Parts d'un bien : utilise bien.parts, sinon les parts globales (coiParts) */
