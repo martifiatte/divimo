@@ -51,13 +51,13 @@ a { color: inherit; text-decoration: none; }
 /* ── SÉLECTEUR DE GROUPE ── */
 .group-selector { position: relative; margin-bottom: 10px; }
 @media(max-width:860px) { .group-selector { min-width: 200px; flex-shrink: 0; margin-bottom: 0; margin-right: 6px; } }
-.gs-current { width: 100%; display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1.5px solid var(--gris-bord); border-radius: 11px; background: #fff; cursor: pointer; transition: .15s; text-align: left; }
+.gs-current { width: 100%; display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1.5px solid var(--gris-bord); border-radius: 11px; background: #fff; cursor: pointer; transition: .15s; text-align: left; min-height: 48px; }
 .gs-current:hover { border-color: var(--accent-light); background: var(--gris-clair); }
 .gs-current.open { border-color: var(--navy); }
 .gs-ico { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,var(--navy),var(--accent)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
 .gs-info { flex: 1; min-width: 0; }
 .gs-label { font-size: .6rem; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--texte-leger, #8896A7); }
-.gs-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--navy); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; word-break: break-word; }
 .gs-chev { color: var(--texte-doux); flex-shrink: 0; transition: .2s; }
 .gs-current.open .gs-chev { transform: rotate(180deg); }
 .gs-menu { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--gris-bord); border-radius: 12px; box-shadow: 0 12px 30px rgba(15,31,61,.16); z-index: 200; overflow: hidden; display: none; }
@@ -67,7 +67,7 @@ a { color: inherit; text-decoration: none; }
 .gs-item:hover { background: var(--gris-clair); }
 .gs-item.active { background: rgba(44,82,130,.06); }
 .gs-item-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .78rem; color: #fff; flex-shrink: 0; font-family: 'Montserrat', sans-serif; font-weight: 700; }
-.gs-item-name { flex: 1; min-width: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-item-name { flex: 1; min-width: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--navy); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; word-break: break-word; }
 .gs-item-check { color: var(--teal); flex-shrink: 0; }
 .gs-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
 .gs-mini { background: none; border: none; cursor: pointer; color: var(--gris-mid); padding: 3px; border-radius: 5px; display: flex; transition: .12s; }
@@ -895,7 +895,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="modal-field">
         <label>Nom du groupe</label>
-        <input type="text" id="groupName" placeholder="Ex : Héritage parents, SCI Dupont…" autocomplete="off">
+        <input type="text" id="groupName" placeholder="Ex : Héritage parents, SCI Dupont…" autocomplete="off" maxlength="60">
       </div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="closeGroupModal()">Annuler</button>
@@ -1112,8 +1112,9 @@ function deleteGroupe(id){
 }
 function renameGroupe(id){
   const n = prompt('Renommer le groupe :', GROUPES[id]?.nom||''); if(!n)return;
-  GROUPES[id].nom = n.trim();
-  if(id===activeId) S.nom = n.trim();
+  const nom = n.trim().slice(0,60);
+  GROUPES[id].nom = nom;
+  if(id===activeId) S.nom = nom;
   save(); renderGroupSelector();
 }
 
