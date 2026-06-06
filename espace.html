@@ -409,6 +409,14 @@ a { color: inherit; text-decoration: none; }
 .db-fig { text-align: right; flex-shrink: 0; }
 .db-val { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .86rem; color: var(--navy); }
 .db-share { font-size: .72rem; color: var(--teal); font-weight: 600; margin-top: 1px; }
+/* Encadrés du haut transformés en boutons de navigation */
+.stat-nav { font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.stat-nav:hover { border-color: var(--accent-light); box-shadow: 0 6px 18px rgba(15,31,61,.08); transform: translateY(-2px); }
+.stat-nav .stat-go { color: var(--accent-light); font-weight: 700; opacity: 0; transition: .15s; margin-left: 2px; }
+.stat-nav:hover .stat-go { opacity: 1; }
+/* Graphique de répartition du tableau de bord */
+.dash-chart { justify-content: center; padding: 6px 0 2px; min-height: 150px; }
+.dash-chart .legend { font-size: .8rem; }
 </style>
 </head>
 <body>
@@ -484,10 +492,10 @@ a { color: inherit; text-decoration: none; }
         <button class="btn-banner" onclick="go('estim')">Lancer une simulation</button>
       </div>
       <div class="stats">
-        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="kBiens">—</div><div class="sl">Bien(s)</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">👥</div><div class="sv" id="kCoi">—</div><div class="sl">Co-indivisaires</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">📄</div><div class="sv" id="kDocs">—</div><div class="sl">Documents</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">📊</div><div class="sv" id="kEstim">—</div><div class="sl">Simulations</div></div>
+        <button type="button" class="stat stat-nav" onclick="go('portfolio')" title="Voir mon patrimoine"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="kBiens">—</div><div class="sl">Bien(s) <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('coi')" title="Voir les co-indivisaires"><div class="ic" style="background:rgba(44,82,130,.1)">👥</div><div class="sv" id="kCoi">—</div><div class="sl">Co-indivisaires <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('docs')" title="Voir les documents"><div class="ic" style="background:rgba(45,106,106,.1)">📄</div><div class="sv" id="kDocs">—</div><div class="sl">Documents <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('estim')" title="Voir les simulations"><div class="ic" style="background:rgba(74,127,181,.12)">📊</div><div class="sv" id="kEstim">—</div><div class="sl">Simulations <span class="stat-go">→</span></div></button>
       </div>
       <div class="cols2">
         <div class="card">
@@ -502,12 +510,10 @@ a { color: inherit; text-decoration: none; }
           <div class="dash-biens" id="dashBiens"></div>
         </div>
         <div class="card">
-          <div class="card-title">Raccourcis</div>
-          <div class="card-sub">Actions fréquentes</div>
-          <div class="row-item" onclick="go('estim')" style="cursor:pointer"><div class="r-ic" style="background:rgba(44,82,130,.1)">📊</div><div><b>Lancer une simulation</b><span>Estimation, parts, vente</span></div><span class="mini-link">→</span></div>
-          <div class="row-item" onclick="go('juri')" style="cursor:pointer"><div class="r-ic" style="background:rgba(45,106,106,.1)">⚖️</div><div><b>Consulter un expert</b><span>Notaire ou avocat</span></div><span class="mini-link">→</span></div>
-          <div class="row-item" onclick="go('docs')" style="cursor:pointer"><div class="r-ic" style="background:rgba(15,31,61,.07)">📄</div><div><b>Déposer un document</b><span>Coffre-fort sécurisé</span></div><span class="mini-link">→</span></div>
-          <div class="row-item" onclick="go('planning')" style="cursor:pointer"><div class="r-ic" style="background:rgba(74,127,181,.1)">📅</div><div><b>Voir le planning</b><span>Échéances et rendez-vous</span></div><span class="mini-link">→</span></div>
+          <div class="card-head">
+            <div><div class="card-title">Répartition du patrimoine</div><div class="card-sub">Valeur détenue par chaque co-indivisaire</div></div>
+          </div>
+          <div class="donut-wrap dash-chart" id="dashChart"></div>
         </div>
       </div>
     </div>
@@ -1189,7 +1195,7 @@ const ICONS=['📄','🧾','📊','📑','🖼️'];
 
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
-  renderKpis(); renderDashBiens(); renderPortfolio(); renderDocs(); renderCoi();
+  renderKpis(); renderDashBiens(); renderDashChart(); renderPortfolio(); renderDocs(); renderCoi();
   renderEstim(); renderRdv(); renderEvents();
   renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
 }
@@ -1243,6 +1249,45 @@ function renderDashBiens(){
   const mv=document.getElementById('dashMyVal');   if(mv) mv.textContent = eur(myTotal);
   const mp=document.getElementById('dashMyPct');
   if(mp) mp.textContent = total>0 ? ('soit '+Math.round(myTotal/total*100)+'% du patrimoine') : '';
+}
+
+/* Tableau de bord : donut de répartition de la VALEUR totale du patrimoine
+   par co-indivisaire (somme de sa quote-part sur tous les biens) */
+function renderDashChart(){
+  const el = document.getElementById('dashChart'); if(!el) return;
+  const map = {}; let grand = 0;
+  S.biens.forEach(b=>{
+    const val = bienVal(b);
+    bienParts(b).forEach(p=>{
+      const k = p.ini || p.name; if(!k) return;
+      if(!map[k]) map[k] = {name:p.name||p.ini, ini:p.ini||'?', val:0};
+      const v = val*(+p.pct||0)/100;
+      map[k].val += v; grand += v;
+    });
+  });
+  const people = Object.values(map).sort((a,b)=>b.val-a.val);
+  if(!people.length || grand<=0){
+    el.innerHTML = '<div class="empty"><div class="empty-ic">📊</div>Ajoutez un bien et ses parts pour voir la répartition.</div>';
+    return;
+  }
+  const meIni = (meCoi()||{}).ini;
+  let off = 0;
+  const segs = people.map((p,i)=>{
+    const pct = p.val/grand*100;
+    const c = `<circle cx="21" cy="21" r="15.9" fill="none" stroke="${PAL[i%PAL.length]}" stroke-width="5.5" stroke-dasharray="${pct.toFixed(2)} ${(100-pct).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+    off += pct; return c;
+  }).join('');
+  const legend = people.map((p,i)=>{
+    const pct = Math.round(p.val/grand*100);
+    const you = p.ini===meIni ? ' <span class="db-share">(vous)</span>' : '';
+    return `<span><i style="background:${PAL[i%PAL.length]}"></i>${p.name} (${pct}%)${you} <b>${eur(p.val)}</b></span>`;
+  }).join('');
+  el.innerHTML = `
+    <svg width="150" height="150" viewBox="0 0 42 42" style="transform:rotate(-90deg);flex-shrink:0">
+      <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF2F8" stroke-width="5.5"/>
+      ${segs}
+    </svg>
+    <div class="legend">${legend}</div>`;
 }
 
 /* Parts d'un bien : utilise bien.parts, sinon les parts globales (coiParts) */
