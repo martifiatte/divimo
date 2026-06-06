@@ -454,6 +454,46 @@ a { color: inherit; text-decoration: none; }
 .wiz-photo .wp-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(15,31,61,.7); color: #fff; border: none; cursor: pointer; font-size: 1rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .wiz-foot { justify-content: space-between; }
 .bien-card-cover { height: 120px; border-radius: 11px; background-size: cover; background-position: center; margin-bottom: 12px; background-color: var(--gris-clair); }
+
+/* ── BUDGET : statuts & paiements ── */
+.bud-stats { grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); }
+.bud-stat.due .bs-amount { color: #C8821E; }
+.st-chip { display: inline-flex; align-items: center; gap: 5px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .66rem; padding: .18rem .5rem; border-radius: 99px; white-space: nowrap; }
+.st-chip .st-dot { width: 7px; height: 7px; border-radius: 50%; }
+.st-apayer { background: rgba(192,57,57,.1); color: #C0392B; }
+.st-attente { background: rgba(200,130,30,.12); color: #9A6010; }
+.st-paye { background: rgba(25,169,116,.14); color: #13855B; }
+.tx-row.payable { cursor: pointer; border-radius: 10px; transition: .14s; margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
+.tx-row.payable:hover { background: var(--gris-clair); }
+.tx-status-line { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.tx-prog { flex: 1; max-width: 130px; height: 5px; border-radius: 99px; background: var(--gris-clair); overflow: hidden; }
+.tx-prog-fill { height: 100%; background: #19A974; border-radius: 99px; transition: width .3s; }
+/* Modal paiement */
+.pay-head-card { background: var(--gris-clair); border-radius: 12px; padding: 13px 15px; margin-bottom: 6px; }
+.pay-amount { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--navy); line-height: 1.1; }
+.pay-meta { font-size: .78rem; color: var(--texte-doux); margin-top: 4px; overflow-wrap: anywhere; }
+.pay-progress { margin: 16px 0 4px; }
+.pay-prog-bar { height: 8px; border-radius: 99px; background: var(--gris-clair); overflow: hidden; }
+.pay-prog-fill { height: 100%; background: linear-gradient(90deg,#19A974,#2D6A6A); border-radius: 99px; transition: width .35s cubic-bezier(.2,.7,.2,1); }
+.pay-prog-lbl { display: flex; justify-content: space-between; font-size: .76rem; color: var(--texte-doux); margin-bottom: 6px; }
+.pay-row { display: flex; align-items: center; gap: 11px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.pay-row:first-child { border-top: none; }
+.pay-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .76rem; color: #fff; flex-shrink: 0; }
+.pay-body { flex: 1; min-width: 0; }
+.pay-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .86rem; color: var(--navy); overflow-wrap: anywhere; }
+.pay-sub { font-size: .74rem; color: var(--texte-doux); }
+.pay-due { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .92rem; color: var(--navy); white-space: nowrap; }
+.pay-toggle { border: 1.5px solid var(--gris-bord); background: #fff; border-radius: 8px; padding: .42rem .7rem; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .74rem; cursor: pointer; transition: .14s; color: var(--texte-doux); white-space: nowrap; flex-shrink: 0; }
+.pay-toggle:hover { border-color: var(--accent-light); }
+.pay-toggle.on { background: rgba(25,169,116,.12); border-color: #19A974; color: #13855B; }
+/* Historique des paiements */
+.payhist-row { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--gris-bord); }
+.payhist-row:first-child { border-top: none; }
+.payhist-ico { width: 32px; height: 32px; border-radius: 9px; background: rgba(25,169,116,.14); color: #13855B; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.payhist-body { flex: 1; min-width: 0; }
+.payhist-main { font-size: .82rem; color: var(--navy); overflow-wrap: anywhere; }
+.payhist-meta { font-size: .72rem; color: var(--texte-doux); margin-top: 1px; }
+.payhist-amt { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .84rem; color: var(--teal); white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -676,6 +716,14 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div id="txList" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Historique des paiements -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Historique des paiements</div><div class="card-sub" id="payHistSub">—</div></div>
+        </div>
+        <div id="payHistList" style="margin-top:6px"></div>
       </div>
     </div>
 
@@ -1025,6 +1073,17 @@ a { color: inherit; text-decoration: none; }
         <button class="btn" id="wizNext" onclick="wizNext()">Suivant →</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT D'UNE CHARGE -->
+<div class="modal-overlay" id="payModal" onclick="if(event.target===this)closePayModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Régler une charge</h3>
+      <button class="modal-close" onclick="closePayModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body" id="payBody"></div>
   </div>
 </div>
 
@@ -1837,6 +1896,119 @@ const TX_CATS = {
 };
 function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'📌', color:'#6B7280'}; }
 
+/* ── STATUTS & PAIEMENTS DES CHARGES ── */
+const STATUTS = {
+  apayer:  {label:'À payer',    cls:'st-apayer',  dot:'#C0392B'},
+  attente: {label:'En attente', cls:'st-attente', dot:'#C8821E'},
+  paye:    {label:'Payé',       cls:'st-paye',    dot:'#19A974'},
+};
+function statutChip(st){
+  const s=STATUTS[st]; if(!s) return '';
+  return `<span class="st-chip ${s.cls}"><span class="st-dot" style="background:${s.dot}"></span>${s.label}</span>`;
+}
+/* Répartition d'une charge entre co-indivisaires (selon les parts du bien) + état payé */
+function chargeShares(t){
+  const bien = S.biens.find(b=>b.nom===t.bien);
+  const parts = bienParts(bien);
+  const sum = parts.reduce((a,p)=>a+(+p.pct||0),0) || 100;
+  const paid = t.paid || {};
+  return parts.map(p=>({
+    name:p.name, ini:p.ini, pct:+p.pct||0,
+    due: Math.abs(t.montant)*(+p.pct||0)/sum,
+    paid: !!paid[p.ini], at: paid[p.ini]||null
+  }));
+}
+/* Statut dérivé : apayer / attente / paye (null pour les revenus) */
+function chargeStatut(t){
+  if(t.montant>=0) return null;
+  const sh=chargeShares(t); if(!sh.length) return 'apayer';
+  const np=sh.filter(s=>s.paid).length;
+  if(np===0) return 'apayer';
+  return np<sh.length ? 'attente' : 'paye';
+}
+function addPayment(p){ S.payments=S.payments||[]; S.payments.unshift(p); }
+function removePayment(t,ini){
+  S.payments=S.payments||[];
+  const idx=S.payments.findIndex(p=>p.ini===ini && p.desc===t.desc && p.bien===t.bien);
+  if(idx>-1) S.payments.splice(idx,1);
+}
+
+/* ── MODAL DE PAIEMENT ── */
+let payIdx = -1;
+function openPayModal(i){ payIdx=i; renderPayModal(); document.getElementById('payModal').classList.add('open'); }
+function closePayModal(){ document.getElementById('payModal').classList.remove('open'); }
+function renderPayModal(){
+  const t=S.transactions[payIdx]; if(!t){ closePayModal(); return; }
+  const shares=chargeShares(t);
+  const total=Math.abs(t.montant);
+  const paidAmt=shares.filter(s=>s.paid).reduce((a,s)=>a+s.due,0);
+  const pct= total ? Math.round(paidAmt/total*100) : 0;
+  const st=chargeStatut(t);
+  const dateStr=t.date?new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR'):'';
+  document.getElementById('payBody').innerHTML=`
+    <div class="pay-head-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="min-width:0">
+          <div class="pay-amount">${eur(total)}</div>
+          <div class="pay-meta">${t.desc}${t.bien?(' · 📍 '+t.bien):''}${dateStr?(' · '+dateStr):''}</div>
+        </div>
+        ${statutChip(st)}
+      </div>
+    </div>
+    <div class="pay-progress">
+      <div class="pay-prog-lbl"><span><b style="color:var(--teal)">${eur(paidAmt)}</b> réglé sur ${eur(total)}</span><span>${pct}%</span></div>
+      <div class="pay-prog-bar"><div class="pay-prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem;color:var(--navy);margin:18px 0 2px">Répartition entre co-indivisaires</div>
+    <div>${shares.map((s,j)=>`
+      <div class="pay-row">
+        <div class="pay-av" style="background:linear-gradient(135deg,${PAL[j%PAL.length]},${PAL[j%PAL.length]}cc)">${s.ini}</div>
+        <div class="pay-body">
+          <div class="pay-name">${s.name}</div>
+          <div class="pay-sub">${s.pct}%${s.paid&&s.at?(' · réglé le '+new Date(s.at).toLocaleDateString('fr-FR')):''}</div>
+        </div>
+        <div class="pay-due">${eur(s.due)}</div>
+        <button class="pay-toggle ${s.paid?'on':''}" onclick="togglePay('${s.ini}')">${s.paid?'✓ Payé':'Marquer payé'}</button>
+      </div>`).join('')}</div>
+    <div class="modal-foot" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="resetPay()">Tout réinitialiser</button>
+      <button class="btn" onclick="markAllPaid()" ${st==='paye'?'disabled style="opacity:.55;cursor:default"':''}>${st==='paye'?'Tout est réglé ✓':'Tout marquer payé'}</button>
+    </div>`;
+}
+function togglePay(ini){
+  const t=S.transactions[payIdx]; if(!t) return;
+  t.paid=t.paid||{};
+  const s=chargeShares(t).find(x=>x.ini===ini); if(!s) return;
+  if(t.paid[ini]){
+    delete t.paid[ini]; removePayment(t,ini);
+    toast(`Paiement de ${s.name} annulé.`);
+  } else {
+    const now=new Date().toISOString();
+    t.paid[ini]=now;
+    addPayment({ts:now, ini, name:s.name, amount:s.due, desc:t.desc, bien:t.bien});
+    toast(`🔔 ${s.name} a réglé sa part : ${eur(s.due)}`);
+  }
+  save(); renderPayModal();
+}
+function markAllPaid(){
+  const t=S.transactions[payIdx]; if(!t) return;
+  t.paid=t.paid||{};
+  const now=new Date().toISOString();
+  let n=0;
+  chargeShares(t).forEach(s=>{
+    if(!t.paid[s.ini]){ t.paid[s.ini]=now; addPayment({ts:now, ini:s.ini, name:s.name, amount:s.due, desc:t.desc, bien:t.bien}); n++; }
+  });
+  if(n) toast('🔔 Charge entièrement réglée ✓');
+  save(); renderPayModal();
+}
+function resetPay(){
+  const t=S.transactions[payIdx]; if(!t) return;
+  if(t.paid) Object.keys(t.paid).forEach(ini=>removePayment(t,ini));
+  t.paid={};
+  toast('Statut réinitialisé.');
+  save(); renderPayModal();
+}
+
 /* Quote-parts des co-indivisaires (parse "45% · ...") */
 function coiParts(){
   return S.coi.map((c,i)=>{
@@ -1849,10 +2021,18 @@ function coiParts(){
 let txFilter = 'all';
 
 function renderBudget(){
+  S.payments = S.payments || [];
   const txs = S.transactions;
   const revenus = txs.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
   const chargesAbs = Math.abs(txs.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0));
   const solde = revenus - chargesAbs;
+
+  /* ── Suivi des paiements ── */
+  let totalDue=0, totalPaid=0;
+  txs.filter(t=>t.montant<0).forEach(t=>{
+    chargeShares(t).forEach(s=>{ if(s.paid) totalPaid+=s.due; else totalDue+=s.due; });
+  });
+  const pctPaid = chargesAbs ? Math.round(totalPaid/chargesAbs*100) : 0;
 
   /* ── Cartes résumé ── */
   const st = document.getElementById('budStats');
@@ -1874,6 +2054,12 @@ function renderBudget(){
       <div class="bs-label">Solde net</div>
       <div class="bs-amount" style="color:${solde>=0?'var(--teal)':'#C0392B'}">${solde>=0?'+':'−'}${eur(Math.abs(solde))}</div>
       <div class="bs-sub">${solde>=0?'Le bien est positif':'Charges supérieures aux revenus'}</div>
+    </div>
+    <div class="bud-stat due">
+      <div class="bs-ico" style="background:rgba(200,130,30,.12)">⏳</div>
+      <div class="bs-label">Reste à régler</div>
+      <div class="bs-amount">${eur(totalDue)}</div>
+      <div class="bs-sub">${pctPaid}% des charges réglées</div>
     </div>`;
 
   /* ── Répartition par co-indivisaire (selon les parts de CHAQUE bien) ── */
@@ -1946,7 +2132,14 @@ function renderBudget(){
   if(tl) tl.innerHTML = filtered.map(t=>{
     const ci = catInfo(t.cat);
     const pos = t.montant>=0;
-    return `<div class="tx-row">
+    let statusLine='';
+    if(!pos){
+      const shares=chargeShares(t), tot=Math.abs(t.montant);
+      const paidAmt=shares.filter(s=>s.paid).reduce((a,s)=>a+s.due,0);
+      const pp = tot ? Math.round(paidAmt/tot*100) : 0;
+      statusLine=`<div class="tx-status-line">${statutChip(chargeStatut(t))}<div class="tx-prog"><div class="tx-prog-fill" style="width:${pp}%"></div></div></div>`;
+    }
+    return `<div class="tx-row ${pos?'':'payable'}" ${pos?'':`onclick="openPayModal(${t.i})"`}>
       <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?'💰':ci.ic}</div>
       <div class="tx-body">
         <div class="tx-desc">${t.desc}</div>
@@ -1955,13 +2148,29 @@ function renderBudget(){
           ${t.bien?`<span>📍 ${t.bien}</span>`:''}
           ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR')}</span>`:''}
         </div>
+        ${statusLine}
       </div>
       <div class="tx-right">
         <span class="tx-amount ${pos?'pos':'neg'}">${pos?'+':'−'}${eur(Math.abs(t.montant))}</span>
-        <span class="del" onclick="S.transactions.splice(${t.i},1);save()">×</span>
+        <span class="del" onclick="event.stopPropagation();S.transactions.splice(${t.i},1);save()">×</span>
       </div>
     </div>`;
   }).join('') || '<div class="empty">Aucune transaction.</div>';
+
+  /* ── Historique des paiements ── */
+  const pays = S.payments || [];
+  const phSub = document.getElementById('payHistSub');
+  if(phSub) phSub.textContent = pays.length ? `${pays.length} paiement(s) enregistré(s)` : 'Aucun paiement pour le moment';
+  const ph = document.getElementById('payHistList');
+  if(ph) ph.innerHTML = pays.slice(0,30).map(p=>`
+    <div class="payhist-row">
+      <div class="payhist-ico">✓</div>
+      <div class="payhist-body">
+        <div class="payhist-main"><b>${p.name}</b> a réglé sa part · <span style="color:var(--texte-doux)">${p.desc}</span></div>
+        <div class="payhist-meta">${p.bien?('📍 '+p.bien+' · '):''}${new Date(p.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <div class="payhist-amt">${eur(p.amount)}</div>
+    </div>`).join('') || '<div class="empty">Les paiements réglés apparaîtront ici.</div>';
 }
 
 /* Filtre */
