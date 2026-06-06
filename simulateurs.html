@@ -159,6 +159,12 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .er-cta:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
 .er-cta:disabled{opacity:.3;cursor:not-allowed;transform:none}
 @media print{.site-header,.tabs,.sim-intro,footer,.step-nav,.prog-bar{display:none!important}body{background:#fff}.panel:not(.active){display:none}}
+.rc-check{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--texte-doux);cursor:pointer;margin-top:4px}
+.res-line.sub{font-size:.8rem;border-top:1px dashed var(--gris-bord)}
+.res-line.tot{border-top:2px solid var(--navy);margin-top:3px;padding-top:.6rem}
+.res-line.tot b{font-size:1.02rem}
+.res-note{font-size:.72rem;color:var(--texte-doux);line-height:1.5;margin-top:12px;background:var(--gris-clair);border-radius:9px;padding:10px 12px}
+.res-note b{color:var(--navy)}
 </style>
 </head>
 <body>
@@ -196,7 +202,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <div class="tabs">
     <button class="tab active" data-tab="estimer"><span class="n">1</span> Estimer son bien</button>
     <button class="tab" data-tab="parts"><span class="n">2</span> Calculer les parts</button>
-    <button class="tab" data-tab="vente"><span class="n">3</span> Vente / rachat</button>
+    <button class="tab" data-tab="vente"><span class="n">3</span> Vente</button>
+    <button class="tab" data-tab="rachat"><span class="n">4</span> Rachat de parts</button>
   </div>
 
   <!-- ESTIMATION -->
@@ -457,6 +464,28 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         </div>
       </div>
       <div class="result-col" id="v-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div><span>Renseignez les montants.</span></div></div>
+    </div>
+  </div>
+
+  <!-- RACHAT DE PARTS (précis) -->
+  <div class="panel" id="rachat">
+    <div class="panel-head"><h2>Rachat de parts (soulte)</h2><p>Un indivisaire rachète les parts des autres pour sortir de l'indivision. Calcul de la soulte nette, du droit de partage et des frais de notaire — barèmes officiels.</p></div>
+    <div class="sim-body">
+      <div class="form-col">
+        <div class="field"><label>Valeur du bien</label><div class="sfx-wrap"><input type="number" id="rc-val" value="320000" oninput="rcCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
+        <div class="field"><label>Crédit restant dû <span class="hint">(repris par l'acheteur)</span></label><div class="sfx-wrap"><input type="number" id="rc-dette" value="0" oninput="rcCompute()"><span class="sfx">€</span></div></div>
+        <div class="field"><label>Régime de l'opération</label>
+          <select id="rc-regime" onchange="rcCompute()">
+            <option value="partage">Partage familial / sortie d'indivision — droit 2,5 %</option>
+            <option value="licitation">Licitation / cession hors famille — droits 5,8 %</option>
+          </select>
+          <p class="note">Succession, divorce, indivision familiale → <b>partage</b> (2,5 %). Cession hors cadre familial → <b>licitation</b> (5,8 %).</p>
+        </div>
+        <div class="field"><label>Co-indivisaires <span class="hint">— nom et %</span></label><div id="rc-rows"></div><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><div id="rc-sum"></div></div>
+        <div class="field"><label>Qui rachète les parts ?</label><select id="rc-buyer" onchange="rcCompute()"></select></div>
+        <label class="rc-check"><input type="checkbox" id="rc-fees-buyer" checked onchange="rcCompute()"> Frais et droits à la charge de l'acheteur</label>
+      </div>
+      <div class="result-col" id="rc-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div><span>Renseignez la valeur et les parts.</span></div></div>
     </div>
   </div>
 
@@ -947,7 +976,66 @@ function rachatCompute(){
   let s=0;const l=[];vcoi.forEach((m,i)=>{if(i!==ai){const mt=val*(+m.p||0)/sum;s+=mt;l.push(`<div class="res-line"><span>${m.n||'—'} cède ${+m.p||0}%</span><b>${euro(mt)}</b></div>`);}});
   out.innerHTML=`<div class="res-label" style="margin-top:12px">Rachat</div><div class="res-card"><div class="res-line"><span>${vcoi[ai]?.n||'L\'acheteur'} verse</span><b>${euro(s)}</b></div>${l.join('')}</div>`;
 }
-renderCoi(); renderVcoi();
+/* ── RACHAT DE PARTS (SOULTE) — calcul précis ── */
+let rcoi=[{n:'Marie',p:50},{n:'Paul',p:30},{n:'Léa',p:20}];
+function rcRender(){
+  document.getElementById('rc-rows').innerHTML=rcoi.map((m,i)=>`<div class="coi-row"><input type="text" placeholder="Prénom" value="${m.n}" oninput="rcoi[${i}].n=this.value;rcSyncBuyer();rcCompute()"><div class="sfx-wrap"><input type="number" min="0" max="100" value="${m.p}" oninput="rcoi[${i}].p=+this.value;rcCompute()"><span class="sfx">%</span></div><button class="del-btn" onclick="rcoi.splice(${i},1);rcRender()">×</button></div>`).join('');
+  rcSyncBuyer(); rcCompute();
+}
+function rcAdd(){ rcoi.push({n:'',p:0}); rcRender(); }
+function rcSyncBuyer(){
+  const sel=document.getElementById('rc-buyer'); const cur=+sel.value||0;
+  sel.innerHTML=rcoi.map((m,i)=>`<option value="${i}">${m.n||'Co-ind. '+(i+1)}</option>`).join('');
+  sel.value=Math.max(0,Math.min(cur, rcoi.length-1));
+}
+/* Émoluments proportionnels du notaire (barème réglementé, HT) */
+function emolNotaire(assiette){
+  const tr=[[6500,.0387],[17000,.01596],[60000,.01064],[Infinity,.00799]];
+  let prev=0, em=0;
+  for(const [cap,rate] of tr){ if(assiette>prev) em+=(Math.min(assiette,cap)-prev)*rate; prev=cap; if(assiette<=cap) break; }
+  return em;
+}
+function rcCompute(){
+  const V=+document.getElementById('rc-val').value||0;
+  const D=+document.getElementById('rc-dette').value||0;
+  const regime=document.getElementById('rc-regime').value;
+  const feesBuyer=document.getElementById('rc-fees-buyer').checked;
+  const sum=rcoi.reduce((a,b)=>a+(+b.p||0),0);
+  document.getElementById('rc-sum').innerHTML=`<span class="sum-p ${sum===100?'sum-ok':'sum-bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  const res=document.getElementById('rc-result');
+  const bi=+document.getElementById('rc-buyer').value||0;
+  if(V<=0||sum<=0||!rcoi[bi]){ res.innerHTML='<div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div><span>Renseignez la valeur et les parts.</span></div>'; return; }
+  const actifNet=Math.max(0,V-D);
+  const ceders=rcoi.map((m,i)=>({...m,i})).filter(m=>m.i!==bi && (+m.p||0)>0);
+  const pctCedSum=ceders.reduce((a,m)=>a+(+m.p||0),0);
+  const fracCed=sum?pctCedSum/sum:0;
+  const soulteTotal=actifNet*fracCed;     /* equity nette versée aux cédants */
+  const valBrutCed=V*fracCed;             /* valeur brute des parts cédées */
+  let droit, droitLabel, assiette;
+  if(regime==='partage'){ assiette=actifNet*fracCed; droit=0.025*assiette; droitLabel='Droit de partage (2,5 %)'; }
+  else { assiette=valBrutCed; droit=0.058*valBrutCed; droitLabel='Droits de mutation (5,80 %)'; }
+  const emolTTC=emolNotaire(assiette)*1.2;
+  const csi=0.001*assiette, debours=400;
+  const fraisNotaire=emolTTC+csi+debours;
+  const coutTotal=soulteTotal+droit+fraisNotaire;
+  const perCeder=ceders.map(m=>({n:m.n||'—', p:+m.p||0, montant:actifNet*(+m.p||0)/sum}));
+  const buyerPct=Math.round((+rcoi[bi].p||0)/sum*100);
+  res.innerHTML=`
+    <div class="res-label">${feesBuyer?"Coût total pour l'acheteur":'Soulte à verser'}</div>
+    <div class="res-big">${euro(feesBuyer?coutTotal:soulteTotal)}</div>
+    <div class="res-range">${rcoi[bi].n||"L'acheteur"} rachète ${Math.round(fracCed*100)}% · conserve ${buyerPct}%${D>0?` · reprend ${euro(D)} de crédit`:''}</div>
+    <div class="res-card">
+      <div class="res-line"><span>Soulte versée aux cédants</span><b>${euro(soulteTotal)}</b></div>
+      ${perCeder.map(c=>`<div class="res-line sub"><span style="color:var(--texte-doux)">${c.n} cède ${c.p}%</span><b>${euro(c.montant)}</b></div>`).join('')}
+      <div class="res-line"><span>${droitLabel}</span><b>${euro(droit)}</b></div>
+      <div class="res-line"><span>Frais de notaire <span class="hint">(émol. + débours + CSI)</span></span><b>${euro(fraisNotaire)}</b></div>
+      <div class="res-line tot"><span>${feesBuyer?"Total décaissé par l'acheteur":'Total opération'}</span><b>${euro(coutTotal)}</b></div>
+    </div>
+    <div class="res-note"><b>Hypothèses :</b> barème réglementé des émoluments de notaire (3,870 % / 1,596 % / 1,064 % / 0,799 % par tranches) + TVA 20 %, contribution de sécurité immobilière 0,10 %, débours forfaitaires 400 €. ${regime==='partage'?'Droit de partage 2,5 % sur l\'actif net partagé.':'Droits de mutation 5,80 % sur la valeur des parts cédées.'} L'acheteur reprend le crédit restant (${euro(D)}) et conserve sa quote-part. Résultat indicatif — à confirmer avec votre notaire.</div>
+    <button class="btn pdf-btn" onclick="window.print()">Télécharger en PDF</button>`;
+}
+
+renderCoi(); renderVcoi(); rcRender();
 </script>
 </body>
 </html>
