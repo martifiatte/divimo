@@ -512,6 +512,28 @@ a { color: inherit; text-decoration: none; }
 .inv-emoji:hover { border-color: var(--accent-light); }
 .inv-emoji.sel { border-color: var(--navy); background: var(--gris-clair); }
 .modal-field select { width: 100%; padding: .65rem .8rem; border: 1.5px solid var(--gris-bord); border-radius: 9px; font-family: 'Open Sans', sans-serif; font-size: .9rem; color: var(--texte); background: #fff; }
+.modal-field textarea { width: 100%; padding: .65rem .8rem; border: 1.5px solid var(--gris-bord); border-radius: 9px; font-family: 'Open Sans', sans-serif; font-size: .9rem; color: var(--texte); resize: vertical; }
+.modal-field textarea:focus { outline: none; border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+
+/* ── INCIDENTS : par bien, statuts, historique ── */
+.btn-danger { background: #C0392B; }
+.btn-danger:hover { background: #A93226; }
+.inc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.inc-card { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--gris-bord); }
+.inc-card:first-child { border-top: none; }
+.inc-card .inc-ico { width: 40px; height: 40px; border-radius: 10px; background: var(--gris-clair); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.inc-body { flex: 1; min-width: 0; }
+.inc-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.inc-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; color: var(--navy); overflow-wrap: anywhere; }
+.inc-desc { font-size: .8rem; color: var(--texte); margin-top: 4px; line-height: 1.45; overflow-wrap: anywhere; }
+.inc-meta { font-size: .74rem; color: var(--texte-doux); margin-top: 5px; overflow-wrap: anywhere; }
+.inc-status-seg { display: inline-flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
+.iss { border: 1.5px solid var(--gris-bord); background: #fff; border-radius: 8px; padding: .35rem .65rem; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; cursor: pointer; color: var(--texte-doux); transition: .14s; }
+.iss:hover { border-color: var(--accent-light); }
+.iss.on { color: #fff; }
+.iss.on.st-apayer { background: #C0392B; border-color: #C0392B; }
+.iss.on.st-attente { background: #C8821E; border-color: #C8821E; }
+.iss.on.st-paye { background: #19A974; border-color: #19A974; }
 </style>
 </head>
 <body>
@@ -759,10 +781,19 @@ a { color: inherit; text-decoration: none; }
     <!-- INCIDENTS -->
     <div class="view" id="v-incidents">
       <div class="page-head">
-        <div><h1>Incidents & Sinistres</h1><p>Suivi des problèmes et déclarations de sinistres.</p></div>
-        <button class="btn btn-sm" onclick="addIncident()" style="background:#B03030">+ Déclarer</button>
+        <div><h1>Incidents & Sinistres</h1><p>Suivi des problèmes par bien, de la déclaration à la résolution.</p></div>
+        <button class="btn btn-danger" onclick="openIncModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Déclarer un incident
+        </button>
       </div>
+      <div class="inc-stats" id="incStats"></div>
+      <div class="bud-toolbar" style="margin-bottom:14px"><div class="bud-filter" id="incFilter"></div></div>
       <div class="card"><div id="incidentsList"></div></div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Historique des incidents</div><div class="card-sub" id="incLogSub">—</div></div></div>
+        <div id="incLogList" style="margin-top:6px"></div>
+      </div>
     </div>
 
     <!-- DOCUMENTS -->
@@ -1144,6 +1175,44 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL DÉCLARATION D'INCIDENT -->
+<div class="modal-overlay" id="incModal" onclick="if(event.target===this)closeIncModal()">
+  <div class="modal modal-wizard">
+    <div class="modal-head">
+      <h3>Déclarer un incident</h3>
+      <button class="modal-close" onclick="closeIncModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Type d'incident</label>
+        <div class="type-grid" id="incTypeGrid"></div>
+      </div>
+      <div class="modal-field">
+        <label>Titre / description courte</label>
+        <input type="text" id="incTitre" placeholder="Ex : Fuite sous l'évier" autocomplete="off">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Bien concerné <span style="color:#C0392B">*</span></label>
+          <select id="incBien"></select>
+        </div>
+        <div class="modal-field">
+          <label>Date</label>
+          <input type="date" id="incDate">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Détails <span style="font-weight:400;color:var(--texte-doux)">(option.)</span></label>
+        <textarea id="incDesc" rows="3" placeholder="Décrivez le problème, sa localisation précise…"></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeIncModal()">Annuler</button>
+        <button class="btn btn-danger" onclick="saveIncident()">Déclarer l'incident</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -1243,9 +1312,10 @@ const DEFAULT = {
     {nom:'Lave-linge',val:'480 €',ic:'🫧',bien:'Appartement — Lyon'},
   ],
   incidents:[
-    {titre:'Fuite sous-sol',meta:'Signalé par Paul · 12/03/2026',st:'En cours',ic:'💧',stCls:'pill-warn'},
-    {titre:'Gouttière endommagée',meta:'Signalé par Marti · 05/01/2026',st:'Résolu',ic:'🌧',stCls:'pill-ok'},
+    {titre:'Fuite au sous-sol', desc:'Infiltration repérée près de la chaudière.', cat:'degat_eaux', ic:'💧', bien:'Maison familiale — Annecy', statut:'encours', date:'2026-03-12', by:'Paul'},
+    {titre:'Gouttière endommagée', desc:'Gouttière arrachée côté jardin après la tempête.', cat:'toiture', ic:'🏚', bien:'Maison familiale — Annecy', statut:'resolu', date:'2026-01-05', by:'Marti'},
   ],
+  incidentsLog:[],
   /* Accès partagés : qui peut voir quoi (le propriétaire/admin a tout) */
   sharing:{
     'Paul Dupont':{planning:true, documents:true, budget:true, patrimoine:true},
@@ -2396,16 +2466,139 @@ function deleteInv(idx){
   S.inventaire.splice(idx,1); save(); toast('Élément supprimé.');
 }
 
+/* ── INCIDENTS ── */
+const INC_TYPES=[
+  {k:'degat_eaux', ic:'💧', lbl:'Dégât des eaux'},
+  {k:'electrique', ic:'⚡', lbl:'Électrique'},
+  {k:'toiture',    ic:'🏚', lbl:'Toiture'},
+  {k:'chauffage',  ic:'🔥', lbl:'Chauffage'},
+  {k:'serrurerie', ic:'🔑', lbl:'Serrurerie'},
+  {k:'autre',      ic:'⚠️', lbl:'Autre'},
+];
+function incTypeIcon(k){ return (INC_TYPES.find(t=>t.k===k)||{}).ic || '⚠️'; }
+const INC_STATUTS={
+  declare:{label:'Déclaré',  cls:'st-apayer',  dot:'#C0392B', ic:'🔴', logbg:'rgba(192,57,57,.12)', logtxt:'#C0392B'},
+  encours:{label:'En cours', cls:'st-attente', dot:'#C8821E', ic:'🟠', logbg:'rgba(200,130,30,.14)', logtxt:'#9A6010'},
+  resolu: {label:'Résolu',   cls:'st-paye',    dot:'#19A974', ic:'🟢', logbg:'rgba(25,169,116,.14)', logtxt:'#13855B'},
+};
+function incBienOf(inc){ const names=S.biens.map(b=>b.nom); return names.includes(inc.bien)?inc.bien:'Commun'; }
+let incFilter='all', incTargets=[];
+function setIncFilterIdx(k){ incFilter=incTargets[k]; renderIncidents(); }
+function incLog(inc, text, statut){
+  S.incidentsLog=S.incidentsLog||[];
+  const s=INC_STATUTS[statut]||{ic:'•',logbg:'rgba(44,82,130,.1)',logtxt:'var(--accent)'};
+  S.incidentsLog.unshift({ts:new Date().toISOString(), bien:inc.bien, text:`<b>${inc.titre}</b> — ${text}`, ic:s.ic, bg:s.logbg, txt:s.logtxt});
+}
+
 function renderIncidents(){
+  S.incidentsLog = S.incidentsLog || [];
+  /* normalisation (anciennes données) */
+  S.incidents.forEach(inc=>{
+    if(!inc.statut) inc.statut = inc.st==='Résolu'?'resolu':(inc.st==='En cours'?'encours':'declare');
+    if(!inc.bien) inc.bien='Commun';
+    if(!inc.ic) inc.ic=incTypeIcon(inc.cat);
+  });
+
+  /* Stats par statut */
+  const c={declare:0,encours:0,resolu:0};
+  S.incidents.forEach(i=>{ c[i.statut]=(c[i.statut]||0)+1; });
+  const stEl=document.getElementById('incStats');
+  if(stEl) stEl.innerHTML=`
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(192,57,57,.1)">🔴</div><div class="bs-label">Déclarés</div><div class="bs-amount" style="color:#C0392B">${c.declare}</div><div class="bs-sub">à traiter</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(200,130,30,.12)">🟠</div><div class="bs-label">En cours</div><div class="bs-amount" style="color:#9A6010">${c.encours}</div><div class="bs-sub">en traitement</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(25,169,116,.14)">🟢</div><div class="bs-label">Résolus</div><div class="bs-amount" style="color:#13855B">${c.resolu}</div><div class="bs-sub">clôturés</div></div>`;
+
+  /* Filtre par bien */
+  const bienNames=S.biens.map(b=>b.nom);
+  const hasCommun=S.incidents.some(i=>incBienOf(i)==='Commun');
+  incTargets=['all', ...bienNames.filter(n=>S.incidents.some(i=>i.bien===n)), ...(hasCommun?['Commun']:[])];
+  if(!incTargets.includes(incFilter)) incFilter='all';
+  const fEl=document.getElementById('incFilter');
+  if(fEl) fEl.innerHTML=incTargets.map((t,k)=>{
+    const label=t==='all'?'Tous':(t==='Commun'?'Commun':t);
+    const cnt=t==='all'?S.incidents.length:S.incidents.filter(i=>incBienOf(i)===t).length;
+    return `<span class="bf-chip ${incFilter===t?'sel':''}" onclick="setIncFilterIdx(${k})">${label} <span style="opacity:.55">${cnt}</span></span>`;
+  }).join('');
+
+  /* Liste filtrée */
+  const list=S.incidents.map((inc,i)=>({inc,i})).filter(x=> incFilter==='all' || incBienOf(x.inc)===incFilter);
   const el=document.getElementById('incidentsList');
-  if(!el) return;
-  el.innerHTML=S.incidents.map((inc,i)=>`
-    <div class="incident-item">
-      <div class="incident-ico" style="background:rgba(180,60,60,.08)">${inc.ic}</div>
-      <div><span class="incident-title">${inc.titre}</span><span class="incident-meta">${inc.meta}</span></div>
-      <div class="incident-right"><span class="pill ${inc.stCls}">${inc.st}</span></div>
-      <span class="del" style="margin-left:8px" onclick="S.incidents.splice(${i},1);save()">×</span>
-    </div>`).join('')||'<div class="empty">Aucun incident signalé.</div>';
+  if(el) el.innerHTML=list.map(x=>{
+    const inc=x.inc, i=x.i, sc=INC_STATUTS[inc.statut]||INC_STATUTS.declare;
+    const dateStr=inc.date?new Date(inc.date+'T00:00:00').toLocaleDateString('fr-FR'):'';
+    return `<div class="inc-card">
+      <div class="inc-ico">${inc.ic||'⚠️'}</div>
+      <div class="inc-body">
+        <div class="inc-top">
+          <span class="inc-title">${inc.titre}</span>
+          <span class="st-chip ${sc.cls}"><span class="st-dot" style="background:${sc.dot}"></span>${sc.label}</span>
+        </div>
+        ${inc.desc?`<div class="inc-desc">${inc.desc}</div>`:''}
+        <div class="inc-meta">📍 ${inc.bien}${dateStr?(' · '+dateStr):''}${inc.by?(' · signalé par '+inc.by):''}</div>
+        <div class="inc-status-seg">
+          ${['declare','encours','resolu'].map(s=>`<button class="iss ${inc.statut===s?('on '+INC_STATUTS[s].cls):''}" onclick="setIncStatus(${i},'${s}')">${INC_STATUTS[s].label}</button>`).join('')}
+        </div>
+      </div>
+      <button class="del" onclick="deleteIncident(${i})" title="Supprimer">×</button>
+    </div>`;
+  }).join('') || '<div class="empty">Aucun incident pour ce filtre.</div>';
+
+  /* Historique */
+  const log=S.incidentsLog||[];
+  const lsub=document.getElementById('incLogSub'); if(lsub) lsub.textContent = log.length?`${log.length} événement(s)`:'Aucun événement pour le moment';
+  const ll=document.getElementById('incLogList');
+  if(ll) ll.innerHTML=log.slice(0,40).map(e=>`
+    <div class="payhist-row">
+      <div class="payhist-ico" style="background:${e.bg||'rgba(44,82,130,.1)'};color:${e.txt||'var(--accent)'}">${e.ic||'•'}</div>
+      <div class="payhist-body">
+        <div class="payhist-main">${e.text}</div>
+        <div class="payhist-meta">📍 ${e.bien} · ${new Date(e.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    </div>`).join('') || '<div class="empty">L\'activité des incidents apparaîtra ici.</div>';
+}
+function setIncStatus(i,s){
+  const inc=S.incidents[i]; if(!inc||inc.statut===s) return;
+  inc.statut=s; inc.st=INC_STATUTS[s].label;
+  incLog(inc, 'Statut : '+INC_STATUTS[s].label, s);
+  save(); toast('Statut mis à jour : '+INC_STATUTS[s].label);
+}
+function deleteIncident(i){
+  const inc=S.incidents[i]; if(!inc) return;
+  if(!confirm('Supprimer l\'incident « '+inc.titre+' » ?')) return;
+  S.incidents.splice(i,1); save(); toast('Incident supprimé.');
+}
+
+/* ── MODAL DÉCLARATION D'INCIDENT ── */
+let incType='degat_eaux';
+function openIncModal(){
+  incType='degat_eaux';
+  document.getElementById('incTitre').value='';
+  document.getElementById('incDesc').value='';
+  document.getElementById('incDate').value=_todayISO;
+  document.getElementById('incTypeGrid').innerHTML=INC_TYPES.map(t=>
+    `<div class="type-card${t.k===incType?' sel':''}" data-k="${t.k}" onclick="selectIncType('${t.k}')">
+       <span class="tc-ico">${t.ic}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
+  const sel=document.getElementById('incBien');
+  sel.innerHTML = S.biens.length
+    ? S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')
+    : '<option value="">— Aucun bien disponible —</option>';
+  document.getElementById('incModal').classList.add('open');
+  setTimeout(()=>document.getElementById('incTitre').focus(),60);
+}
+function closeIncModal(){ document.getElementById('incModal').classList.remove('open'); }
+function selectIncType(k){ incType=k; document.querySelectorAll('#incTypeGrid .type-card').forEach(c=>c.classList.toggle('sel',c.dataset.k===k)); }
+function saveIncident(){
+  const titre=document.getElementById('incTitre').value.trim();
+  if(!titre){ toast('Décrivez l\'incident.'); document.getElementById('incTitre').focus(); return; }
+  const bien=document.getElementById('incBien').value;
+  if(!bien){ toast('Sélectionnez le bien concerné.'); return; }
+  const desc=document.getElementById('incDesc').value.trim();
+  const date=document.getElementById('incDate').value||_todayISO;
+  const me=meCoi(); const by = me ? (me.n||'').replace(/\s*\(vous\)/i,'').trim() : 'Vous';
+  const inc={titre, desc, cat:incType, ic:incTypeIcon(incType), bien, statut:'declare', st:'Déclaré', date, by};
+  S.incidents.unshift(inc);
+  incLog(inc, 'Incident déclaré', 'declare');
+  closeIncModal(); save(); toast('🔔 Incident déclaré.');
 }
 
 /* ━━━━ ACTIONS ━━━━ */
@@ -2534,10 +2727,8 @@ function addEvent(){ openEventModal(); }
 function addTransaction(){ openTxModal(); }
 /* alias de compatibilité → ouvre le modal */
 function addInventaire(){ openInvModal(); }
-function addIncident(){
-  const t=prompt('Description de l\'incident :','');if(!t)return;
-  S.incidents.unshift({titre:t,meta:'Signalé à l\'instant',st:'Ouvert',ic:'⚠️',stCls:'pill-warn'});save();toast('Incident déclaré.');
-}
+/* alias de compatibilité → ouvre le modal */
+function addIncident(){ openIncModal(); }
 function addBienOnMap(){go('carte');setTimeout(()=>{placing=true;if(map)map.getContainer().style.cursor='crosshair';toast('Cliquez sur la carte pour placer le bien.');},150);}
 
 /* ━━━━ DOCUMENTS DROP ━━━━ */
