@@ -1308,6 +1308,31 @@ function loadGroupes(){
   return defaultGroupes();
 }
 
+/* Restauration des données de démo (régénère groupes/biens/budget/planning…)
+   tout en conservant les biens ajoutés via le simulateur.
+   Déclenché par ?restore=demo */
+function restoreDemoData(){
+  let salvaged=[];
+  try{
+    const raw=ssGet(GROUPES_KEY);
+    if(raw){ const g=JSON.parse(raw);
+      Object.values(g||{}).forEach(grp=>{ (grp&&grp.biens||[]).forEach(b=>{ if(b && b.info==='Ajouté depuis le simulateur') salvaged.push(b); }); });
+    }
+  }catch(e){}
+  const demo=defaultGroupes();
+  if(salvaged.length){
+    const k=Object.keys(demo)[0];
+    salvaged.forEach(b=>{ if(!demo[k].biens.some(x=>x.nom===b.nom)) demo[k].biens.push(b); });
+  }
+  ssSet(GROUPES_KEY, JSON.stringify(demo));
+  ssSet(ACTIVE_KEY, Object.keys(demo)[0]);
+}
+if(location.search.indexOf('restore=demo')>-1){
+  restoreDemoData();
+  /* on retire le paramètre puis on recharge proprement */
+  location.replace(location.pathname);
+}
+
 let GROUPES = loadGroupes();
 let activeId = (function(){ try{ const a=ssGet(ACTIVE_KEY); if(a && GROUPES[a]) return a; }catch(e){} return Object.keys(GROUPES)[0]; })();
 let S = GROUPES[activeId];
