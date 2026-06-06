@@ -417,6 +417,43 @@ a { color: inherit; text-decoration: none; }
 /* Graphique de répartition du tableau de bord */
 .dash-chart { justify-content: center; padding: 6px 0 2px; min-height: 150px; }
 .dash-chart .legend { font-size: .8rem; }
+
+/* ── WIZARD AJOUT D'UN BIEN ── */
+.modal-wizard { max-width: 480px; }
+.wiz-progress { padding: 14px 22px 0; }
+.wiz-steps { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.wiz-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.wiz-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--gris-clair); border: 1.5px solid var(--gris-bord); color: var(--texte-doux); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; transition: .2s; }
+.wiz-lbl { font-size: .66rem; font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--texte-doux); transition: .2s; }
+.wiz-step.active .wiz-dot { background: var(--navy); border-color: var(--navy); color: #fff; }
+.wiz-step.done .wiz-dot { background: var(--teal); border-color: var(--teal); color: #fff; }
+.wiz-step.active .wiz-lbl, .wiz-step.done .wiz-lbl { color: var(--navy); }
+.wiz-bar { height: 5px; background: var(--gris-clair); border-radius: 3px; overflow: hidden; }
+.wiz-bar-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--accent)); border-radius: 3px; width: 25%; transition: width .3s cubic-bezier(.2,.7,.2,1); }
+.wiz-pane { animation: modalFade .25s ease; }
+.wiz-q { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; color: var(--navy); margin-bottom: 12px; }
+.type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+.type-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px; border: 1.5px solid var(--gris-bord); border-radius: 12px; cursor: pointer; transition: .15s; text-align: center; }
+.type-card:hover { border-color: var(--accent-light); background: var(--gris-clair); transform: translateY(-2px); }
+.type-card.sel { border-color: var(--navy); background: var(--gris-clair); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+.type-card .tc-ico { font-size: 1.7rem; }
+.type-card .tc-lbl { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .74rem; color: var(--navy); }
+.wiz-money { position: relative; }
+.wiz-money input { width: 100%; padding: .8rem 2.2rem .8rem .9rem; border: 1.5px solid var(--gris-bord); border-radius: 10px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--navy); }
+.wiz-money input:focus { outline: none; border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+.wiz-money-cur { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--texte-doux); }
+.wiz-hint { font-size: .78rem; color: var(--texte-doux); line-height: 1.5; background: var(--gris-clair); border-radius: 9px; padding: 10px 12px; margin-top: 4px; }
+.wiz-drop { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 26px 16px; border: 2px dashed var(--gris-mid); border-radius: 13px; cursor: pointer; transition: .18s; background: rgba(44,82,130,.02); text-align: center; }
+.wiz-drop:hover, .wiz-drop.over { border-color: var(--accent-light); background: rgba(44,82,130,.06); }
+.wiz-drop-ico { font-size: 1.9rem; }
+.wiz-drop b { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--navy); font-size: .86rem; }
+.wiz-drop span { font-size: .76rem; color: var(--texte-doux); }
+.wiz-photos { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+.wiz-photo { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 1px solid var(--gris-bord); }
+.wiz-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wiz-photo .wp-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(15,31,61,.7); color: #fff; border: none; cursor: pointer; font-size: 1rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.wiz-foot { justify-content: space-between; }
+.bien-card-cover { height: 120px; border-radius: 11px; background-size: cover; background-position: center; margin-bottom: 12px; background-color: var(--gris-clair); }
 </style>
 </head>
 <body>
@@ -925,6 +962,72 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- MODAL AJOUT D'UN BIEN (wizard multi-étapes) -->
+<div class="modal-overlay" id="bienModal" onclick="if(event.target===this)closeBienModal()">
+  <div class="modal modal-wizard">
+    <div class="modal-head">
+      <h3 id="bienModalTitle">Ajouter un bien</h3>
+      <button class="modal-close" onclick="closeBienModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="wiz-progress">
+      <div class="wiz-steps" id="wizSteps">
+        <div class="wiz-step"><span class="wiz-dot">1</span><span class="wiz-lbl">Type</span></div>
+        <div class="wiz-step"><span class="wiz-dot">2</span><span class="wiz-lbl">Localisation</span></div>
+        <div class="wiz-step"><span class="wiz-dot">3</span><span class="wiz-lbl">Valeur</span></div>
+        <div class="wiz-step"><span class="wiz-dot">4</span><span class="wiz-lbl">Photos</span></div>
+      </div>
+      <div class="wiz-bar"><div class="wiz-bar-fill" id="wizBarFill"></div></div>
+    </div>
+    <div class="modal-body">
+      <div class="wiz-pane" data-step="1">
+        <div class="wiz-q">Quel type de bien souhaitez-vous ajouter ?</div>
+        <div class="type-grid" id="bienTypeGrid"></div>
+      </div>
+      <div class="wiz-pane" data-step="2" hidden>
+        <div class="modal-field">
+          <label>Nom du bien</label>
+          <input type="text" id="bienNom" placeholder="Ex : Maison familiale" autocomplete="off">
+        </div>
+        <div class="modal-field">
+          <label>Ville / adresse</label>
+          <input type="text" id="bienVille" placeholder="Ex : 74000 Annecy" autocomplete="off">
+        </div>
+        <div class="modal-field">
+          <label>Surface <span style="font-weight:400;color:var(--texte-doux)">(option.)</span></label>
+          <div style="position:relative">
+            <input type="number" id="bienSurface" min="0" placeholder="120" style="width:100%;padding:.65rem 2.1rem .65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:9px;font-family:'Open Sans',sans-serif;font-size:.9rem">
+            <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.82rem">m²</span>
+          </div>
+        </div>
+      </div>
+      <div class="wiz-pane" data-step="3" hidden>
+        <div class="modal-field">
+          <label>Valeur estimée du bien</label>
+          <div class="wiz-money">
+            <input type="text" id="bienVal" inputmode="numeric" placeholder="320 000" autocomplete="off" oninput="formatBienVal(this)">
+            <span class="wiz-money-cur">€</span>
+          </div>
+        </div>
+        <div class="wiz-hint">💡 Pas sûr de la valeur ? Vous pourrez la modifier plus tard, ou lancer une simulation d'estimation depuis l'onglet Simulations.</div>
+      </div>
+      <div class="wiz-pane" data-step="4" hidden>
+        <div class="wiz-q">Ajoutez des photos du bien <span style="font-weight:400;color:var(--texte-doux);font-size:.8rem">(facultatif)</span></div>
+        <label class="wiz-drop" for="bienPhotoInput" id="bienDrop">
+          <div class="wiz-drop-ico">📷</div>
+          <b>Cliquez pour ajouter des photos</b>
+          <span>ou glissez-déposez vos images ici</span>
+        </label>
+        <input type="file" id="bienPhotoInput" accept="image/*" multiple hidden onchange="handleBienPhotos(this.files);this.value=''">
+        <div class="wiz-photos" id="bienPhotos"></div>
+      </div>
+      <div class="modal-foot wiz-foot">
+        <button class="btn btn-ghost" id="wizPrev" onclick="wizPrev()">Précédent</button>
+        <button class="btn" id="wizNext" onclick="wizNext()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━━ AUTH ━━━━ */
 const STATE_KEY = 'divimo_state';
@@ -1303,8 +1406,11 @@ function renderPortfolio(){
     const parts = bienParts(b);
     const sum = parts.reduce((a,p)=>a+(+p.pct||0),0);
     const nDocs = S.docs.filter(d=>d.bien===b.nom || d.bien==='__all__').length;
+    const cover = (b.photos && b.photos.length)
+      ? `<div class="bien-card-cover" style="background-image:url('${b.photos[0]}')"></div>`
+      : `<div class="bien-card-ico">${bienIcon(b.type)}</div>`;
     return `<div class="bien-card">
-      <div class="bien-card-ico">🏠</div>
+      ${cover}
       <div class="bien-card-name">${b.nom}</div>
       <div class="bien-card-meta">${b.info}</div>
       <div class="bien-card-val">${b.val}</div>
@@ -1953,16 +2059,110 @@ function renderIncidents(){
 }
 
 /* ━━━━ ACTIONS ━━━━ */
-function addBien(){
-  const nom=prompt('Nom du bien :','');if(!nom)return;
-  const info=prompt('Localisation / description :','')||'';
-  const val=prompt('Valeur estimée :','250 000 €')||'—';
-  const ville=info.toLowerCase();
-  const VILLES={paris:[48.85,2.35],lyon:[45.76,4.84],marseille:[43.30,5.37],annecy:[45.90,6.13],bordeaux:[44.84,-0.58],lille:[50.63,3.06],toulouse:[43.60,1.44],nantes:[47.22,-1.55],nice:[43.71,7.26]};
-  let lat=46.6+(Math.random()-.5)*2,lng=2.4+(Math.random()-.5)*3;
-  for(const v in VILLES){if(ville.includes(v)){lat=VILLES[v][0];lng=VILLES[v][1];break;}}
-  S.biens.push({nom,info,val,lat,lng});save();toast('Bien ajouté.');
+/* ━━━━ WIZARD AJOUT D'UN BIEN ━━━━ */
+const BIEN_TYPES = [
+  {k:'maison',   ic:'🏠', lbl:'Maison'},
+  {k:'appart',   ic:'🏢', lbl:'Appartement'},
+  {k:'terrain',  ic:'🌳', lbl:'Terrain'},
+  {k:'immeuble', ic:'🏬', lbl:'Immeuble'},
+  {k:'local',    ic:'🏪', lbl:'Local pro'},
+  {k:'autre',    ic:'📍', lbl:'Autre'},
+];
+function bienIcon(type){ return (BIEN_TYPES.find(t=>t.k===type)||{}).ic || '🏠'; }
+let wizStep = 1, wizData = {};
+
+/* alias appelé par le bouton "+ Ajouter un bien" */
+function addBien(){ openBienModal(); }
+
+function openBienModal(){
+  wizData = {type:'maison', nom:'', ville:'', surface:'', val:'', photos:[]};
+  document.getElementById('bienTypeGrid').innerHTML = BIEN_TYPES.map(t=>
+    `<div class="type-card${t.k===wizData.type?' sel':''}" data-k="${t.k}" onclick="selectBienType('${t.k}')">
+       <span class="tc-ico">${t.ic}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
+  ['bienNom','bienVille','bienSurface','bienVal'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('bienPhotos').innerHTML='';
+  wizGo(1);
+  document.getElementById('bienModal').classList.add('open');
 }
+function closeBienModal(){ document.getElementById('bienModal').classList.remove('open'); }
+function selectBienType(k){
+  wizData.type=k;
+  document.querySelectorAll('#bienTypeGrid .type-card').forEach(c=>c.classList.toggle('sel',c.dataset.k===k));
+}
+function wizGo(step){
+  wizStep = step;
+  document.querySelectorAll('#bienModal .wiz-pane').forEach(p=>p.hidden = (+p.dataset.step!==step));
+  document.getElementById('wizBarFill').style.width = (step/4*100)+'%';
+  document.querySelectorAll('#wizSteps .wiz-step').forEach((s,i)=>{
+    s.classList.toggle('active', i+1===step);
+    s.classList.toggle('done', i+1<step);
+  });
+  document.getElementById('wizPrev').style.visibility = step===1 ? 'hidden' : 'visible';
+  document.getElementById('wizNext').textContent = step===4 ? 'Créer le bien ✓' : 'Suivant →';
+  const focusId = {2:'bienNom',3:'bienVal'}[step];
+  if(focusId) setTimeout(()=>document.getElementById(focusId)?.focus(),80);
+}
+function wizPrev(){ if(wizStep>1) wizGo(wizStep-1); }
+function wizNext(){
+  if(wizStep===2){
+    const nom=document.getElementById('bienNom').value.trim();
+    if(!nom){ toast('Donnez un nom au bien.'); return; }
+    wizData.nom=nom;
+    wizData.ville=document.getElementById('bienVille').value.trim();
+    wizData.surface=document.getElementById('bienSurface').value.trim();
+  }
+  if(wizStep===3){ wizData.val=document.getElementById('bienVal').value.trim(); }
+  if(wizStep===4){ saveBien(); return; }
+  wizGo(wizStep+1);
+}
+function formatBienVal(el){
+  const v = el.value.replace(/[^\d]/g,'');
+  el.value = v ? Number(v).toLocaleString('fr-FR').replace(/\s/g,' ') : '';
+}
+/* Photos : downscale via canvas pour tenir dans localStorage, max 6 */
+function handleBienPhotos(files){
+  [...files].forEach(f=>{
+    if(!f.type.startsWith('image/')) return;
+    if(wizData.photos.length>=6){ toast('6 photos maximum.'); return; }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=900, scale=Math.min(1,max/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        wizData.photos.push(c.toDataURL('image/jpeg',0.72));
+        renderWizPhotos();
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function renderWizPhotos(){
+  document.getElementById('bienPhotos').innerHTML = wizData.photos.map((src,i)=>
+    `<div class="wiz-photo"><img src="${src}" alt=""><button class="wp-del" onclick="wizData.photos.splice(${i},1);renderWizPhotos()" title="Retirer">×</button></div>`).join('');
+}
+function saveBien(){
+  const VILLES={paris:[48.85,2.35],lyon:[45.76,4.84],marseille:[43.30,5.37],annecy:[45.90,6.13],bordeaux:[44.84,-0.58],lille:[50.63,3.06],toulouse:[43.60,1.44],nantes:[47.22,-1.55],nice:[43.71,7.26],strasbourg:[48.58,7.75],montpellier:[43.61,3.88],rennes:[48.11,-1.68]};
+  const ville=(wizData.ville||'').toLowerCase();
+  let lat=46.6+(Math.random()-.5)*2,lng=2.4+(Math.random()-.5)*3;
+  for(const v in VILLES){ if(ville.includes(v)){ lat=VILLES[v][0]; lng=VILLES[v][1]; break; } }
+  const surf = wizData.surface ? (' · '+wizData.surface+' m²') : '';
+  const info = (wizData.ville || 'Localisation non précisée')+surf;
+  const digits=(wizData.val||'').replace(/[^\d]/g,'');
+  const val = digits ? (Number(digits).toLocaleString('fr-FR').replace(/\s/g,' ')+' €') : '—';
+  S.biens.push({ nom:wizData.nom, info, val, type:wizData.type, surface:wizData.surface, photos:wizData.photos, lat, lng });
+  save(); closeBienModal(); toast('Bien ajouté ✓'); go('portfolio');
+}
+/* Drag & drop sur la zone photo du wizard */
+(function(){
+  const drop=document.getElementById('bienDrop'); if(!drop) return;
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');handleBienPhotos(e.dataTransfer.files);});
+})();
 function addEstim(){
   const t=prompt('Titre :','');if(!t)return;
   const d=prompt('Résultat :','')||'—';
