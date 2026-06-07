@@ -471,7 +471,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <div><label>Taux du droit</label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-taux" value="2.5" oninput="rcCompute()"><span class="sfx">%</span></div></div>
         </div>
         <p class="note" id="rc-regime-note">Succession, divorce, indivision familiale → droit de partage 2,5 % sur l'actif net.</p>
-        <div class="field"><label>Frais de notaire <span class="hint">(émoluments + débours + CSI)</span></label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-frais" value="0" oninput="rcCompute()" disabled><span class="sfx">%</span></div><label class="rc-check"><input type="checkbox" id="rc-frais-auto" checked onchange="rcFraisAutoToggle()"> Calcul automatique (barème). Décochez pour saisir un %.</label></div>
+        <div class="field"><label>Honoraires du notaire <span class="hint">(barème officiel, modifiable)</span></label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-frais" value="0" oninput="rcCompute()" disabled><span class="sfx">%</span></div><label class="rc-check"><input type="checkbox" id="rc-frais-auto" checked onchange="rcFraisAutoToggle()"> Calcul automatique (barème). Décochez pour saisir un %.</label></div>
         <div class="field"><label>Indivisaires <span class="hint">— nom, % et rôle</span></label><div id="rc-rows"></div><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><div id="rc-sum"></div></div>
         <label class="rc-check"><input type="checkbox" id="rc-fees-buyer" checked onchange="rcCompute()"> Frais et droits à la charge des acheteurs</label>
       </div>
@@ -1147,12 +1147,11 @@ function rcCompute(){
 
     <div class="res-card">
       <div class="res-line"><span>Soulte (parts rachetées)</span><b>${euro(soulteTotal)}</b></div>
-      <div class="res-line"><span>${droitLabel}</span><b>${euro(droit)}</b></div>
-      <div class="res-line"><span>Frais de notaire <span class="hint">(${fraisPct.toLocaleString('fr-FR',{maximumFractionDigits:2})} % · émol. + débours + CSI)</span></span><b>${euro(fraisNotaire)}</b></div>
+      <div class="res-line"><span>Frais de notaire <span class="hint">(tout compris)</span></span><b>${euro(droit+fraisNotaire)}</b></div>
       <div class="res-line tot"><span>Coût total de l'opération</span><b>${euro(coutTotal)}</b></div>
     </div>
 
-    <div class="res-note"><b>Hypothèses :</b> ${fraisAuto?('frais calculés au barème réglementé des émoluments '+(regime==='partage'?'de partage (4,931 / 2,034 / 1,356 / 1,017 %)':'de vente (3,870 / 1,596 / 1,064 / 0,799 %)')+' + TVA 20 %, CSI 0,10 %, débours 400 €'):'frais de notaire saisis manuellement ('+fraisPct.toLocaleString('fr-FR')+' %)'}. Droit au taux saisi (${tauxPct.toLocaleString('fr-FR')} %) sur ${regime==='partage'?"l'actif net partagé":'la valeur des parts cédées'}. Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts au prorata de leurs quote-parts. Résultat indicatif — à confirmer avec votre notaire.</div>
+    <div class="res-note"><b>Frais de notaire, tout compris.</b> Ce montant réunit en une seule fois les honoraires du notaire (calculés sur un barème officiel), la TVA, les petites taxes obligatoires et les frais de dossier, plus l'impôt versé à l'État sur l'opération. ${regime==='partage' ? "Votre cas est un partage familial, par exemple une succession, un divorce ou une indivision de famille. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur nette du bien, c'est à dire après déduction du crédit." : "Votre cas est une licitation ou une cession hors cadre familial. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur des parts vendues."} Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts selon leurs quote-parts. Estimation indicative, à confirmer avec votre notaire.</div>
     <button class="btn pdf-btn" onclick="rcSaveToEspace()" style="background:var(--navy);color:#fff;margin-top:10px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
     <button class="btn pdf-btn" onclick="window.print()">Télécharger en PDF</button>`;
 }
