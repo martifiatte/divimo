@@ -979,7 +979,7 @@ function refreshAllBienSelects(){
   fillBienSelect('rc-load','rc-load-wrap'); fillBienSelect('p-load','p-load-wrap'); fillBienSelect('e-load','e-load-wrap');
   refreshNomList('rc-nom-list'); refreshNomList('p-nom-list'); refreshNomList('e-nom-list');
 }
-function saveBienToEspace(nom, valNum, parts){
+function saveBienToEspace(nom, valNum, parts, sim){
   let groups=divimoGroups(); let active;
   if(groups && Object.keys(groups).length){
     active=localStorage.getItem('divimo_active'); if(!active || !groups[active]) active=Object.keys(groups)[0];
@@ -995,12 +995,16 @@ function saveBienToEspace(nom, valNum, parts){
   const bien={nom, info:'Ajouté depuis le simulateur', val, parts:parts||[]};
   if(ex>-1) groups[active].biens[ex]=Object.assign({}, groups[active].biens[ex], bien);
   else groups[active].biens.push(bien);
+  if(sim){
+    if(!groups[active].estim) groups[active].estim=[];
+    groups[active].estim.unshift({type:sim.type, titre:sim.titre, detail:sim.detail, bien:nom, date:new Date().toISOString(), nouveau:(ex<0)});
+  }
   try{
     localStorage.setItem('divimo_groupes', JSON.stringify(groups));
     if(!localStorage.getItem('divimo_active')) localStorage.setItem('divimo_active', active);
   }catch(e){ simToast('Stockage plein — impossible d\'enregistrer.'); return false; }
   refreshAllBienSelects();
-  simToast((ex>-1?'« '+nom+' » mis à jour':'« '+nom+' » enregistré')+' dans votre espace ✓');
+  simToast((ex>-1?'« '+nom+' » mis à jour':'« '+nom+' » enregistré')+(sim?' · ajouté à vos simulations ✓':' dans votre espace ✓'));
   return true;
 }
 
@@ -1031,7 +1035,8 @@ function pLoadBien(){
 }
 function pSave(){
   const parts=coi.filter(m=>(+m.p||0)>0).map(m=>({ini:initiales(m.n), name:m.n||'—', pct:+m.p||0}));
-  saveBienToEspace(document.getElementById('p-nom').value, +document.getElementById('p-val').value||0, parts);
+  const V=+document.getElementById('p-val').value||0;
+  saveBienToEspace(document.getElementById('p-nom').value, V, parts, {type:'parts', titre:'Calcul des parts', detail:'Valeur '+euro(V)+' · '+parts.length+' indivisaire(s)'});
 }
 
 /* Estimer son bien */
@@ -1047,7 +1052,7 @@ function eLoadBien(){
 }
 function eSave(){
   if(!_estMid){ simToast('Lancez d\'abord une estimation (choisissez une commune).'); return; }
-  saveBienToEspace(document.getElementById('e-nom').value, _estMid, []);
+  saveBienToEspace(document.getElementById('e-nom').value, _estMid, [], {type:'estimation', titre:'Estimation', detail:'Valeur estimée '+euro(_estMid)});
 }
 function rcRegimeChange(){
   const r=document.getElementById('rc-regime').value;
@@ -1077,7 +1082,9 @@ function simToast(msg){
 /* Enregistrer le bien simulé dans l'espace personnel (localStorage) */
 function rcSaveToEspace(){
   const parts=rcoi.filter(m=>(+m.p||0)>0).map(m=>({ini:initiales(m.n), name:m.n||'—', pct:+m.p||0}));
-  saveBienToEspace(document.getElementById('rc-nom').value, +document.getElementById('rc-val').value||0, parts);
+  const L=window._rcLast||{}; 
+  const detail = (L.cout!=null) ? ('Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte)) : 'Vente / rachat de parts';
+  saveBienToEspace(document.getElementById('rc-nom').value, +document.getElementById('rc-val').value||0, parts, {type:'vente', titre:'Vente / rachat de parts', detail:detail});
 }
 function rcCompute(){
   const V=+document.getElementById('rc-val').value||0;
@@ -1117,6 +1124,7 @@ function rcCompute(){
     fraisNotaire=fraisPct/100*valBrutCed;
   }
   const coutTotal=soulteTotal+droit+fraisNotaire;
+  window._rcLast={cout:coutTotal, soulte:soulteTotal, frac:fracCed};
   /* Cédants : chacun reçoit sa part nette */
   const perCeder=ceders.map(m=>({n:m.n||'—', p:+m.p||0, montant:actifNet*(+m.p||0)/sum}));
   /* Acheteurs : se répartissent les parts cédées au prorata de leurs parts actuelles */
