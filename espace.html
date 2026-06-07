@@ -600,19 +600,19 @@ a { color: inherit; text-decoration: none; }
     <!-- TABLEAU DE BORD -->
     <div class="view active" id="v-dash">
       <div class="page-head">
-        <div><h1 id="greet">Bonjour 👋</h1><p>Voici un résumé de votre patrimoine en indivision.</p></div>
+        <div><h1 id="greet">Bonjour</h1><p>Voici un résumé de votre patrimoine en indivision.</p></div>
         <button class="btn btn-sm" onclick="go('portfolio')">Voir mon patrimoine →</button>
       </div>
       <div class="banner">
-        <span style="font-size:1.4rem">🏛</span>
+        <span style="display:inline-flex"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h.01M12 7h.01M16 7h.01M8 11h.01M12 11h.01M16 11h.01"/></svg></span>
         <div><b id="bannerTitle">Accès complet activé</b><p>Tous les outils Divimo sont disponibles sur votre compte.</p></div>
         <button class="btn-banner" onclick="go('estim')">Lancer une simulation</button>
       </div>
       <div class="stats">
-        <button type="button" class="stat stat-nav" onclick="go('portfolio')" title="Voir mon patrimoine"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="kBiens">—</div><div class="sl">Bien(s) <span class="stat-go">→</span></div></button>
-        <button type="button" class="stat stat-nav" onclick="go('coi')" title="Voir les co-indivisaires"><div class="ic" style="background:rgba(44,82,130,.1)">👥</div><div class="sv" id="kCoi">—</div><div class="sl">Co-indivisaires <span class="stat-go">→</span></div></button>
-        <button type="button" class="stat stat-nav" onclick="go('docs')" title="Voir les documents"><div class="ic" style="background:rgba(45,106,106,.1)">📄</div><div class="sv" id="kDocs">—</div><div class="sl">Documents <span class="stat-go">→</span></div></button>
-        <button type="button" class="stat stat-nav" onclick="go('estim')" title="Voir les simulations"><div class="ic" style="background:rgba(74,127,181,.12)">📊</div><div class="sv" id="kEstim">—</div><div class="sl">Simulations <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('portfolio')" title="Voir mon patrimoine"><div class="ic" style="background:rgba(15,31,61,.07)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div><div class="sv" id="kBiens">—</div><div class="sl">Bien(s) <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('coi')" title="Voir les co-indivisaires"><div class="ic" style="background:rgba(44,82,130,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="sv" id="kCoi">—</div><div class="sl">Co-indivisaires <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('docs')" title="Voir les documents"><div class="ic" style="background:rgba(45,106,106,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="sv" id="kDocs">—</div><div class="sl">Documents <span class="stat-go">→</span></div></button>
+        <button type="button" class="stat stat-nav" onclick="go('estim')" title="Voir les simulations"><div class="ic" style="background:rgba(74,127,181,.12)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg></div><div class="sv" id="kEstim">—</div><div class="sl">Simulations <span class="stat-go">→</span></div></button>
       </div>
       <div class="cols2">
         <div class="card">
@@ -642,10 +642,10 @@ a { color: inherit; text-decoration: none; }
         <button class="btn" onclick="addBien()">+ Ajouter un bien</button>
       </div>
       <div class="stats">
-        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">🏠</div><div class="sv" id="ptBiens">—</div><div class="sl">Biens</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">💰</div><div class="sv" id="ptValeur">—</div><div class="sl">Valeur totale</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">👥</div><div class="sv" id="ptCoi">—</div><div class="sl">Co-indivisaires</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">📄</div><div class="sv" id="ptDocs">—</div><div class="sl">Documents</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div><div class="sv" id="ptBiens">—</div><div class="sl">Biens</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M17 6.5a7.5 7.5 0 1 0 0 11"/><path d="M4 10.5h10M4 13.5h10"/></svg></div><div class="sv" id="ptValeur">—</div><div class="sl">Valeur totale</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="sv" id="ptCoi">—</div><div class="sl">Co-indivisaires</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="sv" id="ptDocs">—</div><div class="sl">Documents</div></div>
       </div>
       <div class="portfolio-grid" id="portfolioGrid"></div>
     </div>
@@ -654,7 +654,7 @@ a { color: inherit; text-decoration: none; }
     <div class="view" id="v-carte">
       <div class="page-head">
         <div><h1>Carte des biens</h1><p>Localisation de vos biens en indivision.</p></div>
-        <button class="btn btn-sm" onclick="addBienOnMap()">📍 Placer un bien</button>
+        <button class="btn btn-sm" onclick="addBienOnMap()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Placer un bien</button>
       </div>
       <div class="card"><div id="map"></div></div>
     </div>
@@ -832,7 +832,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="card" style="background:linear-gradient(135deg,rgba(44,82,130,.05),rgba(45,106,106,.05));border-color:rgba(44,82,130,.18)">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="font-size:1.6rem">🔗</div>
+          <div style="display:flex;justify-content:center;margin-bottom:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div>
           <div style="flex:1;min-width:200px">
             <div class="card-title" style="margin-bottom:2px">Espace partagé de l'indivision</div>
             <div style="font-size:.82rem;color:var(--texte-doux)">Chaque co-indivisaire accède uniquement à ce que vous activez ci-dessous.</div>
@@ -850,9 +850,9 @@ a { color: inherit; text-decoration: none; }
     <div class="view" id="v-estim">
       <div class="page-head"><div><h1>Simulations</h1><p>Lancez un simulateur ou retrouvez vos résultats enregistrés.</p></div></div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-        <a class="card" href="simulateurs.html" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">🏠</div><div class="card-title" style="font-size:.92rem">Estimer un bien</div></a>
-        <a class="card" href="simulateurs.html#parts" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">📊</div><div class="card-title" style="font-size:.92rem">Calculer les parts</div></a>
-        <a class="card" href="simulateurs.html#vente" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px">🔑</div><div class="card-title" style="font-size:.92rem">Vente & rachat</div></a>
+        <a class="card" href="simulateurs.html" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div><div class="card-title" style="font-size:.92rem">Estimer un bien</div></a>
+        <a class="card" href="simulateurs.html#parts" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg></div><div class="card-title" style="font-size:.92rem">Calculer les parts</div></a>
+        <a class="card" href="simulateurs.html#vente" style="cursor:pointer;transition:.22s;text-align:center;padding:22px" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--gris-bord)'"><div style="font-size:1.6rem;margin-bottom:10px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5L20 3M16 7l3 3"/></svg></div><div class="card-title" style="font-size:.92rem">Vente & rachat</div></a>
       </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Simulations enregistrées</div><button class="btn btn-ghost btn-sm" onclick="addEstim()">+ Enregistrer</button></div>
@@ -888,7 +888,7 @@ a { color: inherit; text-decoration: none; }
       <div class="card" style="max-width:560px">
         <div class="card-title">Formule</div>
         <div class="card-sub">Votre accès actuel.</div>
-        <div class="row-item"><div class="r-ic" style="background:rgba(44,82,130,.1)">⭐</div><div><b>Accès complet</b><span>Tous les modules inclus</span></div><span class="pill pill-info">Actif</span></div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(44,82,130,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M20 6L9 17l-5-5"/></svg></div><div><b>Accès complet</b><span>Tous les modules inclus</span></div><span class="pill pill-info">Actif</span></div>
       </div>
     </div>
 
@@ -900,24 +900,24 @@ a { color: inherit; text-decoration: none; }
         <div class="card-sub">Vous êtes connecté en tant qu'administrateur de Divimo.</div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)">👥</div><div class="sv" id="admin-users">—</div><div class="sl">Utilisateurs inscrits</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)">📅</div><div class="sv" id="admin-today">—</div><div class="sl">Inscrits aujourd'hui</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)">✅</div><div class="sv" id="admin-confirmed">—</div><div class="sl">Confirmés</div></div>
-        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)">🔐</div><div class="sv">Admin</div><div class="sl">Votre rôle</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(15,31,61,.07)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="sv" id="admin-users">—</div><div class="sl">Utilisateurs inscrits</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(44,82,130,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="sv" id="admin-today">—</div><div class="sl">Inscrits aujourd'hui</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(45,106,106,.1)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sv" id="admin-confirmed">—</div><div class="sl">Confirmés</div></div>
+        <div class="stat"><div class="ic" style="background:rgba(74,127,181,.12)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="sv">Admin</div><div class="sl">Votre rôle</div></div>
       </div>
       <div class="card">
         <div class="card-head">
           <div><div class="card-title">Utilisateurs inscrits</div></div>
           <button class="btn btn-ghost btn-sm" onclick="loadAdminData()" id="admin-refresh-btn">↻ Actualiser</button>
         </div>
-        <div id="admin-user-list"><div class="empty"><div class="empty-ic">👥</div>Chargement…</div></div>
+        <div id="admin-user-list"><div class="empty"><div class="empty-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>Chargement…</div></div>
       </div>
       <div class="card admin-links">
         <div class="card-title">Liens rapides</div>
         <div class="card-sub">Accès direct aux outils de gestion.</div>
-        <div class="row-item"><div class="r-ic" style="background:rgba(15,31,61,.07)">🗄</div><div><b>Supabase</b><span>Base de données, utilisateurs, logs</span></div><a href="https://supabase.com/dashboard/project/anrwoxsibhabivtkepqt" target="_blank" class="mini-link">Ouvrir →</a></div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(15,31,61,.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg></div><div><b>Supabase</b><span>Base de données, utilisateurs, logs</span></div><a href="https://supabase.com/dashboard/project/anrwoxsibhabivtkepqt" target="_blank" class="mini-link">Ouvrir →</a></div>
         <div class="row-item"><div class="r-ic" style="background:rgba(44,82,130,.1)">▲</div><div><b>Vercel</b><span>Déploiements, analytics</span></div><a href="https://vercel.com/martifiatte-2970s-projects/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
-        <div class="row-item"><div class="r-ic" style="background:rgba(45,106,106,.1)">🐙</div><div><b>GitHub</b><span>Code source, branches</span></div><a href="https://github.com/martifiatte/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
+        <div class="row-item"><div class="r-ic" style="background:rgba(45,106,106,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div><div><b>GitHub</b><span>Code source, branches</span></div><a href="https://github.com/martifiatte/divimo" target="_blank" class="mini-link">Ouvrir →</a></div>
       </div>
     </div>
 
@@ -1107,12 +1107,12 @@ a { color: inherit; text-decoration: none; }
             <span class="wiz-money-cur">€</span>
           </div>
         </div>
-        <div class="wiz-hint">💡 Pas sûr de la valeur ? Vous pourrez la modifier plus tard, ou lancer une simulation d'estimation depuis l'onglet Simulations.</div>
+        <div class="wiz-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M9 18h6M10 22h4M8 14a7 7 0 1 1 8 0c-.6.5-1 1.3-1 2.1V18H9v-1.9c0-.8-.4-1.6-1-2.1z"/></svg> Pas sûr de la valeur ? Vous pourrez la modifier plus tard, ou lancer une simulation d'estimation depuis l'onglet Simulations.</div>
       </div>
       <div class="wiz-pane" data-step="4" hidden>
         <div class="wiz-q">Ajoutez des photos du bien <span style="font-weight:400;color:var(--texte-doux);font-size:.8rem">(facultatif)</span></div>
         <label class="wiz-drop" for="bienPhotoInput" id="bienDrop">
-          <div class="wiz-drop-ico">📷</div>
+          <div class="wiz-drop-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
           <b>Cliquez pour ajouter des photos</b>
           <span>ou glissez-déposez vos images ici</span>
         </label>
@@ -1229,7 +1229,7 @@ function applyUser(user){
   const isAdmin = m.role === 'admin';
 
   /* Le header est géré par header-auth.js — on met à jour uniquement l'intérieur */
-  document.getElementById('greet').textContent = 'Bonjour, ' + name + ' 👋';
+  document.getElementById('greet').textContent = 'Bonjour, ' + name;
   const profilAv = document.getElementById('profilAv');
   if(profilAv) profilAv.textContent = initials;
   const profilName = document.getElementById('profilName');
@@ -1281,10 +1281,10 @@ const DEFAULT = {
      parts:[{ini:'MF',name:'Marti',pct:50},{ini:'PD',name:'Paul',pct:50}]},
   ],
   docs:[
-    {name:'Acte notarié.pdf',meta:'Marie · 2,4 Mo',ic:'📄',bien:'Maison familiale — Annecy'},
-    {name:'Factures travaux 2025',meta:'8 fichiers',ic:'🧾',bien:'Maison familiale — Annecy'},
-    {name:'Relevé de charges.xlsx',meta:'Hier',ic:'📊',bien:'__all__'},
-    {name:'Règlement copropriété.pdf',meta:'Lyon · 1,1 Mo',ic:'📕',bien:'Appartement — Lyon'},
+    {name:'Acte notarié.pdf',meta:'Marie · 2,4 Mo',ic:'file',bien:'Maison familiale — Annecy'},
+    {name:'Factures travaux 2025',meta:'8 fichiers',ic:'receipt',bien:'Maison familiale — Annecy'},
+    {name:'Relevé de charges.xlsx',meta:'Hier',ic:'spreadsheet',bien:'__all__'},
+    {name:'Règlement copropriété.pdf',meta:'Lyon · 1,1 Mo',ic:'book',bien:'Appartement — Lyon'},
   ],
   coi:[{n:'Marti (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'pill-ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'pill-warn'}],
   estim:[],rdv:[],
@@ -1304,16 +1304,16 @@ const DEFAULT = {
     {desc:'Assurance habitation',cat:'assurance',bien:'Maison Annecy',montant:-420,date:'2026-03-12'},
   ],
   inventaire:[
-    {nom:'Canapé 3 places',val:'800 €',ic:'🛋',bien:'Maison familiale — Annecy'},
-    {nom:'Table de jardin',val:'320 €',ic:'🌿',bien:'Maison familiale — Annecy'},
-    {nom:'Lit king size',val:'1 200 €',ic:'🛏',bien:'Maison familiale — Annecy'},
-    {nom:'Télévision 65"',val:'900 €',ic:'📺',bien:'Appartement — Lyon'},
-    {nom:'Réfrigérateur',val:'650 €',ic:'🧊',bien:'Appartement — Lyon'},
-    {nom:'Lave-linge',val:'480 €',ic:'🫧',bien:'Appartement — Lyon'},
+    {nom:'Canapé 3 places',val:'800 €',ic:'sofa',bien:'Maison familiale — Annecy'},
+    {nom:'Table de jardin',val:'320 €',ic:'tree',bien:'Maison familiale — Annecy'},
+    {nom:'Lit king size',val:'1 200 €',ic:'bed',bien:'Maison familiale — Annecy'},
+    {nom:'Télévision 65"',val:'900 €',ic:'tv',bien:'Appartement — Lyon'},
+    {nom:'Réfrigérateur',val:'650 €',ic:'fridge',bien:'Appartement — Lyon'},
+    {nom:'Lave-linge',val:'480 €',ic:'washer',bien:'Appartement — Lyon'},
   ],
   incidents:[
-    {titre:'Fuite au sous-sol', desc:'Infiltration repérée près de la chaudière.', cat:'degat_eaux', ic:'💧', bien:'Maison familiale — Annecy', statut:'encours', date:'2026-03-12', by:'Paul'},
-    {titre:'Gouttière endommagée', desc:'Gouttière arrachée côté jardin après la tempête.', cat:'toiture', ic:'🏚', bien:'Maison familiale — Annecy', statut:'resolu', date:'2026-01-05', by:'Marti'},
+    {titre:'Fuite au sous-sol', desc:'Infiltration repérée près de la chaudière.', cat:'degat_eaux', ic:'drop', bien:'Maison familiale — Annecy', statut:'encours', date:'2026-03-12', by:'Paul'},
+    {titre:'Gouttière endommagée', desc:'Gouttière arrachée côté jardin après la tempête.', cat:'toiture', ic:'building', bien:'Maison familiale — Annecy', statut:'resolu', date:'2026-01-05', by:'Marti'},
   ],
   incidentsLog:[],
   /* Accès partagés : qui peut voir quoi (le propriétaire/admin a tout) */
@@ -1336,8 +1336,8 @@ const DEFAULT_GROUPE_2 = {
      parts:[{ini:'MF',name:'Marti',pct:34},{ini:'SG',name:'Sophie',pct:33},{ini:'KR',name:'Karim',pct:33}]},
   ],
   docs:[
-    {name:'Statuts SCI.pdf',meta:'2,0 Mo',ic:'📜',bien:'__all__'},
-    {name:'Bail commercial.pdf',meta:'Villa Marseille',ic:'📄',bien:'Villa — Marseille 8e'},
+    {name:'Statuts SCI.pdf',meta:'2,0 Mo',ic:'book',bien:'__all__'},
+    {name:'Bail commercial.pdf',meta:'Villa Marseille',ic:'file',bien:'Villa — Marseille 8e'},
   ],
   coi:[
     {n:'Marti (vous)',r:'34% · Gérant',ini:'MF',st:'Actif',cls:'pill-ok'},
@@ -1505,7 +1505,7 @@ function saveGroupModal(){
 }
 
 const PAL=['#2C5282','#2D6A6A','#4A7FB5','#4A9B8E','#1E3A5F','#3D7A7A'];
-const ICONS=['📄','🧾','📊','📑','🖼️'];
+const ICONS=['file','receipt','spreadsheet','clipboard','image'];
 
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
@@ -1547,7 +1547,7 @@ function renderDashBiens(){
     const pct = part ? (+part.pct||0) : 0;
     const myVal = val*pct/100; myTotal += myVal;
     return `<div class="db-row" onclick="go('portfolio')" title="Voir le détail du bien">
-      <div class="db-ico">🏠</div>
+      <div class="db-ico">${svgIcon('home',18)}</div>
       <div class="db-main">
         <div class="db-name">${b.nom||'Bien'}</div>
         <div class="db-meta">${b.info||''}</div>
@@ -1557,7 +1557,7 @@ function renderDashBiens(){
         <div class="db-share">${pct ? ('ma part '+pct+'% · '+eur(myVal)) : 'pas de part'}</div>
       </div>
     </div>`;
-  }).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien dans cette indivision.</div>';
+  }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('home',24)+'</div>Aucun bien dans cette indivision.</div>';
   el.innerHTML = rows;
   const tv=document.getElementById('dashTotalVal'); if(tv) tv.textContent = eur(total);
   const mv=document.getElementById('dashMyVal');   if(mv) mv.textContent = eur(myTotal);
@@ -1581,7 +1581,7 @@ function renderDashChart(){
   });
   const people = Object.values(map).sort((a,b)=>b.val-a.val);
   if(!people.length || grand<=0){
-    el.innerHTML = '<div class="empty"><div class="empty-ic">📊</div>Ajoutez un bien et ses parts pour voir la répartition.</div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ic">'+svgIcon('chart',24)+'</div>Ajoutez un bien et ses parts pour voir la répartition.</div>';
     return;
   }
   const meIni = (meCoi()||{}).ini;
@@ -1619,7 +1619,7 @@ function renderPortfolio(){
     const nDocs = S.docs.filter(d=>d.bien===b.nom || d.bien==='__all__').length;
     const cover = (b.photos && b.photos.length)
       ? `<div class="bien-card-cover" style="background-image:url('${b.photos[0]}')"></div>`
-      : `<div class="bien-card-ico">${bienIcon(b.type)}</div>`;
+      : `<div class="bien-card-ico">${svgIcon(bienIcon(b.type),22)}</div>`;
     return `<div class="bien-card">
       ${cover}
       <div class="bien-card-name">${b.nom}</div>
@@ -1642,7 +1642,7 @@ function renderPortfolio(){
         Gérer les parts
       </div>
     </div>`;
-  }).join('') || '<div class="empty"><div class="empty-ic">🏠</div>Aucun bien. Ajoutez votre premier bien ci-dessus.</div>';
+  }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('home',24)+'</div>Aucun bien. Ajoutez votre premier bien ci-dessus.</div>';
 }
 
 /* ── MODAL QUOTE-PARTS PAR BIEN ── */
@@ -1692,7 +1692,7 @@ function renderDocs(){
   const up = document.getElementById('docUploadBien');
   if(up){
     const cur = up.value;
-    up.innerHTML = `<option value="__all__">📋 Tous les biens (commun)</option>`
+    up.innerHTML = `<option value="__all__">Tous les biens (commun)</option>`
       + S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('');
     if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur;
   }
@@ -1701,7 +1701,7 @@ function renderDocs(){
   if(fb){
     fb.innerHTML = `<span class="bf-chip${docFilter==='__all_filter__'?' sel':''}" onclick="docFilter='__all_filter__';renderDocs()">Tous</span>`
       + S.biens.map(b=>`<span class="bf-chip${docFilter===b.nom?' sel':''}" onclick="docFilter='${b.nom.replace(/'/g,"\\'")}';renderDocs()">${b.nom.split('—')[0].trim()}</span>`).join('')
-      + `<span class="bf-chip${docFilter==='__all__'?' sel':''}" onclick="docFilter='__all__';renderDocs()">📋 Communs</span>`;
+      + `<span class="bf-chip${docFilter==='__all__'?' sel':''}" onclick="docFilter='__all__';renderDocs()">Communs</span>`;
   }
   const list = S.docs.map((d,i)=>({...d,i})).filter(d=>{
     if(docFilter==='__all_filter__') return true;
@@ -1710,13 +1710,13 @@ function renderDocs(){
   });
   el.innerHTML = list.map(d=>{
     const isAll = d.bien==='__all__';
-    const bienLabel = isAll ? '📋 Tous les biens' : (d.bien? d.bien.split('—')[0].trim() : '—');
+    const bienLabel = isAll ? 'Tous les biens' : (d.bien? d.bien.split('—')[0].trim() : '—');
     return `<div class="row-item">
-      <div class="r-ic" style="background:rgba(44,82,130,.08)">${d.ic||'📄'}</div>
+      <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('file',18)}</div>
       <div style="flex:1;min-width:0"><b>${d.name}</b><span>${d.meta} · <span class="doc-bien-tag ${isAll?'all':''}">${bienLabel}</span></span></div>
       <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="S.docs.splice(${d.i},1);save()">×</span></div>
     </div>`;
-  }).join('') || '<div class="empty"><div class="empty-ic">📁</div>Aucun document pour ce filtre.</div>';
+  }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document pour ce filtre.</div>';
 }
 
 function renderCoi(){
@@ -1732,10 +1732,10 @@ function renderCoi(){
 
 /* ── PARTAGE & ACCÈS ── */
 const SHARE_ITEMS = [
-  {key:'planning',   ico:'📅', label:'Planning'},
-  {key:'documents',  ico:'📁', label:'Documents'},
-  {key:'budget',     ico:'💶', label:'Budget'},
-  {key:'patrimoine', ico:'🏠', label:'Patrimoine'},
+  {key:'planning',   ico:'calendar', label:'Planning'},
+  {key:'documents',  ico:'folder', label:'Documents'},
+  {key:'budget',     ico:'coins', label:'Budget'},
+  {key:'patrimoine', ico:'home', label:'Patrimoine'},
 ];
 function renderSharing(){
   const el = document.getElementById('shareList');
@@ -1757,7 +1757,7 @@ function renderSharing(){
         ${SHARE_ITEMS.map(it=>{
           const on = isOwner ? true : !!conf[it.key];
           return `<div class="share-toggle ${on?'on':''}">
-            <span class="st-ico">${it.ico}</span>
+            <span class="st-ico">${svgIcon(it.ico,18)}</span>
             <span class="st-label">${it.label}</span>
             <button class="tgl ${on?'on':''}" ${isOwner?'disabled':`onclick="toggleShare('${c.n.replace(/'/g,"\\'")}','${it.key}')"`}></button>
           </div>`;
@@ -1784,10 +1784,10 @@ function renderEstim(){
   if(!el) return;
   el.innerHTML = S.estim.map((e,i)=>`
     <div class="row-item">
-      <div class="r-ic" style="background:rgba(44,82,130,.1)">📊</div>
+      <div class="r-ic" style="background:rgba(44,82,130,.1)">${svgIcon('chart',18)}</div>
       <div><b>${e.titre}</b><span>${e.detail}</span></div>
       <div class="row-act"><span class="del" onclick="S.estim.splice(${i},1);save()">×</span></div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">📊</div>Aucune simulation enregistrée.</div>';
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('chart',24)+'</div>Aucune simulation enregistrée.</div>';
 }
 
 function renderRdv(){
@@ -1795,10 +1795,10 @@ function renderRdv(){
   if(!el) return;
   el.innerHTML = S.rdv.map((r,i)=>`
     <div class="row-item">
-      <div class="r-ic" style="background:rgba(45,106,106,.1)">⚖️</div>
+      <div class="r-ic" style="background:rgba(45,106,106,.1)">${svgIcon('scale',18)}</div>
       <div><b>${r.pro}</b><span>${r.when}</span></div>
       <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="S.rdv.splice(${i},1);save()">×</span></div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">⚖️</div>Aucun rendez-vous planifié.</div>';
+    </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun rendez-vous planifié.</div>';
 }
 
 /* ═══════ CALENDRIER ═══════ */
@@ -1832,7 +1832,7 @@ function renderUpcoming(){
     .slice(0,6);
   if(sub) sub.textContent = up.length ? up.length+' à venir' : 'Aucun événement à venir';
   if(!up.length){
-    el.innerHTML = '<div class="cal-side-empty"><div class="ic">🗓️</div>Rien de prévu.</div>';
+    el.innerHTML = '<div class="cal-side-empty"><div class="ic">'+svgIcon('calendar',22)+'</div>Rien de prévu.</div>';
     return;
   }
   const today = new Date(_todayISO+'T00:00:00');
@@ -1907,7 +1907,7 @@ function renderDayPanel(){
   subEl.textContent = evs.length ? evs.length+' événement'+(evs.length>1?'s':'') : 'Aucun événement ce jour';
 
   if(!evs.length){
-    listEl.innerHTML = '<div class="cal-side-empty"><div class="ic">📅</div>Rien de prévu.<br>Ajoutez un événement ci-dessous.</div>';
+    listEl.innerHTML = '<div class="cal-side-empty"><div class="ic">'+svgIcon('calendar',22)+'</div>Rien de prévu.<br>Ajoutez un événement ci-dessous.</div>';
     return;
   }
   listEl.innerHTML = evs.map(e=>{
@@ -1918,8 +1918,8 @@ function renderDayPanel(){
         <div class="cal-ev-title">${e.titre}</div>
         <div class="cal-ev-meta">
           <span class="cal-ev-type" style="background:${t.bg};color:${t.color}">${t.label}</span>
-          ${e.heure?`<span>🕐 ${e.heure}</span>`:''}
-          ${e.lieu?`<span>📍 ${e.lieu}</span>`:''}
+          ${e.heure?`<span>${svgIcon('clock',12)} ${e.heure}</span>`:''}
+          ${e.lieu?`<span>${svgIcon('pin',12)} ${e.lieu}</span>`:''}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:center;flex-shrink:0">
@@ -2037,16 +2037,77 @@ function exportOneICS(idx){
 
 /* ═══════ BUDGET v2 ═══════ */
 const eur = n => (isFinite(n)?Math.round(n).toLocaleString('fr-FR'):'0') + ' €';
-const TX_CATS = {
-  taxe:      {label:'Taxe foncière', ic:'🏛', color:'#2C5282'},
-  travaux:   {label:'Travaux',       ic:'🔧', color:'#C8821E'},
-  copro:     {label:'Charges copro', ic:'🏢', color:'#2D6A6A'},
-  assurance: {label:'Assurance',     ic:'🛡', color:'#7A4FBF'},
-  energie:   {label:'Énergie',       ic:'⚡', color:'#E0843D'},
-  loyer:     {label:'Loyer',         ic:'💰', color:'#19A974'},
-  autre:     {label:'Autre',         ic:'📌', color:'#6B7280'},
+
+/* ── Jeu d'icônes SVG (style trait fin, comme la navigation) ──
+   svgIcon('home') renvoie un <svg>. Si le nom est inconnu (ex : ancienne
+   donnée emoji en localStorage), la valeur est renvoyée telle quelle. */
+const SVG_ICONS = {
+  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  chart:'<path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/>',
+  building:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h.01M12 7h.01M16 7h.01M8 11h.01M12 11h.01M16 11h.01"/>',
+  building2:'<path d="M3 21h18M5 21V8l6-3v16M11 21V11l8-3v13M9 11h.01M9 14h.01M15 12h.01M15 15h.01"/>',
+  shop:'<path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M4 9h16M9 20v-5h6v5"/>',
+  tree:'<path d="M12 22v-5M8.5 17a4.5 4.5 0 0 1-1.4-8.8 5 5 0 0 1 9.8 0A4.5 4.5 0 0 1 15.5 17z"/>',
+  pin:'<path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  coins:'<path d="M17 6.5a7.5 7.5 0 1 0 0 11"/><path d="M4 10.5h10M4 13.5h10"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+  shield:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/>',
+  bolt:'<path d="M13 2L3 14h7l-1 8 10-12h-7z"/>',
+  bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5L20 3M16 7l3 3"/>',
+  bulb:'<path d="M9 18h6M10 22h4M8 14a7 7 0 1 1 8 0c-.6.5-1 1.3-1 2.1V18H9v-1.9c0-.8-.4-1.6-1-2.1z"/>',
+  box:'<path d="M21 16V8l-9-5-9 5v8l9 5z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/>',
+  fire:'<path d="M12 2s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1.5 2.5 2 1 .5-1.5-1-3 1-5.5z"/>',
+  drop:'<path d="M12 2.5S6 9 6 13.5a6 6 0 0 0 12 0C18 9 12 2.5 12 2.5z"/>',
+  clipboard:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+  scale:'<path d="M12 3v18M5 7h14M7 7l-3 6a3 3 0 0 0 6 0L7 7zM17 7l-3 6a3 3 0 0 0 6 0L17 7z"/>',
+  trendup:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  trenddown:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>',
+  hourglass:'<path d="M6 2h12M6 22h12M7 2c0 4 4 5 5 7 1-2 5-3 5-7M7 22c0-4 4-5 5-7 1 2 5 3 5 7"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  code:'<path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>',
+  tv:'<rect x="2" y="6" width="20" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
+  fridge:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 9h12M10 5v1M10 12v3"/>',
+  washer:'<rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 5h.01M11 5h.01"/>',
+  sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M3 11a2 2 0 0 1 2 2v4h14v-4a2 2 0 0 1 2-2M6 21v-4M18 21v-4"/>',
+  bed:'<path d="M3 18v-6h18v6M3 12V7M21 18v-2M7 12V9h4v3"/>',
+  chair:'<path d="M6 19v-7M18 19v-7M5 12h14M7 12V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"/>',
+  desktop:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  shower:'<path d="M4 4h6a4 4 0 0 1 4 4v1M14 9h6M9 14v.5M12 17v.5M15 14v.5M12 20v.5"/>',
+  plate:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+  basket:'<path d="M5 11l2-6M19 11l-2-6M2 11h20l-1.5 8.5a2 2 0 0 1-2 1.5H5.5a2 2 0 0 1-2-1.5z"/>',
+  alert:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  spreadsheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/>',
+  receipt:'<path d="M5 3v18l2-1 2 1 2-1 2 1 2-1 2 1V3l-2 1-2-1-2 1-2-1-2 1z"/><path d="M8 8h8M8 12h8"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M4 5v14"/>',
 };
-function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'📌', color:'#6B7280'}; }
+function svgIcon(name, size=18, sw=2){
+  const inner = SVG_ICONS[name];
+  if(!inner) return name; /* fallback : ancienne valeur (emoji) inchangée */
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle">${inner}</svg>`;
+}
+const TX_CATS = {
+  taxe:      {label:'Taxe foncière', ic:'building', color:'#2C5282'},
+  travaux:   {label:'Travaux',       ic:'wrench', color:'#C8821E'},
+  copro:     {label:'Charges copro', ic:'building2', color:'#2D6A6A'},
+  assurance: {label:'Assurance',     ic:'shield', color:'#7A4FBF'},
+  energie:   {label:'Énergie',       ic:'bolt', color:'#E0843D'},
+  loyer:     {label:'Loyer',         ic:'coins', color:'#19A974'},
+  autre:     {label:'Autre',         ic:'receipt', color:'#6B7280'},
+};
+function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'receipt', color:'#6B7280'}; }
 
 /* ── STATUTS & PAIEMENTS DES CHARGES ── */
 const STATUTS = {
@@ -2102,7 +2163,7 @@ function renderPayModal(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
         <div style="min-width:0">
           <div class="pay-amount">${eur(total)}</div>
-          <div class="pay-meta">${t.desc}${t.bien?(' · 📍 '+t.bien):''}${dateStr?(' · '+dateStr):''}</div>
+          <div class="pay-meta">${t.desc}${t.bien?(' · '+svgIcon('pin',12)+' '+t.bien):''}${dateStr?(' · '+dateStr):''}</div>
         </div>
         ${statutChip(st)}
       </div>
@@ -2138,7 +2199,7 @@ function togglePay(ini){
     const now=new Date().toISOString();
     t.paid[ini]=now;
     addPayment({ts:now, ini, name:s.name, amount:s.due, desc:t.desc, bien:t.bien});
-    toast(`🔔 ${s.name} a réglé sa part : ${eur(s.due)}`);
+    toast(`${s.name} a réglé sa part : ${eur(s.due)}`);
   }
   save(); renderPayModal();
 }
@@ -2150,7 +2211,7 @@ function markAllPaid(){
   chargeShares(t).forEach(s=>{
     if(!t.paid[s.ini]){ t.paid[s.ini]=now; addPayment({ts:now, ini:s.ini, name:s.name, amount:s.due, desc:t.desc, bien:t.bien}); n++; }
   });
-  if(n) toast('🔔 Charge entièrement réglée ✓');
+  if(n) toast('Charge entièrement réglée ✓');
   save(); renderPayModal();
 }
 function resetPay(){
@@ -2190,25 +2251,25 @@ function renderBudget(){
   const st = document.getElementById('budStats');
   if(st) st.innerHTML = `
     <div class="bud-stat rev">
-      <div class="bs-ico" style="background:rgba(45,106,106,.12)">📈</div>
+      <div class="bs-ico" style="background:rgba(45,106,106,.12)">${svgIcon('trendup',18)}</div>
       <div class="bs-label">Revenus</div>
       <div class="bs-amount">+${eur(revenus)}</div>
       <div class="bs-sub">${txs.filter(t=>t.montant>0).length} entrée(s)</div>
     </div>
     <div class="bud-stat chg">
-      <div class="bs-ico" style="background:rgba(192,57,57,.1)">📉</div>
+      <div class="bs-ico" style="background:rgba(192,57,57,.1)">${svgIcon('trenddown',18)}</div>
       <div class="bs-label">Charges</div>
       <div class="bs-amount">−${eur(chargesAbs)}</div>
       <div class="bs-sub">${txs.filter(t=>t.montant<0).length} dépense(s)</div>
     </div>
     <div class="bud-stat sol">
-      <div class="bs-ico" style="background:rgba(44,82,130,.1)">⚖️</div>
+      <div class="bs-ico" style="background:rgba(44,82,130,.1)">${svgIcon('scale',18)}</div>
       <div class="bs-label">Solde net</div>
       <div class="bs-amount" style="color:${solde>=0?'var(--teal)':'#C0392B'}">${solde>=0?'+':'−'}${eur(Math.abs(solde))}</div>
       <div class="bs-sub">${solde>=0?'Le bien est positif':'Charges supérieures aux revenus'}</div>
     </div>
     <div class="bud-stat due">
-      <div class="bs-ico" style="background:rgba(200,130,30,.12)">⏳</div>
+      <div class="bs-ico" style="background:rgba(200,130,30,.12)">${svgIcon('hourglass',18)}</div>
       <div class="bs-label">Reste à régler</div>
       <div class="bs-amount">${eur(totalDue)}</div>
       <div class="bs-sub">${pctPaid}% des charges réglées</div>
@@ -2266,7 +2327,7 @@ function renderBudget(){
         <svg width="130" height="130" viewBox="0 0 42 42" style="transform:rotate(-90deg)"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#EEF2F8" stroke-width="6"/>${segs}</svg>
         <div class="cat-legend">${cats.map(([k,v])=>{
           const ci=catInfo(k);
-          return `<div class="cat-leg-row"><span class="cat-leg-dot" style="background:${ci.color}"></span><span class="cat-leg-name">${ci.ic} ${ci.label}</span><span class="cat-leg-val">${eur(v)}</span></div>`;
+          return `<div class="cat-leg-row"><span class="cat-leg-dot" style="background:${ci.color}"></span><span class="cat-leg-name">${svgIcon(ci.ic,15)} ${ci.label}</span><span class="cat-leg-val">${eur(v)}</span></div>`;
         }).join('')}</div>
       </div>`;
     }
@@ -2292,12 +2353,12 @@ function renderBudget(){
       statusLine=`<div class="tx-status-line">${statutChip(chargeStatut(t))}<div class="tx-prog"><div class="tx-prog-fill" style="width:${pp}%"></div></div></div>`;
     }
     return `<div class="tx-row ${pos?'':'payable'}" ${pos?'':`onclick="openPayModal(${t.i})"`}>
-      <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?'💰':ci.ic}</div>
+      <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?svgIcon('coins',18):svgIcon(ci.ic,18)}</div>
       <div class="tx-body">
         <div class="tx-desc">${t.desc}</div>
         <div class="tx-meta">
           <span class="tx-tag">${ci.label}</span>
-          ${t.bien?`<span>📍 ${t.bien}</span>`:''}
+          ${t.bien?`<span>${svgIcon('pin',12)} ${t.bien}</span>`:''}
           ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR')}</span>`:''}
         </div>
         ${statusLine}
@@ -2319,7 +2380,7 @@ function renderBudget(){
       <div class="payhist-ico">✓</div>
       <div class="payhist-body">
         <div class="payhist-main"><b>${p.name}</b> a réglé sa part · <span style="color:var(--texte-doux)">${p.desc}</span></div>
-        <div class="payhist-meta">${p.bien?('📍 '+p.bien+' · '):''}${new Date(p.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="payhist-meta">${p.bien?(svgIcon('pin',12)+' '+p.bien+' · '):''}${new Date(p.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
       </div>
       <div class="payhist-amt">${eur(p.amount)}</div>
     </div>`).join('') || '<div class="empty">Les paiements réglés apparaîtront ici.</div>';
@@ -2354,7 +2415,7 @@ function buildTxCats(){
   if(!keys.includes(txEditCat)) txEditCat=keys[0];
   document.getElementById('txCatPicker').innerHTML = keys.map(k=>{
     const ci=TX_CATS[k];
-    return `<div class="type-opt${k===txEditCat?' sel':''}" data-v="${k}"><span class="dot" style="background:${ci.color}"></span>${ci.ic} ${ci.label}</div>`;
+    return `<div class="type-opt${k===txEditCat?' sel':''}" data-v="${k}"><span class="dot" style="background:${ci.color}"></span>${svgIcon(ci.ic,15)} ${ci.label}</div>`;
   }).join('');
   document.querySelectorAll('#txCatPicker .type-opt').forEach(o=>o.addEventListener('click',()=>{
     document.querySelectorAll('#txCatPicker .type-opt').forEach(x=>x.classList.remove('sel'));
@@ -2365,10 +2426,10 @@ function updateTxSplitInfo(){
   const info=document.getElementById('txSplitInfo');
   const m=parseFloat((document.getElementById('txMontant').value||'').replace(',','.'))||0;
   if(txEditType==='revenu'){
-    info.innerHTML='💡 Les revenus sont répartis entre indivisaires selon les quote-parts.';
+    info.innerHTML='Les revenus sont répartis entre indivisaires selon les quote-parts.';
     return;
   }
-  if(!m){ info.innerHTML='💡 La charge sera répartie automatiquement selon les quote-parts du bien sélectionné.'; return; }
+  if(!m){ info.innerHTML='La charge sera répartie automatiquement selon les quote-parts du bien sélectionné.'; return; }
   const bienNom = document.getElementById('txBien').value;
   const bien = S.biens.find(b=>b.nom===bienNom);
   const parts = bienParts(bien);
@@ -2412,8 +2473,8 @@ function renderInventaire(){
   const totalVal=S.inventaire.reduce((a,it)=>a+invNum(it.val),0);
   const stEl=document.getElementById('invStats');
   if(stEl) stEl.innerHTML=`
-    <div class="bud-stat"><div class="bs-ico" style="background:rgba(44,82,130,.1)">📦</div><div class="bs-label">Objets</div><div class="bs-amount" style="color:var(--navy)">${totalCount}</div><div class="bs-sub">dans l'inventaire</div></div>
-    <div class="bud-stat"><div class="bs-ico" style="background:rgba(45,106,106,.12)">💰</div><div class="bs-label">Valeur totale</div><div class="bs-amount" style="color:var(--teal)">${eur(totalVal)}</div><div class="bs-sub">tous biens confondus</div></div>`;
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(44,82,130,.1)">${svgIcon('box',18)}</div><div class="bs-label">Objets</div><div class="bs-amount" style="color:var(--navy)">${totalCount}</div><div class="bs-sub">dans l'inventaire</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(45,106,106,.12)">${svgIcon('coins',18)}</div><div class="bs-label">Valeur totale</div><div class="bs-amount" style="color:var(--teal)">${eur(totalVal)}</div><div class="bs-sub">tous biens confondus</div></div>`;
 
   /* Filtre par bien */
   const bienNames=S.biens.map(b=>b.nom);
@@ -2438,14 +2499,14 @@ function renderInventaire(){
     const sub=items.reduce((a,x)=>a+invNum(x.it.val),0);
     return `<div class="card inv-group">
       <div class="card-head">
-        <div><div class="card-title">${gn==='Commun'?'🗂 Commun (aucun bien)':'🏠 '+gn}</div><div class="card-sub">${items.length} objet(s) · ${eur(sub)}</div></div>
+        <div><div class="card-title">${gn==='Commun'? svgIcon('folder',16)+' Commun (aucun bien)' : svgIcon('home',16)+' '+gn}</div><div class="card-sub">${items.length} objet(s) · ${eur(sub)}</div></div>
       </div>
       <div class="inv-grid">${items.map(x=>`
         <div class="inv-item">
           <div class="inv-item-head">
-            <span class="inv-ico">${x.it.ic||'📦'}</span>
+            <span class="inv-ico">${svgIcon(x.it.ic||'box',20)}</span>
             <span class="inv-acts">
-              <button class="inv-act" onclick="openInvModal(${x.i})" title="Modifier">✎</button>
+              <button class="inv-act" onclick="openInvModal(${x.i})" title="Modifier">${svgIcon('edit',13)}</button>
               <button class="inv-act del" onclick="deleteInv(${x.i})" title="Supprimer">×</button>
             </span>
           </div>
@@ -2457,24 +2518,24 @@ function renderInventaire(){
 }
 
 /* ── MODAL INVENTAIRE (ajout / modification) ── */
-const INV_ICONS=['📦','🛋','🛏','📺','🧊','🌿','🫧','🪑','🖥','🚿','🍽','🧺','🖼','🔧'];
-let invEditIdx=-1, invIcon='📦';
+const INV_ICONS=['box','sofa','bed','tv','fridge','tree','washer','chair','desktop','shower','plate','basket','image','wrench'];
+let invEditIdx=-1, invIcon='box';
 function openInvModal(idx){
   invEditIdx = (typeof idx==='number') ? idx : -1;
   const it = invEditIdx>-1 ? S.inventaire[invEditIdx] : null;
   document.getElementById('invModalTitle').textContent = it ? "Modifier l'élément" : 'Ajouter un élément';
   document.getElementById('invNom').value = it ? it.nom : '';
   document.getElementById('invVal').value = it ? String(invNum(it.val)||'').replace(/\B(?=(\d{3})+(?!\d))/g,' ') : '';
-  invIcon = it ? (it.ic||'📦') : '📦';
+  invIcon = it ? (it.ic||'box') : 'box';
   const sel=document.getElementById('invBien');
   sel.innerHTML = S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')+'<option value="Commun">Commun (aucun bien)</option>';
   sel.value = it ? (S.biens.some(b=>b.nom===it.bien)?it.bien:'Commun') : (S.biens[0]?S.biens[0].nom:'Commun');
-  document.getElementById('invIconPicker').innerHTML = INV_ICONS.map(e=>`<button type="button" class="inv-emoji${e===invIcon?' sel':''}" onclick="selectInvIcon('${e}')">${e}</button>`).join('');
+  document.getElementById('invIconPicker').innerHTML = INV_ICONS.map(e=>`<button type="button" class="inv-emoji${e===invIcon?' sel':''}" data-ic="${e}" onclick="selectInvIcon('${e}')">${svgIcon(e,20)}</button>`).join('');
   document.getElementById('invModal').classList.add('open');
   setTimeout(()=>document.getElementById('invNom').focus(),60);
 }
 function closeInvModal(){ document.getElementById('invModal').classList.remove('open'); }
-function selectInvIcon(e){ invIcon=e; document.querySelectorAll('#invIconPicker .inv-emoji').forEach(b=>b.classList.toggle('sel',b.textContent===e)); }
+function selectInvIcon(e){ invIcon=e; document.querySelectorAll('#invIconPicker .inv-emoji').forEach(b=>b.classList.toggle('sel',b.dataset.ic===e)); }
 function saveInv(){
   const nom=document.getElementById('invNom').value.trim();
   if(!nom){ toast('Indiquez un nom.'); document.getElementById('invNom').focus(); return; }
@@ -2493,18 +2554,18 @@ function deleteInv(idx){
 
 /* ── INCIDENTS ── */
 const INC_TYPES=[
-  {k:'degat_eaux', ic:'💧', lbl:'Dégât des eaux'},
-  {k:'electrique', ic:'⚡', lbl:'Électrique'},
-  {k:'toiture',    ic:'🏚', lbl:'Toiture'},
-  {k:'chauffage',  ic:'🔥', lbl:'Chauffage'},
-  {k:'serrurerie', ic:'🔑', lbl:'Serrurerie'},
-  {k:'autre',      ic:'⚠️', lbl:'Autre'},
+  {k:'degat_eaux', ic:'drop', lbl:'Dégât des eaux'},
+  {k:'electrique', ic:'bolt', lbl:'Électrique'},
+  {k:'toiture',    ic:'building', lbl:'Toiture'},
+  {k:'chauffage',  ic:'fire', lbl:'Chauffage'},
+  {k:'serrurerie', ic:'key', lbl:'Serrurerie'},
+  {k:'autre',      ic:'alert', lbl:'Autre'},
 ];
-function incTypeIcon(k){ return (INC_TYPES.find(t=>t.k===k)||{}).ic || '⚠️'; }
+function incTypeIcon(k){ return (INC_TYPES.find(t=>t.k===k)||{}).ic || 'alert'; }
 const INC_STATUTS={
-  declare:{label:'Déclaré',  cls:'st-apayer',  dot:'#C0392B', ic:'🔴', logbg:'rgba(192,57,57,.12)', logtxt:'#C0392B'},
-  encours:{label:'En cours', cls:'st-attente', dot:'#C8821E', ic:'🟠', logbg:'rgba(200,130,30,.14)', logtxt:'#9A6010'},
-  resolu: {label:'Résolu',   cls:'st-paye',    dot:'#19A974', ic:'🟢', logbg:'rgba(25,169,116,.14)', logtxt:'#13855B'},
+  declare:{label:'Déclaré',  cls:'st-apayer',  dot:'#C0392B', ic:'alert', logbg:'rgba(192,57,57,.12)', logtxt:'#C0392B'},
+  encours:{label:'En cours', cls:'st-attente', dot:'#C8821E', ic:'clock', logbg:'rgba(200,130,30,.14)', logtxt:'#9A6010'},
+  resolu: {label:'Résolu',   cls:'st-paye',    dot:'#19A974', ic:'check', logbg:'rgba(25,169,116,.14)', logtxt:'#13855B'},
 };
 function incBienOf(inc){ const names=S.biens.map(b=>b.nom); return names.includes(inc.bien)?inc.bien:'Commun'; }
 let incFilter='all', incTargets=[];
@@ -2529,9 +2590,9 @@ function renderIncidents(){
   S.incidents.forEach(i=>{ c[i.statut]=(c[i.statut]||0)+1; });
   const stEl=document.getElementById('incStats');
   if(stEl) stEl.innerHTML=`
-    <div class="bud-stat"><div class="bs-ico" style="background:rgba(192,57,57,.1)">🔴</div><div class="bs-label">Déclarés</div><div class="bs-amount" style="color:#C0392B">${c.declare}</div><div class="bs-sub">à traiter</div></div>
-    <div class="bud-stat"><div class="bs-ico" style="background:rgba(200,130,30,.12)">🟠</div><div class="bs-label">En cours</div><div class="bs-amount" style="color:#9A6010">${c.encours}</div><div class="bs-sub">en traitement</div></div>
-    <div class="bud-stat"><div class="bs-ico" style="background:rgba(25,169,116,.14)">🟢</div><div class="bs-label">Résolus</div><div class="bs-amount" style="color:#13855B">${c.resolu}</div><div class="bs-sub">clôturés</div></div>`;
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(192,57,57,.1)">${svgIcon('alert',18)}</div><div class="bs-label">Déclarés</div><div class="bs-amount" style="color:#C0392B">${c.declare}</div><div class="bs-sub">à traiter</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(200,130,30,.12)">${svgIcon('clock',18)}</div><div class="bs-label">En cours</div><div class="bs-amount" style="color:#9A6010">${c.encours}</div><div class="bs-sub">en traitement</div></div>
+    <div class="bud-stat"><div class="bs-ico" style="background:rgba(25,169,116,.14)">${svgIcon('check',18)}</div><div class="bs-label">Résolus</div><div class="bs-amount" style="color:#13855B">${c.resolu}</div><div class="bs-sub">clôturés</div></div>`;
 
   /* Filtre par bien */
   const bienNames=S.biens.map(b=>b.nom);
@@ -2552,14 +2613,14 @@ function renderIncidents(){
     const inc=x.inc, i=x.i, sc=INC_STATUTS[inc.statut]||INC_STATUTS.declare;
     const dateStr=inc.date?new Date(inc.date+'T00:00:00').toLocaleDateString('fr-FR'):'';
     return `<div class="inc-card">
-      <div class="inc-ico">${inc.ic||'⚠️'}</div>
+      <div class="inc-ico">${svgIcon(inc.ic||'alert',20)}</div>
       <div class="inc-body">
         <div class="inc-top">
           <span class="inc-title">${inc.titre}</span>
           <span class="st-chip ${sc.cls}"><span class="st-dot" style="background:${sc.dot}"></span>${sc.label}</span>
         </div>
         ${inc.desc?`<div class="inc-desc">${inc.desc}</div>`:''}
-        <div class="inc-meta">📍 ${inc.bien}${dateStr?(' · '+dateStr):''}${inc.by?(' · signalé par '+inc.by):''}</div>
+        <div class="inc-meta">${svgIcon('pin',12)} ${inc.bien}${dateStr?(' · '+dateStr):''}${inc.by?(' · signalé par '+inc.by):''}</div>
         <div class="inc-status-seg">
           ${['declare','encours','resolu'].map(s=>`<button class="iss ${inc.statut===s?('on '+INC_STATUTS[s].cls):''}" onclick="setIncStatus(${i},'${s}')">${INC_STATUTS[s].label}</button>`).join('')}
         </div>
@@ -2574,10 +2635,10 @@ function renderIncidents(){
   const ll=document.getElementById('incLogList');
   if(ll) ll.innerHTML=log.slice(0,40).map(e=>`
     <div class="payhist-row">
-      <div class="payhist-ico" style="background:${e.bg||'rgba(44,82,130,.1)'};color:${e.txt||'var(--accent)'}">${e.ic||'•'}</div>
+      <div class="payhist-ico" style="background:${e.bg||'rgba(44,82,130,.1)'};color:${e.txt||'var(--accent)'}">${svgIcon(e.ic||'check',16)}</div>
       <div class="payhist-body">
         <div class="payhist-main">${e.text}</div>
-        <div class="payhist-meta">📍 ${e.bien} · ${new Date(e.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="payhist-meta">${svgIcon('pin',12)} ${e.bien} · ${new Date(e.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
       </div>
     </div>`).join('') || '<div class="empty">L\'activité des incidents apparaîtra ici.</div>';
 }
@@ -2602,7 +2663,7 @@ function openIncModal(){
   document.getElementById('incDate').value=_todayISO;
   document.getElementById('incTypeGrid').innerHTML=INC_TYPES.map(t=>
     `<div class="type-card${t.k===incType?' sel':''}" data-k="${t.k}" onclick="selectIncType('${t.k}')">
-       <span class="tc-ico">${t.ic}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
+       <span class="tc-ico">${svgIcon(t.ic,24)}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
   const sel=document.getElementById('incBien');
   sel.innerHTML = S.biens.length
     ? S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')
@@ -2623,20 +2684,20 @@ function saveIncident(){
   const inc={titre, desc, cat:incType, ic:incTypeIcon(incType), bien, statut:'declare', st:'Déclaré', date, by};
   S.incidents.unshift(inc);
   incLog(inc, 'Incident déclaré', 'declare');
-  closeIncModal(); save(); toast('🔔 Incident déclaré.');
+  closeIncModal(); save(); toast('Incident déclaré.');
 }
 
 /* ━━━━ ACTIONS ━━━━ */
 /* ━━━━ WIZARD AJOUT D'UN BIEN ━━━━ */
 const BIEN_TYPES = [
-  {k:'maison',   ic:'🏠', lbl:'Maison'},
-  {k:'appart',   ic:'🏢', lbl:'Appartement'},
-  {k:'terrain',  ic:'🌳', lbl:'Terrain'},
-  {k:'immeuble', ic:'🏬', lbl:'Immeuble'},
-  {k:'local',    ic:'🏪', lbl:'Local pro'},
-  {k:'autre',    ic:'📍', lbl:'Autre'},
+  {k:'maison',   ic:'home', lbl:'Maison'},
+  {k:'appart',   ic:'building', lbl:'Appartement'},
+  {k:'terrain',  ic:'tree', lbl:'Terrain'},
+  {k:'immeuble', ic:'building2', lbl:'Immeuble'},
+  {k:'local',    ic:'shop', lbl:'Local pro'},
+  {k:'autre',    ic:'pin', lbl:'Autre'},
 ];
-function bienIcon(type){ return (BIEN_TYPES.find(t=>t.k===type)||{}).ic || '🏠'; }
+function bienIcon(type){ return (BIEN_TYPES.find(t=>t.k===type)||{}).ic || 'home'; }
 let wizStep = 1, wizData = {};
 
 /* alias appelé par le bouton "+ Ajouter un bien" */
@@ -2646,7 +2707,7 @@ function openBienModal(){
   wizData = {type:'maison', nom:'', ville:'', surface:'', val:'', photos:[]};
   document.getElementById('bienTypeGrid').innerHTML = BIEN_TYPES.map(t=>
     `<div class="type-card${t.k===wizData.type?' sel':''}" data-k="${t.k}" onclick="selectBienType('${t.k}')">
-       <span class="tc-ico">${t.ic}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
+       <span class="tc-ico">${svgIcon(t.ic,24)}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
   ['bienNom','bienVille','bienSurface','bienVal'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('bienPhotos').innerHTML='';
   wizGo(1);
