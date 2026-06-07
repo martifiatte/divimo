@@ -224,7 +224,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
       <!-- FORMULAIRE -->
       <div class="est-form">
-        <div class="field" id="e-load-wrap" style="display:none;margin-bottom:14px"><label>📂 Charger un bien enregistré</label><select id="e-load" onchange="eLoadBien()"><option value="">— Choisir un bien —</option></select></div>
+        <div class="field" id="e-load-wrap" style="display:none;margin-bottom:14px"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="e-load" onchange="eLoadBien()"><option value="">— Choisir un bien —</option></select></div>
         <div class="field" style="margin-bottom:14px"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="e-nom" list="e-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="e-nom-list"></datalist></div>
         <div class="prog-bar" id="prog">
           <div class="prog-item cur" data-i="0"><div class="pb"></div><div class="pl">Localisation</div></div>
@@ -415,7 +415,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <!-- PANNEAU RÉSULTAT — simple, juste la valeur live -->
       <div class="est-result" id="erPanel">
         <div class="er-empty" id="erEmpty">
-          <div class="ico">🏠</div>
+          <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div>
           <p>Renseignez la localisation et les caractéristiques pour voir l'estimation.</p>
         </div>
         <div id="erLive" style="display:none">
@@ -430,7 +430,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <button class="btn er-cta" id="erCta" onclick="openResult()">
             Voir l'estimation complète →
           </button>
-          <button class="btn er-cta" id="erSave" onclick="eSave()" style="margin-top:8px;background:rgba(255,255,255,.14);color:#fff">💾 Enregistrer ce bien dans mon espace</button>
+          <button class="btn er-cta" id="erSave" onclick="eSave()" style="margin-top:8px;background:rgba(255,255,255,.14);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
         </div>
       </div>
 
@@ -442,11 +442,11 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="panel-head"><h2>Calculer les parts</h2><p>Répartissez la valeur du bien entre les co-indivisaires selon la quote-part de chacun.</p></div>
     <div class="sim-body">
       <div class="form-col">
-        <div class="field" id="p-load-wrap" style="display:none"><label>📂 Charger un bien enregistré</label><select id="p-load" onchange="pLoadBien()"><option value="">— Choisir un bien —</option></select></div>
+        <div class="field" id="p-load-wrap" style="display:none"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="p-load" onchange="pLoadBien()"><option value="">— Choisir un bien —</option></select></div>
         <div class="field"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="p-nom" list="p-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="p-nom-list"></datalist></div>
         <div class="field"><label>Valeur totale du bien</label><div class="sfx-wrap"><input type="number" id="p-val" value="320000" oninput="partsCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
         <div class="field"><label>Co-indivisaires <span class="hint">— nom et %</span></label><div id="p-rows"></div><button class="add-btn" onclick="addCoi()">+ Ajouter</button><div id="p-sum"></div></div>
-        <button class="btn pdf-btn" onclick="pSave()" style="background:var(--navy);color:#fff">💾 Enregistrer ce bien dans mon espace</button>
+        <button class="btn pdf-btn" onclick="pSave()" style="background:var(--navy);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
       </div>
       <div class="result-col" id="p-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><span>Renseignez la valeur et les parts.</span></div></div>
     </div>
@@ -457,7 +457,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="panel-head"><h2>Vente / rachat de parts</h2><p>Un ou plusieurs indivisaires rachètent les parts de ceux qui sortent. Soulte nette, droit de partage ou de mutation et frais de notaire — barèmes officiels.</p></div>
     <div class="sim-body">
       <div class="form-col">
-        <div class="field" id="rc-load-wrap" style="display:none"><label>📂 Charger un bien enregistré</label><select id="rc-load" onchange="rcLoadBien()"><option value="">— Choisir un bien —</option></select><p class="note">Pré-remplit la valeur et les co-indivisaires depuis votre espace.</p></div>
+        <div class="field" id="rc-load-wrap" style="display:none"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="rc-load" onchange="rcLoadBien()"><option value="">— Choisir un bien —</option></select><p class="note">Pré-remplit la valeur et les co-indivisaires depuis votre espace.</p></div>
         <div class="field"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="rc-nom" list="rc-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="rc-nom-list"></datalist></div>
         <div class="field"><label>Valeur du bien</label><div class="sfx-wrap"><input type="number" id="rc-val" value="320000" oninput="rcCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
         <div class="field"><label>Crédit restant dû <span class="hint">(repris par les acheteurs)</span></label><div class="sfx-wrap"><input type="number" id="rc-dette" value="0" oninput="rcCompute()"><span class="sfx">€</span></div></div>
@@ -1153,7 +1153,7 @@ function rcCompute(){
     </div>
 
     <div class="res-note"><b>Hypothèses :</b> ${fraisAuto?('frais calculés au barème réglementé des émoluments '+(regime==='partage'?'de partage (4,931 / 2,034 / 1,356 / 1,017 %)':'de vente (3,870 / 1,596 / 1,064 / 0,799 %)')+' + TVA 20 %, CSI 0,10 %, débours 400 €'):'frais de notaire saisis manuellement ('+fraisPct.toLocaleString('fr-FR')+' %)'}. Droit au taux saisi (${tauxPct.toLocaleString('fr-FR')} %) sur ${regime==='partage'?"l'actif net partagé":'la valeur des parts cédées'}. Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts au prorata de leurs quote-parts. Résultat indicatif — à confirmer avec votre notaire.</div>
-    <button class="btn pdf-btn" onclick="rcSaveToEspace()" style="background:var(--navy);color:#fff;margin-top:10px">💾 Enregistrer ce bien dans mon espace</button>
+    <button class="btn pdf-btn" onclick="rcSaveToEspace()" style="background:var(--navy);color:#fff;margin-top:10px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
     <button class="btn pdf-btn" onclick="window.print()">Télécharger en PDF</button>`;
 }
 
