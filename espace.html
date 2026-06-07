@@ -1782,12 +1782,18 @@ function copyShareLink(){
 function renderEstim(){
   const el = document.getElementById('estimList');
   if(!el) return;
-  el.innerHTML = S.estim.map((e,i)=>`
-    <div class="row-item">
-      <div class="r-ic" style="background:rgba(44,82,130,.1)">${svgIcon('chart',18)}</div>
-      <div><b>${e.titre}</b><span>${e.detail}</span></div>
+  const TYP={estimation:{ic:'chart',lbl:'Estimation'},parts:{ic:'chart',lbl:'Calcul des parts'},vente:{ic:'key',lbl:'Vente / rachat'}};
+  el.innerHTML = S.estim.map((e,i)=>{
+    const t=TYP[e.type]||{ic:'chart',lbl:'Simulation'};
+    const date=e.date?new Date(e.date).toLocaleDateString('fr-FR'):'';
+    const sub=[e.bien,e.detail,date].filter(Boolean).join(' · ');
+    const tag=e.nouveau?' <span class="pill pill-ok" style="margin-left:6px">Nouveau bien</span>':'';
+    return `<div class="row-item">
+      <div class="r-ic" style="background:rgba(44,82,130,.1)">${svgIcon(t.ic,18)}</div>
+      <div style="min-width:0"><b>${e.titre||t.lbl}${tag}</b><span>${sub}</span></div>
       <div class="row-act"><span class="del" onclick="S.estim.splice(${i},1);save()">×</span></div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('chart',24)+'</div>Aucune simulation enregistrée.</div>';
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('chart',24)+'</div>Aucune simulation enregistrée.</div>';
 }
 
 function renderRdv(){
