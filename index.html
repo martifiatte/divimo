@@ -231,7 +231,7 @@ img { display: block; max-width: 100%; }
   transition: .25s;
   display: flex; flex-direction: column;
 }
-.aud-card:hover { border-color: var(--accent-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.aud-card { /* pas d'effet de survol : ce n'est pas un bouton */ }
 .aud-card.pro { background: var(--navy); border-color: var(--navy); }
 .aud-icon { font-size: 2rem; margin-bottom: 20px; }
 .aud-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; letter-spacing: -.02em; }
@@ -266,12 +266,13 @@ img { display: block; max-width: 100%; }
   border-radius: var(--radius-lg); overflow: hidden; transition: .25s;
   display: flex; flex-direction: column;
 }
-.feat:hover { border-color: transparent; box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.feat { /* pas d'effet de survol : ce n'est pas un bouton */ }
 .feat-preview {
-  padding: 22px 22px 0;
+  padding: 22px;
   background: linear-gradient(160deg, #EEF2F8, var(--gris-clair));
-  min-height: 160px; display: flex; align-items: flex-end;
+  height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+.feat-preview > div { width: 100%; }
 .feat-body { padding: 20px 22px 22px; flex: 1; }
 .feat-body h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
 .feat-body p { font-size: .86rem; color: var(--texte-doux); line-height: 1.65; }
@@ -369,7 +370,7 @@ img { display: block; max-width: 100%; }
   border-radius: var(--radius-lg); padding: 26px; transition: .22s;
   display: flex; flex-direction: column;
 }
-.testi:hover { box-shadow: var(--shadow-md); border-color: transparent; }
+.testi { /* pas d'effet de survol : ce n'est pas un bouton */ }
 .stars { color: #D4A017; font-size: .82rem; letter-spacing: 1.5px; margin-bottom: 12px; }
 .testi blockquote { font-size: .91rem; color: var(--texte); line-height: 1.75; font-style: italic; margin-bottom: 18px; flex: 1; }
 .testi-by { display: flex; align-items: center; gap: .7rem; }
@@ -424,8 +425,7 @@ footer { background: #080D1A; border-top: 1px solid rgba(255,255,255,.05); paddi
 .usecases { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 38px; }
 @media(max-width:760px){ .usecases { grid-template-columns: 1fr; } }
 .usecase { background: #fff; border: 1.5px solid var(--gris-bord); border-radius: 14px; padding: 26px 22px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-.usecase { transition: .2s; }
-.usecase:hover { border-color: var(--accent-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+/* cas d'usage : pas d'effet de survol */
 .usecase .uc-ico { font-size: 1.8rem; margin-bottom: 10px; }
 .usecase h4 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1rem; color: var(--navy); margin-bottom: 6px; }
 .usecase p { font-size: .88rem; color: var(--texte-doux); line-height: 1.55; }
