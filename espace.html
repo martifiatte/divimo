@@ -1793,11 +1793,15 @@ function copyShareLink(){
   else { toast('Lien : ' + link); }
 }
 
+/* Simulations : stockage dédié, totalement séparé des biens/patrimoine */
+function divimoSims(){ try{ const a=JSON.parse(ssGet('divimo_sims')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function deleteSim(idx){ const a=divimoSims(); a.splice(idx,1); ssSet('divimo_sims', JSON.stringify(a)); renderEstim(); }
 function renderEstim(){
   const el = document.getElementById('estimList');
   if(!el) return;
   const TYP={estimation:{ic:'chart',lbl:'Estimation'},parts:{ic:'chart',lbl:'Calcul des parts'},vente:{ic:'key',lbl:'Vente / rachat'}};
-  el.innerHTML = S.estim.map((e,i)=>{
+  const sims = divimoSims();
+  el.innerHTML = sims.map((e,i)=>{
     const t=TYP[e.type]||{ic:'chart',lbl:'Simulation'};
     const date=e.date?new Date(e.date).toLocaleDateString('fr-FR'):'';
     const sub=[e.bien,date].filter(Boolean).join(' · ');
@@ -1807,7 +1811,7 @@ function renderEstim(){
       <summary>
         <span class="r-ic" style="background:rgba(44,82,130,.1)">${svgIcon(t.ic,18)}</span>
         <span class="sim-main"><b>${e.titre||t.lbl}</b><span>${sub||e.detail||''}</span></span>
-        <span class="del" onclick="event.preventDefault();event.stopPropagation();S.estim.splice(${i},1);save()">×</span>
+        <span class="del" onclick="event.preventDefault();event.stopPropagation();deleteSim(${i})">×</span>
       </summary>
       <div class="sim-det">${body}</div>
     </details>`;
@@ -2819,7 +2823,8 @@ function saveBien(){
 function addEstim(){
   const t=prompt('Titre :','');if(!t)return;
   const d=prompt('Résultat :','')||'—';
-  S.estim.unshift({titre:t,detail:d});save();toast('Simulation enregistrée.');
+  const a=divimoSims(); a.unshift({type:'autre',titre:t,detail:d,date:new Date().toISOString()});
+  ssSet('divimo_sims', JSON.stringify(a)); renderEstim(); toast('Simulation enregistrée.');
 }
 function inviteCoi(){
   const n=prompt('Prénom et nom du co-indivisaire :','');if(!n)return;

@@ -1054,20 +1054,12 @@ function eLoadBien(){
   simToast('Bien chargé — sélectionnez la commune pour relancer l\'estimation.');
 }
 function saveSimulation(type, titre, label, summary, lines){
-  let groups=divimoGroups(); let active;
-  if(groups && Object.keys(groups).length){
-    active=localStorage.getItem('divimo_active'); if(!active || !groups[active]) active=Object.keys(groups)[0];
-  } else {
-    active='g1'; groups={};
-    groups[active]={nom:'Mon indivision', biens:[], coi:[], docs:[], estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}};
-  }
+  /* Stockage DÉDIÉ aux simulations (clé séparée) : ne touche jamais aux biens ni au patrimoine */
   label=(label||'').trim() || 'Simulation';
-  if(!groups[active].estim) groups[active].estim=[];
-  groups[active].estim.unshift({type, titre, detail:summary, lines:lines||[], bien:label, date:new Date().toISOString()});
-  try{
-    localStorage.setItem('divimo_groupes', JSON.stringify(groups));
-    if(!localStorage.getItem('divimo_active')) localStorage.setItem('divimo_active', active);
-  }catch(e){ simToast('Stockage plein — impossible d\'enregistrer.'); return false; }
+  let sims=[]; try{ const a=JSON.parse(localStorage.getItem('divimo_sims')||'[]'); if(Array.isArray(a)) sims=a; }catch(e){}
+  sims.unshift({type, titre, detail:summary, lines:lines||[], bien:label, date:new Date().toISOString()});
+  try{ localStorage.setItem('divimo_sims', JSON.stringify(sims)); }
+  catch(e){ simToast('Stockage plein — impossible d\'enregistrer.'); return false; }
   simToast('Simulation « '+label+' » ajoutée à l\'onglet Simulations ✓');
   return true;
 }
