@@ -979,34 +979,6 @@ function refreshAllBienSelects(){
   fillBienSelect('rc-load','rc-load-wrap'); fillBienSelect('p-load','p-load-wrap'); fillBienSelect('e-load','e-load-wrap');
   refreshNomList('rc-nom-list'); refreshNomList('p-nom-list'); refreshNomList('e-nom-list');
 }
-function saveBienToEspace(nom, valNum, parts, sim){
-  let groups=divimoGroups(); let active;
-  if(groups && Object.keys(groups).length){
-    active=localStorage.getItem('divimo_active'); if(!active || !groups[active]) active=Object.keys(groups)[0];
-  } else {
-    /* Aucune indivision sur ce navigateur → on en crée une (l'espace la reprendra au prochain login) */
-    active='g1'; groups={};
-    groups[active]={nom:'Mon indivision', biens:[], coi:[], docs:[], estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}};
-  }
-  nom=(nom||'').trim() || ('Bien simulé '+new Date().toLocaleDateString('fr-FR'));
-  const val= valNum ? valNum.toLocaleString('fr-FR').replace(/\s/g,' ')+' €' : '—';
-  if(!groups[active].biens) groups[active].biens=[];
-  const ex=groups[active].biens.findIndex(b=>b.nom===nom);
-  const bien={nom, info:'Ajouté depuis le simulateur', val, parts:parts||[]};
-  if(ex>-1) groups[active].biens[ex]=Object.assign({}, groups[active].biens[ex], bien);
-  else groups[active].biens.push(bien);
-  if(sim){
-    if(!groups[active].estim) groups[active].estim=[];
-    groups[active].estim.unshift({type:sim.type, titre:sim.titre, detail:sim.detail, bien:nom, date:new Date().toISOString(), nouveau:(ex<0)});
-  }
-  try{
-    localStorage.setItem('divimo_groupes', JSON.stringify(groups));
-    if(!localStorage.getItem('divimo_active')) localStorage.setItem('divimo_active', active);
-  }catch(e){ simToast('Stockage plein — impossible d\'enregistrer.'); return false; }
-  refreshAllBienSelects();
-  simToast((ex>-1?'« '+nom+' » mis à jour':'« '+nom+' » enregistré')+(sim?' · ajouté à vos simulations ✓':' dans votre espace ✓'));
-  return true;
-}
 
 /* Vente / rachat */
 function rcInitBiens(){ fillBienSelect('rc-load','rc-load-wrap'); }
