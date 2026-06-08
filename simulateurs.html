@@ -225,7 +225,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <!-- FORMULAIRE -->
       <div class="est-form">
         <div class="field" id="e-load-wrap" style="display:none;margin-bottom:14px"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="e-load" onchange="eLoadBien()"><option value="">— Choisir un bien —</option></select></div>
-        <div class="field" style="margin-bottom:14px"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="e-nom" list="e-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="e-nom-list"></datalist></div>
+        <div class="field" style="margin-bottom:14px"><label>Nom du bien <span class="hint">(pour l'historique)</span></label><input type="text" id="e-nom" list="e-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="e-nom-list"></datalist></div>
         <div class="prog-bar" id="prog">
           <div class="prog-item cur" data-i="0"><div class="pb"></div><div class="pl">Localisation</div></div>
           <div class="prog-item" data-i="1"><div class="pb"></div><div class="pl">Le bien</div></div>
@@ -430,7 +430,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <button class="btn er-cta" id="erCta" onclick="openResult()">
             Voir l'estimation complète →
           </button>
-          <button class="btn er-cta" id="erSave" onclick="eSave()" style="margin-top:8px;background:rgba(255,255,255,.14);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
+          <button class="btn er-cta" id="erSave" onclick="eSave()" style="margin-top:8px;background:rgba(255,255,255,.14);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer la simulation</button>
         </div>
       </div>
 
@@ -443,10 +443,10 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="sim-body">
       <div class="form-col">
         <div class="field" id="p-load-wrap" style="display:none"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="p-load" onchange="pLoadBien()"><option value="">— Choisir un bien —</option></select></div>
-        <div class="field"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="p-nom" list="p-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="p-nom-list"></datalist></div>
+        <div class="field"><label>Nom du bien <span class="hint">(pour l'historique)</span></label><input type="text" id="p-nom" list="p-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="p-nom-list"></datalist></div>
         <div class="field"><label>Valeur totale du bien</label><div class="sfx-wrap"><input type="number" id="p-val" value="320000" oninput="partsCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
         <div class="field"><label>Co-indivisaires <span class="hint">— nom et %</span></label><div id="p-rows"></div><button class="add-btn" onclick="addCoi()">+ Ajouter</button><div id="p-sum"></div></div>
-        <button class="btn pdf-btn" onclick="pSave()" style="background:var(--navy);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
+        <button class="btn pdf-btn" onclick="pSave()" style="background:var(--navy);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer la simulation</button>
       </div>
       <div class="result-col" id="p-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><span>Renseignez la valeur et les parts.</span></div></div>
     </div>
@@ -458,7 +458,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="sim-body">
       <div class="form-col">
         <div class="field" id="rc-load-wrap" style="display:none"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="rc-load" onchange="rcLoadBien()"><option value="">— Choisir un bien —</option></select><p class="note">Pré-remplit la valeur et les co-indivisaires depuis votre espace.</p></div>
-        <div class="field"><label>Nom du bien <span class="hint">(pour l'enregistrer)</span></label><input type="text" id="rc-nom" list="rc-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="rc-nom-list"></datalist></div>
+        <div class="field"><label>Nom du bien <span class="hint">(pour l'historique)</span></label><input type="text" id="rc-nom" list="rc-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="rc-nom-list"></datalist></div>
         <div class="field"><label>Valeur du bien</label><div class="sfx-wrap"><input type="number" id="rc-val" value="320000" oninput="rcCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
         <div class="field"><label>Crédit restant dû <span class="hint">(repris par les acheteurs)</span></label><div class="sfx-wrap"><input type="number" id="rc-dette" value="0" oninput="rcCompute()"><span class="sfx">€</span></div></div>
         <div class="field two">
@@ -888,7 +888,7 @@ function liveCalc(){
   const val=surf*pmF;
   const mg=(gS('e-herite')?.dataset.k<0||gS('e-conflit')?.dataset.k<0)?.12:.08;
   const low=Math.round(val*(1-mg)/1000)*1000, high=Math.round(val*(1+mg)/1000)*1000, mid=Math.round(val/1000)*1000;
-  _estMid=mid;
+  _estMid=mid; window._est={mid,low,high,pm:pmF,type:tv,surf,city:(c?c.n:'')};
   document.getElementById('erEmpty').style.display='none';
   document.getElementById('erLive').style.display='';
   document.getElementById('erVal').textContent=euro(mid);
@@ -1034,9 +1034,12 @@ function pLoadBien(){
   renderCoi();
 }
 function pSave(){
-  const parts=coi.filter(m=>(+m.p||0)>0).map(m=>({ini:initiales(m.n), name:m.n||'—', pct:+m.p||0}));
   const V=+document.getElementById('p-val').value||0;
-  saveBienToEspace(document.getElementById('p-nom').value, V, parts, {type:'parts', titre:'Calcul des parts', detail:'Valeur '+euro(V)+' · '+parts.length+' indivisaire(s)'});
+  const act=coi.filter(m=>(+m.p||0)>0); const sum=coi.reduce((a,b)=>a+(+b.p||0),0)||1;
+  const lines=[['Valeur du bien', euro(V)]];
+  act.forEach(m=> lines.push([(m.n||'—')+' ('+(+m.p||0)+'%)', euro(V*(+m.p||0)/sum)]));
+  lines.push(['Total des parts', sum.toLocaleString('fr-FR')+' %']);
+  saveSimulation('parts','Calcul des parts', document.getElementById('p-nom').value, 'Valeur '+euro(V)+' · '+act.length+' indivisaire(s)', lines);
 }
 
 /* Estimer son bien */
@@ -1050,9 +1053,26 @@ function eLoadBien(){
   if(m){ const sN=document.getElementById('sN'); if(sN){ sN.value=m[1]; if(typeof syncS==='function') syncS(m[1],'n'); } }
   simToast('Bien chargé — sélectionnez la commune pour relancer l\'estimation.');
 }
+function saveSimulation(type, titre, label, summary, lines){
+  /* Stockage DÉDIÉ aux simulations (clé séparée) : ne touche jamais aux biens ni au patrimoine */
+  label=(label||'').trim() || 'Simulation';
+  let sims=[]; try{ const a=JSON.parse(localStorage.getItem('divimo_sims')||'[]'); if(Array.isArray(a)) sims=a; }catch(e){}
+  sims.unshift({type, titre, detail:summary, lines:lines||[], bien:label, date:new Date().toISOString()});
+  try{ localStorage.setItem('divimo_sims', JSON.stringify(sims)); }
+  catch(e){ simToast('Stockage plein — impossible d\'enregistrer.'); return false; }
+  simToast('Simulation « '+label+' » ajoutée à l\'onglet Simulations ✓');
+  return true;
+}
 function eSave(){
   if(!_estMid){ simToast('Lancez d\'abord une estimation (choisissez une commune).'); return; }
-  saveBienToEspace(document.getElementById('e-nom').value, _estMid, [], {type:'estimation', titre:'Estimation', detail:'Valeur estimée '+euro(_estMid)});
+  const e=window._est||{mid:_estMid};
+  const lines=[['Valeur estimée', euro(e.mid)]];
+  if(e.low!=null && e.high!=null) lines.push(['Fourchette', euro(e.low)+' à '+euro(e.high)]);
+  if(e.pm) lines.push(['Prix au m²', e.pm.toLocaleString('fr-FR')+' €']);
+  if(e.type) lines.push(['Type de bien', e.type==='maison'?'Maison':'Appartement']);
+  if(e.surf) lines.push(['Surface', e.surf+' m²']);
+  if(e.city) lines.push(['Commune', e.city]);
+  saveSimulation('estimation','Estimation', document.getElementById('e-nom').value, 'Valeur estimée '+euro(e.mid), lines);
 }
 function rcRegimeChange(){
   const r=document.getElementById('rc-regime').value;
@@ -1081,10 +1101,20 @@ function simToast(msg){
 }
 /* Enregistrer le bien simulé dans l'espace personnel (localStorage) */
 function rcSaveToEspace(){
-  const parts=rcoi.filter(m=>(+m.p||0)>0).map(m=>({ini:initiales(m.n), name:m.n||'—', pct:+m.p||0}));
-  const L=window._rcLast||{}; 
-  const detail = (L.cout!=null) ? ('Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte)) : 'Vente / rachat de parts';
-  saveBienToEspace(document.getElementById('rc-nom').value, +document.getElementById('rc-val').value||0, parts, {type:'vente', titre:'Vente / rachat de parts', detail:detail});
+  const L=window._rcLast;
+  if(!L){ simToast('Lancez d\'abord le calcul du partage.'); return; }
+  const lines=[
+    ['Valeur du bien', euro(L.val)],
+    ['Régime', L.regime==='partage'?'Partage familial':'Licitation / cession'],
+    ['Taux du droit', L.taux.toLocaleString('fr-FR')+' %'],
+  ];
+  if(L.credit) lines.push(['Crédit repris', euro(L.credit)]);
+  (L.ceders||[]).forEach(c=> lines.push(['Cédant · '+c.n+' ('+c.p+'%)', 'reçoit '+euro(c.montant)]));
+  (L.buyers||[]).forEach(b=> lines.push(['Acheteur · '+b.n, 'verse '+euro(b.pays)+' → '+b.newPct.toLocaleString('fr-FR',{maximumFractionDigits:1})+'%']));
+  lines.push(['Soulte totale', euro(L.soulte)]);
+  lines.push(['Frais de notaire (tout compris)', euro(L.notaire)]);
+  lines.push(['Coût total', euro(L.cout)]);
+  saveSimulation('vente','Vente / rachat de parts', document.getElementById('rc-nom').value, 'Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte), lines);
 }
 function rcCompute(){
   const V=+document.getElementById('rc-val').value||0;
@@ -1124,7 +1154,6 @@ function rcCompute(){
     fraisNotaire=fraisPct/100*valBrutCed;
   }
   const coutTotal=soulteTotal+droit+fraisNotaire;
-  window._rcLast={cout:coutTotal, soulte:soulteTotal, frac:fracCed};
   /* Cédants : chacun reçoit sa part nette */
   const perCeder=ceders.map(m=>({n:m.n||'—', p:+m.p||0, montant:actifNet*(+m.p||0)/sum}));
   /* Acheteurs : se répartissent les parts cédées au prorata de leurs parts actuelles */
@@ -1137,6 +1166,8 @@ function rcCompute(){
     const newPct = (((+m.p||0)+acquiredPct)/sum)*100;   /* nouvelle quote-part */
     return {n:m.n||'—', pays:equity+fees, equity, fees, newPct};
   });
+  window._rcLast={ val:V, regime, taux:tauxPct, credit:D, soulte:soulteTotal, droit, frais:fraisNotaire, notaire:droit+fraisNotaire, cout:coutTotal,
+    ceders:perCeder.map(c=>({n:c.n,p:c.p,montant:c.montant})), buyers:perBuyer.map(b=>({n:b.n,pays:b.pays,newPct:b.newPct})) };
   res.innerHTML=`
     <div class="res-label">Montant total de l'opération</div>
     <div class="res-big">${euro(coutTotal)}</div>
@@ -1160,7 +1191,7 @@ function rcCompute(){
     </div>
 
     <div class="res-note"><b>Frais de notaire, tout compris.</b> Ce montant réunit en une seule fois les honoraires du notaire (calculés sur un barème officiel), la TVA, les petites taxes obligatoires et les frais de dossier, plus l'impôt versé à l'État sur l'opération. ${regime==='partage' ? "Votre cas est un partage familial, par exemple une succession, un divorce ou une indivision de famille. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur nette du bien, c'est à dire après déduction du crédit." : "Votre cas est une licitation ou une cession hors cadre familial. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur des parts vendues."} Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts selon leurs quote-parts. Estimation indicative, à confirmer avec votre notaire.</div>
-    <button class="btn pdf-btn" onclick="rcSaveToEspace()" style="background:var(--navy);color:#fff;margin-top:10px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer ce bien dans mon espace</button>
+    <button class="btn pdf-btn" onclick="rcSaveToEspace()" style="background:var(--navy);color:#fff;margin-top:10px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer la simulation</button>
     <button class="btn pdf-btn" onclick="window.print()">Télécharger en PDF</button>`;
 }
 
