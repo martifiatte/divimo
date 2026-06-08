@@ -888,7 +888,7 @@ function liveCalc(){
   const val=surf*pmF;
   const mg=(gS('e-herite')?.dataset.k<0||gS('e-conflit')?.dataset.k<0)?.12:.08;
   const low=Math.round(val*(1-mg)/1000)*1000, high=Math.round(val*(1+mg)/1000)*1000, mid=Math.round(val/1000)*1000;
-  _estMid=mid;
+  _estMid=mid; window._est={mid,low,high,pm:pmF,type:tv,surf,city:(c?c.n:'')};
   document.getElementById('erEmpty').style.display='none';
   document.getElementById('erLive').style.display='';
   document.getElementById('erVal').textContent=euro(mid);
@@ -1038,6 +1038,7 @@ function pSave(){
   const act=coi.filter(m=>(+m.p||0)>0); const sum=coi.reduce((a,b)=>a+(+b.p||0),0)||1;
   const lines=[['Valeur du bien', euro(V)]];
   act.forEach(m=> lines.push([(m.n||'—')+' ('+(+m.p||0)+'%)', euro(V*(+m.p||0)/sum)]));
+  lines.push(['Total des parts', sum.toLocaleString('fr-FR')+' %']);
   saveSimulation('parts','Calcul des parts', document.getElementById('p-nom').value, 'Valeur '+euro(V)+' · '+act.length+' indivisaire(s)', lines);
 }
 
@@ -1072,10 +1073,14 @@ function saveSimulation(type, titre, label, summary, lines){
 }
 function eSave(){
   if(!_estMid){ simToast('Lancez d\'abord une estimation (choisissez une commune).'); return; }
-  const lines=[['Valeur estimée', euro(_estMid)]];
-  if(selKey && DB[selKey]) lines.push(['Commune', DB[selKey].n]);
-  const surf=document.getElementById('sN'); if(surf && surf.value) lines.push(['Surface', surf.value+' m²']);
-  saveSimulation('estimation','Estimation', document.getElementById('e-nom').value, 'Valeur estimée '+euro(_estMid), lines);
+  const e=window._est||{mid:_estMid};
+  const lines=[['Valeur estimée', euro(e.mid)]];
+  if(e.low!=null && e.high!=null) lines.push(['Fourchette', euro(e.low)+' à '+euro(e.high)]);
+  if(e.pm) lines.push(['Prix au m²', e.pm.toLocaleString('fr-FR')+' €']);
+  if(e.type) lines.push(['Type de bien', e.type==='maison'?'Maison':'Appartement']);
+  if(e.surf) lines.push(['Surface', e.surf+' m²']);
+  if(e.city) lines.push(['Commune', e.city]);
+  saveSimulation('estimation','Estimation', document.getElementById('e-nom').value, 'Valeur estimée '+euro(e.mid), lines);
 }
 function rcRegimeChange(){
   const r=document.getElementById('rc-regime').value;
@@ -1104,17 +1109,20 @@ function simToast(msg){
 }
 /* Enregistrer le bien simulé dans l'espace personnel (localStorage) */
 function rcSaveToEspace(){
-  const L=window._rcLast||{};
+  const L=window._rcLast;
+  if(!L){ simToast('Lancez d\'abord le calcul du partage.'); return; }
   const lines=[
-    ['Valeur du bien', euro(+document.getElementById('rc-val').value||0)],
-    ['Régime', document.getElementById('rc-regime').value==='partage'?'Partage familial':'Licitation / cession'],
-    ['Taux du droit', (+document.getElementById('rc-taux').value||0).toLocaleString('fr-FR')+' %'],
+    ['Valeur du bien', euro(L.val)],
+    ['Régime', L.regime==='partage'?'Partage familial':'Licitation / cession'],
+    ['Taux du droit', L.taux.toLocaleString('fr-FR')+' %'],
   ];
-  const credit=+document.getElementById('rc-dette').value||0; if(credit) lines.push(['Crédit repris', euro(credit)]);
-  if(L.soulte!=null) lines.push(['Soulte', euro(L.soulte)]);
-  if(L.cout!=null) lines.push(['Coût total', euro(L.cout)]);
-  const summary=(L.cout!=null)?('Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte)):'Vente / rachat de parts';
-  saveSimulation('vente','Vente / rachat de parts', document.getElementById('rc-nom').value, summary, lines);
+  if(L.credit) lines.push(['Crédit repris', euro(L.credit)]);
+  (L.ceders||[]).forEach(c=> lines.push(['Cédant · '+c.n+' ('+c.p+'%)', 'reçoit '+euro(c.montant)]));
+  (L.buyers||[]).forEach(b=> lines.push(['Acheteur · '+b.n, 'verse '+euro(b.pays)+' → '+b.newPct.toLocaleString('fr-FR',{maximumFractionDigits:1})+'%']));
+  lines.push(['Soulte totale', euro(L.soulte)]);
+  lines.push(['Frais de notaire (tout compris)', euro(L.notaire)]);
+  lines.push(['Coût total', euro(L.cout)]);
+  saveSimulation('vente','Vente / rachat de parts', document.getElementById('rc-nom').value, 'Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte), lines);
 }
 function rcCompute(){
   const V=+document.getElementById('rc-val').value||0;
@@ -1154,7 +1162,6 @@ function rcCompute(){
     fraisNotaire=fraisPct/100*valBrutCed;
   }
   const coutTotal=soulteTotal+droit+fraisNotaire;
-  window._rcLast={cout:coutTotal, soulte:soulteTotal, frac:fracCed};
   /* Cédants : chacun reçoit sa part nette */
   const perCeder=ceders.map(m=>({n:m.n||'—', p:+m.p||0, montant:actifNet*(+m.p||0)/sum}));
   /* Acheteurs : se répartissent les parts cédées au prorata de leurs parts actuelles */
@@ -1167,6 +1174,8 @@ function rcCompute(){
     const newPct = (((+m.p||0)+acquiredPct)/sum)*100;   /* nouvelle quote-part */
     return {n:m.n||'—', pays:equity+fees, equity, fees, newPct};
   });
+  window._rcLast={ val:V, regime, taux:tauxPct, credit:D, soulte:soulteTotal, droit, frais:fraisNotaire, notaire:droit+fraisNotaire, cout:coutTotal,
+    ceders:perCeder.map(c=>({n:c.n,p:c.p,montant:c.montant})), buyers:perBuyer.map(b=>({n:b.n,pays:b.pays,newPct:b.newPct})) };
   res.innerHTML=`
     <div class="res-label">Montant total de l'opération</div>
     <div class="res-big">${euro(coutTotal)}</div>
