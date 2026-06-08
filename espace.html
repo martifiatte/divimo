@@ -96,7 +96,8 @@ a { color: inherit; text-decoration: none; }
 .btn-teal:hover { background: var(--teal-light); }
 
 /* ── CARDS ── */
-.card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 20px; margin-bottom: 16px; transition: transform .18s ease, box-shadow .18s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(15,31,61,.07); }
 .card-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .96rem; color: var(--navy); margin-bottom: 4px; }
 .card-sub { color: var(--texte-doux); font-size: .82rem; margin-bottom: 14px; }
 .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
@@ -1281,6 +1282,7 @@ function go(v){
   document.querySelectorAll('.view').forEach(w=>w.classList.toggle('active',w.id==='v-'+v));
   document.getElementById('siteHeader').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='dash') setTimeout(animateDashboard,60);
   if(v==='carte')setTimeout(initMap,80);
   if(v==='admin'){loadAdminData();clearInterval(window._adminTimer);window._adminTimer=setInterval(loadAdminData,30000);}
 }
@@ -1316,6 +1318,9 @@ const DEFAULT = {
     {desc:'Facture plomberie',cat:'travaux',bien:'Maison Annecy',montant:-580,date:'2026-05-20'},
     {desc:'Charges copropriété T2',cat:'copro',bien:'Appt. Lyon',montant:-340,date:'2026-04-01'},
     {desc:'Assurance habitation',cat:'assurance',bien:'Maison Annecy',montant:-420,date:'2026-03-12'},
+    {desc:'Loyer saisonnier printemps',cat:'loyer',bien:'Appt. Lyon',montant:1450,date:'2026-05-02'},
+    {desc:'Facture énergie',cat:'energie',bien:'Maison Annecy',montant:-260,date:'2026-05-28'},
+    {desc:'Travaux ravalement façade',cat:'travaux',bien:'Maison Annecy',montant:-3200,date:'2026-06-01'},
   ],
   inventaire:[
     {nom:'Canapé 3 places',val:'800 €',ic:'sofa',bien:'Maison familiale — Annecy'},
@@ -2907,8 +2912,20 @@ async function loadAdminData(){
   }
 }
 
+function _countUp(el){
+  if(!el) return;
+  const raw=el.textContent;
+  const target=parseFloat(raw.replace(/[^\d.-]/g,''))||0;
+  if(target<=0) return;
+  const isE=/€/.test(raw), t0=performance.now(), dur=850;
+  const fmt=n=> isE ? Math.round(n).toLocaleString('fr-FR')+' €' : Math.round(n).toLocaleString('fr-FR');
+  (function step(t){ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3); el.textContent=fmt(target*e); if(p<1) requestAnimationFrame(step); else el.textContent=raw; })(performance.now());
+}
+function animateDashboard(){ ['kBiens','kCoi','kDocs','kEstim','dashTotalVal','dashMyVal'].forEach(id=>_countUp(document.getElementById(id))); }
+
 renderGroupSelector();
 renderAll();
+animateDashboard();
 </script>
 </body>
 </html>
