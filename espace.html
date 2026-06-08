@@ -1591,8 +1591,8 @@ function renderDashChart(){
   S.biens.forEach(b=>{
     const val = bienVal(b);
     bienParts(b).forEach(p=>{
-      const k = p.ini || p.name; if(!k) return;
-      if(!map[k]) map[k] = {name:p.name||p.ini, ini:p.ini||'?', val:0};
+      const k = (p.name||p.ini||'').trim().toLowerCase(); if(!k) return;
+      if(!map[k]) map[k] = {name:(p.name||p.ini||'').trim(), ini:p.ini||'?', val:0};
       const v = val*(+p.pct||0)/100;
       map[k].val += v; grand += v;
     });
@@ -1602,7 +1602,9 @@ function renderDashChart(){
     el.innerHTML = '<div class="empty"><div class="empty-ic">'+svgIcon('chart',24)+'</div>Ajoutez un bien et ses parts pour voir la répartition.</div>';
     return;
   }
-  const meIni = (meCoi()||{}).ini;
+  const _me = meCoi()||{};
+  const meIni = _me.ini;
+  const meName = (_me.n||'').replace(/\s*\(vous\)/i,'').trim().toLowerCase();
   let off = 0;
   const segs = people.map((p,i)=>{
     const pct = p.val/grand*100;
@@ -1611,7 +1613,7 @@ function renderDashChart(){
   }).join('');
   const legend = people.map((p,i)=>{
     const pct = Math.round(p.val/grand*100);
-    const you = p.ini===meIni ? ' <span class="db-share">(vous)</span>' : '';
+    const you = (p.ini===meIni || (p.name||'').trim().toLowerCase()===meName) ? ' <span class="db-share">(vous)</span>' : '';
     return `<span><i style="background:${PAL[i%PAL.length]}"></i>${p.name} (${pct}%)${you} <b>${eur(p.val)}</b></span>`;
   }).join('');
   el.innerHTML = `
