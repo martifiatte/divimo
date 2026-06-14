@@ -18,7 +18,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -469,6 +469,72 @@ footer { background: #080D1A; border-top: 1px solid rgba(255,255,255,.05); paddi
 .contact-method { font-size: .95rem; color: var(--texte); }
 .contact-method a { color: var(--accent); font-weight: 600; }
 .contact-method .cm-l { display: block; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--texte-leger,#8896A7); margin-bottom: 5px; }
+
+/* ════════════════════════════════════════════════════════════════
+   REFONTE PREMIUM v2 — élévation renforcée (palette Divimo inchangée)
+   Serif d'apparat + italique éditorial + boutons & cartes travaillés
+   ════════════════════════════════════════════════════════════════ */
+.hero-title,
+.section-title {
+  font-family: 'Fraunces', 'Montserrat', Georgia, serif;
+  font-optical-sizing: auto;
+}
+.hero-title {
+  font-weight: 600; letter-spacing: -.025em;
+  font-size: clamp(2.9rem, 5.8vw, 4.7rem); line-height: 1.02;
+}
+/* Mot mis en valeur : italique éditorial, dégradé conservé */
+.hero-title span { font-style: italic; font-weight: 500; }
+.section-title {
+  font-weight: 600; letter-spacing: -.015em;
+  font-size: clamp(2.05rem, 3.4vw, 3.05rem); line-height: 1.1;
+}
+
+/* Eyebrow éditorial : filet dégradé + petites capitales espacées */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: .75rem; letter-spacing: .18em; color: var(--accent);
+}
+.eyebrow::before {
+  content: ""; width: 26px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--teal-light));
+}
+.tc .eyebrow { justify-content: center; }
+.tc .eyebrow::before { display: none; }
+
+/* Hero : label en pastille raffinée */
+.hero-label {
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  padding: .42rem .95rem; border-radius: 999px;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+
+/* Boutons premium : présence + micro-interaction */
+.btn-hero, .btn-cta { letter-spacing: .005em; transition: transform .2s cubic-bezier(.3,.7,.3,1), box-shadow .25s ease, background .2s, border-color .2s; }
+.btn-hero-primary { box-shadow: 0 8px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55); }
+.btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(0,0,0,.34); }
+.btn-hero-secondary { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-color: rgba(255,255,255,.28); }
+.btn-hero-secondary:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.5); }
+
+/* Profondeur premium des cartes (pas de relief au survol, choix conservé) */
+.feat, .usecase, .aud-card {
+  border: 1px solid var(--gris-bord);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(15,31,61,.04), 0 14px 32px -20px rgba(15,31,61,.20);
+}
+
+/* Respiration premium */
+.section { padding-top: clamp(80px, 9.5vw, 128px); padding-bottom: clamp(80px, 9.5vw, 128px); }
+.section-sub { max-width: 60ch; }
+
+/* Révélation au scroll plus raffinée */
+.reveal { transition-duration: .8s; transition-timing-function: cubic-bezier(.16,.8,.24,1); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
 </style>
 </head>
 <body>
@@ -621,7 +687,7 @@ footer { background: #080D1A; border-top: 1px solid rgba(255,255,255,.05); paddi
       <div class="aud-card reveal rd1">
         <div class="aud-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></div>
         <h3>Particuliers patrimoniaux</h3>
-        <p>Vous détenez plusieurs biens en indivision — héritage, achat en commun, SCI familiale. Vous avez besoin d'une vue claire sur votre patrimoine et d'outils pour prendre les bonnes décisions.</p>
+        <p>Vous détenez plusieurs biens en indivision : héritage, achat en commun ou SCI familiale. Vous avez besoin d'une vue claire sur votre patrimoine et d'outils pour prendre les bonnes décisions.</p>
         <ul class="aud-list">
           <li>Vue consolidée de tous vos biens</li>
           <li>Calcul des parts et simulation de soulte</li>
