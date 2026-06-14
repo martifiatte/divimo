@@ -971,7 +971,18 @@ const SIM_DEFAULT_GROUPES = {
     {nom:'Villa — Marseille 8e', info:'13008 Marseille · 160 m²', val:'620 000 €', parts:[{ini:'MF',name:'Marti',pct:34},{ini:'SG',name:'Sophie',pct:33},{ini:'KR',name:'Karim',pct:33}]},
   ]},
 };
+/* Connecté ? (même logique synchrone que header-auth.js, zéro flash) */
+function simLoggedIn(){
+  try{
+    var p=JSON.parse(localStorage.getItem('sb-anrwoxsibhabivtkepqt-auth-token')||'');
+    var u=p&&(p.user||(p.currentSession&&p.currentSession.user));
+    var e=p&&(p.expires_at||(p.currentSession&&p.currentSession.expires_at));
+    return !!(u&&(!e||Date.now()/1000<e));
+  }catch(_){ return false; }
+}
 function divimoGroups(){
+  /* Déconnecté : aucun bien enregistré accessible (le menu se cache) */
+  if(!simLoggedIn()) return {};
   let g=null; try{ g=JSON.parse(localStorage.getItem('divimo_groupes')||'null'); }catch(e){ g=null; }
   return (g && typeof g==='object' && Object.keys(g).length) ? g : SIM_DEFAULT_GROUPES;
 }
