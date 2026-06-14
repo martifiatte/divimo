@@ -179,8 +179,31 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 #simToast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.86rem;padding:.8rem 1.2rem;border-radius:10px;box-shadow:0 10px 30px rgba(15,31,61,.3);opacity:0;pointer-events:none;transition:.25s;z-index:2000;max-width:90vw;text-align:center}
 #simToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
+  <link rel="stylesheet" href="premium.css">
 </head>
 <body>
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand-logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
+      Divimo
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="simulateurs.html" class="active">Simulateurs</a>
+      <a href="offres.html">Nos offres</a>
+      <a href="apropos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="connexion.html" class="hbtn hbtn-ghost">Se connecter</a>
+      <a href="creer-compte.html" class="hbtn hbtn-primary">Créer mon compte</a>
+    </div>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" onclick="this.closest('.site-header').classList.toggle('open')">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
 
 
 <div class="sim-intro wrap">

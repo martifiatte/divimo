@@ -1,0 +1,44 @@
+/* ════════════════════════════════════════════════════════════════
+   DIVIMO — Couche premium partagée (refonte)
+   Déclinaison de la direction validée sur la page d'accueil.
+   Palette Divimo strictement inchangée (variables de style.css).
+   À lier EN DERNIER dans le <head> pour primer sur les styles de page.
+   ════════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&display=swap');
+
+/* — Titres serif d'apparat — */
+h1, h2,
+.hero-title, .section-title, .page-title {
+  font-family: 'Fraunces', 'Montserrat', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  letter-spacing: -.018em;
+}
+/* Accent éditorial : mot mis en valeur en italique */
+.hero-title span, h1 em, h2 em { font-style: italic; font-weight: 500; }
+
+/* — Eyebrow éditorial (filet dégradé) — */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: .75rem; letter-spacing: .18em; color: var(--accent);
+}
+.eyebrow::before {
+  content: ""; width: 26px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--teal-light));
+}
+.tc .eyebrow, .center .eyebrow, .text-center .eyebrow { justify-content: center; }
+.tc .eyebrow::before, .center .eyebrow::before, .text-center .eyebrow::before { display: none; }
+
+/* — Profondeur premium des cartes neutres (pas de relief au survol) — */
+.feat, .usecase, .aud-card {
+  border: 1px solid var(--gris-bord);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(15,31,61,.04), 0 14px 32px -20px rgba(15,31,61,.20);
+}
+
+/* — Boutons : finition — */
+.btn-hero, .btn-cta { letter-spacing: .005em; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
