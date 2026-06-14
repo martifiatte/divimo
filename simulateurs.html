@@ -936,16 +936,48 @@ function rcAdd(){ rcoi.push({n:'',p:0,role:'ceder'}); rcRender(); }
 function rcFraisAutoToggle(){ document.getElementById('rc-frais').disabled = document.getElementById('rc-frais-auto').checked; rcCompute(); }
 /* Charger un bien enregistré dans l'espace (localStorage) */
 /* ── Biens enregistrés (partagés par les 3 simulateurs) ── */
-function divimoGroups(){ try{ return JSON.parse(localStorage.getItem('divimo_groupes')||'null'); }catch(e){ return null; } }
-function divimoBiens(){
-  const g=divimoGroups(); const out=[];
-  if(g && typeof g==='object') Object.values(g).forEach(grp=>{ (grp&&grp.biens||[]).forEach(b=>out.push({label:((grp.nom?grp.nom+' · ':'')+(b.nom||'Bien')), nom:b.nom||'Bien', val:b.val, info:b.info||'', parts:b.parts||[]})); });
-  return out;
+/* Groupes par défaut, identiques à l'espace : filet de sécurité pour que les biens
+   ne disparaissent JAMAIS, même si le localStorage de ce domaine est vide
+   (le stockage navigateur est propre à chaque domaine/adresse). */
+const SIM_DEFAULT_GROUPES = {
+  g1:{ nom:'Indivision familiale — Annecy & Lyon', biens:[
+    {nom:'Maison familiale — Annecy', info:'74000 Annecy · 120 m²', val:'320 000 €', parts:[{ini:'MF',name:'Marti',pct:45},{ini:'PD',name:'Paul',pct:30},{ini:'LM',name:'Léa',pct:25}]},
+    {nom:'Appartement — Lyon', info:'69003 Lyon · 58 m²', val:'265 000 €', parts:[{ini:'MF',name:'Marti',pct:50},{ini:'PD',name:'Paul',pct:50}]},
+  ]},
+  g2:{ nom:'SCI Les Oliviers — Marseille', biens:[
+    {nom:'Villa — Marseille 8e', info:'13008 Marseille · 160 m²', val:'620 000 €', parts:[{ini:'MF',name:'Marti',pct:34},{ini:'SG',name:'Sophie',pct:33},{ini:'KR',name:'Karim',pct:33}]},
+  ]},
+};
+function divimoGroups(){
+  let g=null; try{ g=JSON.parse(localStorage.getItem('divimo_groupes')||'null'); }catch(e){ g=null; }
+  return (g && typeof g==='object' && Object.keys(g).length) ? g : SIM_DEFAULT_GROUPES;
 }
+function escAttr(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* Biens regroupés par indivision, avec un index global (_i) stable pour la sélection */
+function divimoBienGroups(){
+  const g=divimoGroups(); const groups=[]; let i=0;
+  if(g && typeof g==='object') Object.values(g).forEach(grp=>{
+    const items=(grp&&grp.biens||[]).map(b=>({ _i:i++, nom:b.nom||'Bien', val:b.val, info:b.info||'', parts:b.parts||[],
+      groupe:(grp&&grp.nom)||'Indivision', label:((grp&&grp.nom?grp.nom+' · ':'')+(b.nom||'Bien')) }));
+    if(items.length) groups.push({ nom:(grp&&grp.nom)||'Indivision', items });
+  });
+  return groups;
+}
+/* Liste à plat (même ordre que les index _i) — utilisée par les chargeurs de bien */
+function divimoBiens(){ const out=[]; divimoBienGroups().forEach(gr=>gr.items.forEach(b=>out.push(b))); return out; }
 function parseVal(v){ return parseFloat(String(v||'').replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0; }
 function fillBienSelect(selId, wrapId){
-  const list=divimoBiens(), sel=document.getElementById(selId);
-  if(sel){ sel.innerHTML='<option value="">— Choisir un bien —</option>'+list.map((b,i)=>`<option value="${i}">${(b.label||'').replace(/</g,'&lt;')}</option>`).join(''); }
+  const groups=divimoBienGroups(), list=divimoBiens(), sel=document.getElementById(selId);
+  if(sel){
+    let html='<option value="">— Choisir un bien —</option>';
+    if(groups.length<=1){
+      html+=(groups[0]?groups[0].items:[]).map(b=>`<option value="${b._i}">${escAttr(b.nom)}</option>`).join('');
+    }else{
+      /* Plusieurs indivisions : on sépare visuellement chaque groupe pour s'y retrouver */
+      html+=groups.map(gr=>`<optgroup label="${escAttr(gr.nom)}">`+gr.items.map(b=>`<option value="${b._i}">${escAttr(b.nom)}</option>`).join('')+'</optgroup>').join('');
+    }
+    sel.innerHTML=html;
+  }
   const wrap=document.getElementById(wrapId); if(wrap) wrap.style.display = list.length ? '' : 'none';
   return list;
 }
