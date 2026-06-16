@@ -1722,14 +1722,15 @@ function guessFolder(d){
 }
 function demoVotes(){
   const c=S.coi||[]; const ini=c.map(x=>x.ini); const me=(meCoi()||{}).ini;
+  const biens=S.biens||[]; const b0=(biens[0]||{}).nom||'__all__'; const b1=(biens[1]||biens[0]||{}).nom||'__all__';
   const v=[];
-  v.push({ id:'v'+Date.now(), titre:'Réfection de la toiture (Maison Annecy)',
+  v.push({ id:'v'+Date.now(), titre:'Réfection de la toiture', bien:b0,
     desc:"Devis de 12 400 € pour la réfection complète de la toiture suite aux infiltrations, réparti au prorata des quotes-parts.",
     options:['Pour','Contre','Abstention'], deadline:_plusDays(12), status:'open',
     ballots: ini[1]?{[ini[1]]:0}:{}, signatures:[], createdBy:me });
   const ballots={}; ini.forEach((x,k)=>{ ballots[x]=k===1?1:0; });
-  v.push({ id:'v'+(Date.now()+1), titre:'Mandat de vente — Appartement Lyon',
-    desc:"Donner mandat à l'agence pour la mise en vente de l'appartement de Lyon au prix de 265 000 €.",
+  v.push({ id:'v'+(Date.now()+1), titre:'Mandat de vente', bien:b1,
+    desc:"Donner mandat à l'agence pour la mise en vente du bien au prix convenu.",
     options:['Pour','Contre','Abstention'], deadline:_minusDays(5), status:'closed',
     ballots, signatures:[], createdBy:me });
   return v;
@@ -1771,7 +1772,7 @@ function renderVotes(){
       return `<div class="vote-bar-row"><span class="vbl">${cEsc(r.label)}</span><div class="vbar"><i style="width:${w}%;background:${col}"></i></div><span class="vbp">${w}%</span></div>`; }).join('');
     const opts=open?`<div class="vote-opts">`+v.options.map((o,oi)=>`<button class="vote-opt${myBallot===oi?' chosen':''}" onclick="castVote('${v.id}',${oi})">${cEsc(o)}${myBallot===oi?' ✓':''}</button>`).join('')+`</div>`:'';
     return `<div class="card vote-card">
-      <div class="vote-top"><div><span class="vote-status ${open?'open':'closed'}">${open?'Ouvert':'Clôturé'}</span><h3 class="vote-title">${cEsc(v.titre)}</h3></div>
+      <div class="vote-top"><div><span class="vote-status ${open?'open':'closed'}">${open?'Ouvert':'Clôturé'}</span><h3 class="vote-title">${cEsc(v.titre)}</h3><span class="vote-bien">${svgIcon('home',12)} ${cEsc(voteBienLabel(v))}</span></div>
         <span class="vote-deadline">${open?('Échéance : '+cFrDate(v.deadline)):('Clôturé le '+cFrDate(v.deadline))}</span></div>
       <p class="vote-desc">${cEsc(v.desc)}</p>${opts}
       <div class="vote-result">${bars}</div>
@@ -1782,12 +1783,19 @@ function renderVotes(){
 }
 function castVote(id,oi){ const v=S.votes.find(x=>x.id===id); if(!v||v.status!=='open')return; const me=(meCoi()||{}).ini; if(!me)return; v.ballots=v.ballots||{}; v.ballots[me]=oi; save(); renderVotes(); toast('Vote enregistré.'); }
 function closeVoteDecision(id){ const v=S.votes.find(x=>x.id===id); if(!v)return; v.status='closed'; v.deadline=cToday(); save(); renderVotes(); toast('Décision clôturée.'); }
-function openVoteModal(){ document.getElementById('voteTitle').value=''; document.getElementById('voteDesc').value=''; document.getElementById('voteDeadline').value=_plusDays(14); document.getElementById('voteModal').classList.add('open'); }
+function openVoteModal(){
+  document.getElementById('voteTitle').value=''; document.getElementById('voteDesc').value=''; document.getElementById('voteDeadline').value=_plusDays(14);
+  const bs=document.getElementById('voteBien');
+  if(bs) bs.innerHTML=`<option value="__all__">Toute l'indivision</option>`+(S.biens||[]).map(b=>`<option value="${cEsc(b.nom)}">${cEsc(b.nom.split('—')[0].trim())}</option>`).join('');
+  document.getElementById('voteModal').classList.add('open');
+}
+function voteBienLabel(v){ return (!v||!v.bien||v.bien==='__all__')?"Toute l'indivision":v.bien.split('—')[0].trim(); }
 function closeVoteModal(){ document.getElementById('voteModal').classList.remove('open'); }
 function saveVote(){
   const t=document.getElementById('voteTitle').value.trim(); if(!t){ toast('Donnez un objet à la décision.'); return; }
   S.votes=S.votes||[];
-  S.votes.unshift({ id:'v'+Date.now(), titre:t, desc:document.getElementById('voteDesc').value.trim(), options:['Pour','Contre','Abstention'], deadline:document.getElementById('voteDeadline').value||_plusDays(14), status:'open', ballots:{}, signatures:[], createdBy:(meCoi()||{}).ini });
+  const bn=document.getElementById('voteBien'); const bien=bn?bn.value:'__all__';
+  S.votes.unshift({ id:'v'+Date.now(), titre:t, bien, desc:document.getElementById('voteDesc').value.trim(), options:['Pour','Contre','Abstention'], deadline:document.getElementById('voteDeadline').value||_plusDays(14), status:'open', ballots:{}, signatures:[], createdBy:(meCoi()||{}).ini });
   save(); closeVoteModal(); renderVotes(); toast('Décision créée — les co-indivisaires peuvent voter.');
 }
 
@@ -1812,6 +1820,7 @@ function openPV(id){
     <div class="pv-head"><div class="pv-brand">${svgIcon('scale',20)} Divimo</div><div class="pv-meta">Procès-verbal d'assemblée<br>${cEsc(S.nom||'Indivision')}</div></div>
     <h2 class="pv-h2">Procès-verbal de décision</h2>
     <p class="pv-line"><b>Objet :</b> ${cEsc(v.titre)}</p>
+    <p class="pv-line"><b>Bien :</b> ${cEsc(voteBienLabel(v))}</p>
     <p class="pv-line"><b>Date :</b> ${cFrDate(v.deadline)}</p>
     <p class="pv-line">${cEsc(v.desc)}</p>
     <table class="pv-table"><thead><tr><th>Co-indivisaire</th><th>Quote-part</th><th>Vote</th></tr></thead><tbody>${rows}</tbody></table>
@@ -1848,23 +1857,32 @@ function msgKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); post
 
 /* ── Documents : dossiers + visionneuse ── */
 let docFolder='__allfold__';
+function folderIcon(f){ return f==='Actes'?'file':f==='Factures'?'receipt':f==='Juridique'?'scale':f==='Assurance'?'shield':'box'; }
+function docPick(){ const dz=document.getElementById('dropZone'); if(dz) dz.click(); }
 function renderDocs(){
   const el=document.getElementById('docsList'); if(!el) return; normalizeCollab();
+  /* Cible de dépôt = biens du groupe actif */
   const up=document.getElementById('docUploadBien');
-  if(up){ const cur=up.value; up.innerHTML=`<option value="__all__">Tous les biens (commun)</option>`+S.biens.map(b=>`<option value="${cEsc(b.nom)}">${cEsc(b.nom)}</option>`).join(''); if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur; }
-  const fb=document.getElementById('docFilterBar');
-  if(fb){ fb.innerHTML=`<span class="bf-chip${docFilter==='__all_filter__'?' sel':''}" onclick="docFilter='__all_filter__';renderDocs()">Tous les biens</span>`+S.biens.map(b=>`<span class="bf-chip${docFilter===b.nom?' sel':''}" onclick="docFilter='${cEsc(b.nom).replace(/'/g,"\\'")}';renderDocs()">${cEsc(b.nom.split('—')[0].trim())}</span>`).join('')+`<span class="bf-chip${docFilter==='__all__'?' sel':''}" onclick="docFilter='__all__';renderDocs()">Communs</span>`; }
+  if(up){ const cur=up.value; up.innerHTML=`<option value="__all__">Commun à l'indivision</option>`+S.biens.map(b=>`<option value="${cEsc(b.nom)}">${cEsc(b.nom.split('—')[0].trim())}</option>`).join(''); if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur; }
+  /* Dossiers en cartes */
   const fol=document.getElementById('docFolderBar');
-  if(fol){ fol.innerHTML=`<span class="fold-chip${docFolder==='__allfold__'?' sel':''}" onclick="docFolder='__allfold__';renderDocs()">${svgIcon('folder',13)} Tous les dossiers</span>`+DOC_FOLDERS.map(f=>{ const n=S.docs.filter(d=>d.dossier===f).length; return `<span class="fold-chip${docFolder===f?' sel':''}" onclick="docFolder='${f}';renderDocs()">${cEsc(f)}<i class="fold-n">${n}</i></span>`; }).join(''); }
-  const list=S.docs.map((d,i)=>({...d,i})).filter(d=>{
-    const okB= docFilter==='__all_filter__'?true: docFilter==='__all__'? d.bien==='__all__' : (d.bien===docFilter||d.bien==='__all__');
-    const okF= docFolder==='__allfold__'?true: d.dossier===docFolder; return okB&&okF; });
-  el.innerHTML=list.map(d=>{ const isAll=d.bien==='__all__'; const bienLabel=isAll?'Commun':(d.bien?d.bien.split('—')[0].trim():'—');
-    return `<div class="row-item doc-row" onclick="openDoc(${d.i})">
+  if(fol){
+    const fcard=(key,label,icon)=>{ const n=key==='__allfold__'?S.docs.length:S.docs.filter(d=>d.dossier===key).length; return `<button class="doc-folder${docFolder===key?' sel':''}" onclick="docFolder='${key}';renderDocs()"><span class="df-ic">${icon}</span><span class="df-name">${cEsc(label)}</span><span class="df-n">${n}</span></button>`; };
+    fol.innerHTML=fcard('__allfold__','Tous',svgIcon('folder',17))+DOC_FOLDERS.map(f=>fcard(f,f,svgIcon(folderIcon(f),17))).join('');
+  }
+  /* Documents du dossier sélectionné, regroupés par bien */
+  const docs=S.docs.map((d,i)=>({...d,i})).filter(d=> docFolder==='__allfold__'?true:d.dossier===docFolder);
+  if(!docs.length){ el.innerHTML='<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document dans ce dossier.</div>'; return; }
+  const groups=[];
+  (S.biens||[]).forEach(b=>{ const items=docs.filter(d=>d.bien===b.nom); if(items.length) groups.push({label:b.nom.split('—')[0].trim(), items}); });
+  const commun=docs.filter(d=>d.bien==='__all__'); if(commun.length) groups.push({label:"Commun à l'indivision", items:commun});
+  const known=new Set((S.biens||[]).map(b=>b.nom)); const orph=docs.filter(d=>d.bien!=='__all__'&&!known.has(d.bien)); if(orph.length) groups.push({label:'Autres', items:orph});
+  el.innerHTML=groups.map(g=>`<div class="doc-group"><div class="doc-group-h">${cEsc(g.label)}<span>${g.items.length}</span></div>`
+    +g.items.map(d=>`<div class="row-item doc-row" onclick="openDoc(${d.i})">
       <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon(d.pvOf?'scale':'file',18)}</div>
-      <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-bien-tag ${isAll?'all':''}">${cEsc(bienLabel)}</span> · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
+      <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
       <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="S.docs.splice(${d.i},1);save();renderDocs()">×</span></div>
-    </div>`; }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document pour ce filtre.</div>';
+    </div>`).join('')+`</div>`).join('');
 }
 function docExt(name){ const m=String(name||'').match(/\.([a-z0-9]+)$/i); return m?m[1].toUpperCase():'DOC'; }
 function openDoc(i){
