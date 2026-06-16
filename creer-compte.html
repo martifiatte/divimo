@@ -8,108 +8,135 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Open Sans',sans-serif;color:var(--texte);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.2}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:1.05fr .95fr;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.15}
 a{color:inherit;text-decoration:none}
-@media(max-width:860px){body{grid-template-columns:1fr}.brand{display:none!important}}
-.brand{background:linear-gradient(150deg,#1A237E,#5C6BC0);color:#fff;padding:54px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-.brand .dotgrid{position:absolute;width:280px;height:280px;background-image:radial-gradient(rgba(255,255,255,.5) 1.5px,transparent 1.5px);background-size:18px 18px;opacity:.15;bottom:-50px;right:-50px}
-.brand .logo{display:flex;align-items:center;gap:.6rem;font-family:'Montserrat';font-weight:800;font-size:1.5rem;color:#fff;position:relative}
-.brand .slogan{position:relative}
-.brand .slogan h2{font-size:2rem;font-weight:800;line-height:1.25;margin-bottom:1rem}
-.brand .slogan p{color:rgba(255,255,255,.85);font-size:1.05rem;max-width:380px}
-.brand .pts{position:relative;display:flex;flex-direction:column;gap:.8rem;margin-top:1.4rem}
-.brand .pts div{display:flex;gap:.7rem;align-items:center;font-size:.96rem;color:rgba(255,255,255,.92)}
-.brand .pts .c{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:.8rem}
-.back{position:absolute;top:24px;left:24px;font-size:.9rem;color:rgba(255,255,255,.8);display:flex;gap:.4rem;align-items:center}
-.form-side{display:flex;align-items:center;justify-content:center;padding:42px 24px;background:#F7F8FE}
-.form-box{width:100%;max-width:420px}
-.back-m{display:none}@media(max-width:860px){.back-m{display:inline-flex;color:var(--texte-doux);margin-bottom:16px;font-size:.9rem;gap:.4rem;align-items:center}}
-.form-box .eyebrow{font-family:'Montserrat';font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.74rem;color:var(--bleu-violet)}
-.form-box h1{font-size:1.75rem;font-weight:800;color:var(--bleu-roi);margin:.4rem 0 .3rem}
-.form-box .sub{color:var(--texte-doux);font-size:.95rem;margin-bottom:24px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:420px){.row2{grid-template-columns:1fr}}
+@media(max-width:880px){body{grid-template-columns:1fr}.brand{display:none!important}}
+
+/* ── Panneau marque (gauche) ── */
+.brand{position:relative;overflow:hidden;color:#fff;padding:56px 60px;display:flex;flex-direction:column;justify-content:space-between;background:var(--navy)}
+.brand::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 75% 0%, rgba(44,82,130,.55) 0%, transparent 62%),radial-gradient(ellipse 55% 45% at 0% 100%, rgba(45,106,106,.34) 0%, transparent 60%)}
+.brand::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:linear-gradient(160deg,#000,transparent 75%);mask-image:linear-gradient(160deg,#000,transparent 75%)}
+.brand>*{position:relative;z-index:1}
+.brand .top{display:flex;align-items:center;justify-content:space-between}
+.brand .logo{display:inline-flex;align-items:center;gap:.6rem;font-family:'Montserrat';font-weight:800;font-size:1.45rem;color:#fff}
+.brand .back{font-size:.86rem;color:rgba(255,255,255,.72);display:inline-flex;gap:.4rem;align-items:center;transition:.15s}
+.brand .back:hover{color:#fff}
+.brand .slogan h2{font-size:clamp(2.4rem,3.6vw,3.3rem);font-weight:600;line-height:1.1;letter-spacing:-.01em;margin-bottom:1.1rem}
+.brand .slogan h2 em{font-style:italic;font-weight:500;color:#A8C7E8}
+.brand .slogan p{color:rgba(255,255,255,.72);font-size:1.06rem;line-height:1.7;max-width:400px}
+.brand .pts{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
+.brand .pts div{display:flex;gap:.85rem;align-items:center;font-size:.97rem;color:rgba(255,255,255,.9)}
+.brand .pts .c{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:rgba(74,155,142,.18);border:1px solid rgba(122,184,184,.35);display:flex;align-items:center;justify-content:center;color:#7EB8B8}
+.brand .foot{font-size:.82rem;color:rgba(255,255,255,.4)}
+
+/* ── Panneau formulaire (droite) ── */
+.form-side{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 26px;background:#FAFBFE}
+.form-box{width:100%;max-width:430px}
+.form-foot{width:100%;max-width:430px;text-align:center;font-size:.8rem;color:var(--texte-leger,#8896A7);margin-top:28px;padding-top:18px;border-top:1px solid var(--gris-bord)}
+.form-foot a{color:var(--texte-doux);font-weight:600}.form-foot a:hover{color:var(--navy)}
+.back-m{display:none}
+@media(max-width:880px){.back-m{display:inline-flex;color:var(--texte-doux);margin-bottom:18px;font-size:.9rem;gap:.4rem;align-items:center}}
+.form-box .eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-family:'Montserrat';font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.72rem;color:var(--accent)}
+.form-box .eyebrow::before{content:"";width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--teal-light))}
+.form-box h1{font-size:clamp(2rem,2.8vw,2.6rem);font-weight:600;color:var(--navy);margin:.6rem 0 .35rem;letter-spacing:-.005em}
+.form-box .sub{color:var(--texte-doux);font-size:.97rem;margin-bottom:26px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:440px){.row2{grid-template-columns:1fr}}
 .field{margin-bottom:16px}
-.field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.85rem;color:var(--bleu-roi);margin-bottom:.4rem}
-.field label .req{color:#eb5757}
+.field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.85rem;color:var(--navy);margin-bottom:.42rem}
+.field label .req{color:#C0392B}
 .inp{position:relative}
-input{width:100%;padding:.8rem .95rem;border:1.6px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans';font-size:.97rem;background:#fff;transition:.2s}
-input:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.13)}
-input.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
-.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--texte-doux);background:none;border:none;font-size:1.05rem}
-.err-msg{color:#eb5757;font-size:.78rem;margin-top:.3rem;display:none}.err-msg.show{display:block}
-.strength{height:6px;border-radius:99px;background:var(--gris-bord);margin-top:8px;overflow:hidden}
+input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans';font-size:.97rem;color:var(--texte);background:#fff;transition:border-color .18s,box-shadow .18s}
+input::placeholder{color:var(--texte-leger,#8896A7)}
+input:focus{outline:none;border-color:var(--accent-light);box-shadow:0 0 0 4px rgba(74,127,181,.15)}
+input.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
+.inp:has(.eye) input{padding-right:3rem}
+.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--texte-doux);background:none;border:none;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:.15s}
+.eye:hover{background:var(--gris-clair);color:var(--navy)}
+.err-msg{color:#C0392B;font-size:.78rem;margin-top:.32rem;display:none}.err-msg.show{display:block}
+.strength{height:6px;border-radius:99px;background:var(--gris-bord);margin-top:9px;overflow:hidden}
 .strength i{display:block;height:100%;width:0;transition:.3s;border-radius:99px}
-.strength-lbl{font-size:.76rem;margin-top:5px;color:var(--texte-doux)}
-.cgu{display:flex;gap:.5rem;align-items:flex-start;font-size:.84rem;color:var(--texte-doux);margin:6px 0 20px}
-.cgu input{width:auto;margin-top:3px}
-.cgu a{color:var(--bleu-violet);font-weight:600}
-.btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:1rem;padding:.9rem;border-radius:12px;cursor:pointer;border:none;background:var(--bleu-violet);color:#fff;transition:.25s;box-shadow:0 8px 22px rgba(92,107,192,.32)}
-.btn:hover{background:var(--bleu-roi);transform:translateY(-2px)}
-.alt-link{text-align:center;margin-top:22px;font-size:.94rem;color:var(--texte-doux)}.alt-link a{color:var(--bleu-violet);font-weight:600}
-.success{display:none;text-align:center;padding:20px 0}
-.success .circle{width:74px;height:74px;border-radius:50%;background:rgba(165,196,189,.25);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 18px}
-.success h1{color:var(--bleu-roi)}
+.strength-lbl{font-size:.76rem;margin-top:6px;color:var(--texte-doux)}
+.cgu{display:flex;gap:.55rem;align-items:flex-start;font-size:.84rem;color:var(--texte-doux);margin:8px 0 20px}
+.cgu input{width:auto;margin-top:3px;accent-color:var(--accent)}
+.cgu a{color:var(--accent);font-weight:600}
+.btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:1rem;padding:.95rem;border-radius:12px;cursor:pointer;border:none;color:#fff;background:var(--navy);transition:transform .2s cubic-bezier(.3,.7,.3,1),box-shadow .25s,background .2s;box-shadow:0 10px 26px -8px rgba(15,31,61,.5)}
+.btn:hover{background:var(--accent);transform:translateY(-2px);box-shadow:0 16px 34px -10px rgba(15,31,61,.5)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.65;cursor:default;transform:none}
+.alt-link{text-align:center;margin-top:24px;font-size:.94rem;color:var(--texte-doux)}.alt-link a{color:var(--accent);font-weight:600}.alt-link a:hover{color:var(--navy)}
+.success{display:none;text-align:center;padding:14px 0}
+.success .circle{width:74px;height:74px;border-radius:50%;background:rgba(74,155,142,.16);border:1px solid rgba(122,184,184,.4);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.success h1{color:var(--navy)}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
 </style>
   <link rel="stylesheet" href="premium.css">
 </head>
 <body>
 <div class="brand">
-  <a href="index.html" class="back">← Retour au site</a>
-  <a href="index.html" class="logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#A5C4BD"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
+  <div class="top">
+    <a href="index.html?site=1" class="logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A9B8E"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
+    <a href="index.html?site=1" class="back" aria-label="Retour au site">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Retour au site
+    </a>
+  </div>
   <div class="slogan">
-    <h2>Rejoignez Divimo dès aujourd'hui.</h2>
+    <h2>Rejoignez Divimo<br><em>dès aujourd'hui.</em></h2>
     <p>Une nouvelle façon de gérer vos biens en indivision, en toute confiance.</p>
     <div class="pts">
-      <div><span class="c">✓</span> Inscription gratuite et sans engagement</div>
-      <div><span class="c">✓</span> Accès immédiat aux simulateurs</div>
-      <div><span class="c">✓</span> Données hébergées et sécurisées en France</div>
+      <div><span class="c"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Inscription gratuite et sans engagement</div>
+      <div><span class="c"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Accès immédiat aux simulateurs</div>
+      <div><span class="c"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Données hébergées et sécurisées en France</div>
     </div>
   </div>
-  <div class="dotgrid"></div>
+  <div class="foot">© Divimo · Gestion d'indivision</div>
 </div>
 
 <div class="form-side">
   <div class="form-box">
-    <a href="index.html" class="back-m">← Retour au site</a>
+    <a href="index.html?site=1" class="back-m">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Retour au site
+    </a>
     <div id="formWrap">
       <span class="eyebrow">Créer un compte</span>
-      <h1>Créez votre compte Divimo</h1>
+      <h1>Créez votre compte</h1>
       <p class="sub">Quelques secondes suffisent. Aucun paiement requis pour s'inscrire.</p>
       <form id="signupForm" novalidate>
         <div class="row2">
-          <div class="field"><label>Prénom <span class="req">*</span></label><input type="text" id="prenom"><div class="err-msg">Requis</div></div>
-          <div class="field"><label>Nom <span class="req">*</span></label><input type="text" id="nom"><div class="err-msg">Requis</div></div>
+          <div class="field"><label for="prenom">Prénom <span class="req">*</span></label><input type="text" id="prenom" autocomplete="given-name"><div class="err-msg">Requis</div></div>
+          <div class="field"><label for="nom">Nom <span class="req">*</span></label><input type="text" id="nom" autocomplete="family-name"><div class="err-msg">Requis</div></div>
         </div>
-        <div class="field"><label>Email <span class="req">*</span></label><div class="inp"><input type="text" id="email" placeholder="vous@email.com"></div><div class="err-msg">Email invalide</div></div>
-        <div class="field"><label>Mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd" placeholder="8 caractères minimum" oninput="checkStrength()"><button type="button" class="eye" onclick="togglePwd('pwd',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+        <div class="field"><label for="email">Email <span class="req">*</span></label><div class="inp"><input type="email" id="email" autocomplete="email" placeholder="vous@email.com"></div><div class="err-msg">Email invalide</div></div>
+        <div class="field"><label for="pwd">Mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd" autocomplete="new-password" placeholder="8 caractères minimum" oninput="checkStrength()"><button type="button" class="eye" aria-label="Afficher le mot de passe" onclick="togglePwd('pwd',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
           <div class="strength"><i id="sBar"></i></div><div class="strength-lbl" id="sLbl">Utilisez 8+ caractères, avec majuscule et chiffre.</div>
           <div class="err-msg">8 caractères minimum</div></div>
-        <div class="field"><label>Confirmer le mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd2" placeholder="••••••••"><button type="button" class="eye" onclick="togglePwd('pwd2',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="err-msg">Les mots de passe ne correspondent pas</div></div>
-        <label class="cgu"><input type="checkbox" id="cgu"> J'accepte les <a href="#">Conditions Générales d'Utilisation</a> et la <a href="#">Politique de confidentialité</a> de Divimo.</label>
+        <div class="field"><label for="pwd2">Confirmer le mot de passe <span class="req">*</span></label><div class="inp"><input type="password" id="pwd2" autocomplete="new-password" placeholder="••••••••"><button type="button" class="eye" aria-label="Afficher le mot de passe" onclick="togglePwd('pwd2',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="err-msg">Les mots de passe ne correspondent pas</div></div>
+        <label class="cgu"><input type="checkbox" id="cgu"> J'accepte les <a href="mentions-legales.html">Conditions Générales d'Utilisation</a> et la <a href="politique-confidentialite.html">Politique de confidentialité</a> de Divimo.</label>
         <button type="submit" class="btn">Créer mon compte</button>
       </form>
       <p class="alt-link">Déjà inscrit ? <a href="connexion.html">Se connecter</a></p>
     </div>
     <div class="success" id="success">
-      <div class="circle"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <h1>Bienvenue chez Divimo !</h1>
+      <div class="circle"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h1>Bienvenue chez Divimo</h1>
       <p class="sub" id="successMsg" style="margin-top:.6rem">Votre compte a bien été créé. Vous pouvez maintenant accéder à votre espace.</p>
       <a href="espace.html" class="btn" id="successBtn" style="text-decoration:none">Accéder à mon espace →</a>
     </div>
   </div>
+  <div class="form-foot">Inscription chiffrée · <a href="mentions-legales.html">Mentions légales</a> · <a href="politique-confidentialite.html">Confidentialité</a></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script>
-function togglePwd(id,b){const i=document.getElementById(id);const s=i.type==='password';i.type=s?'text':'password';b.innerHTML=s?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M17.9 17.9A10 10 0 0 1 12 20C5 20 1 12 1 12a18 18 0 0 1 5-6M9.9 4.2A9 9 0 0 1 12 4c7 0 11 8 11 8a18 18 0 0 1-2.2 3.2M14.1 14.1A3 3 0 1 1 9.9 9.9"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';}
+function togglePwd(id,b){const i=document.getElementById(id);const s=i.type==='password';i.type=s?'text':'password';b.setAttribute('aria-label',s?'Masquer le mot de passe':'Afficher le mot de passe');b.innerHTML=s?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10 10 0 0 1 12 20C5 20 1 12 1 12a18 18 0 0 1 5-6M9.9 4.2A9 9 0 0 1 12 4c7 0 11 8 11 8a18 18 0 0 1-2.2 3.2M14.1 14.1A3 3 0 1 1 9.9 9.9"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';}
 function scorePwd(p){let s=0;if(p.length>=8)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return s;}
 function checkStrength(){
   const p=document.getElementById('pwd').value,s=scorePwd(p);
   const bar=document.getElementById('sBar'),lbl=document.getElementById('sLbl');
-  const cfg=[['0%','',''],['33%','#eb5757','Faible'],['60%','#F2994A','Moyen'],['80%','#5C6BC0','Bon'],['100%','#19a974','Excellent']][p?s:0]||['0%','',''];
+  const cfg=[['0%','',''],['33%','#C0392B','Faible'],['60%','#E08A3C','Moyen'],['80%','#2C5282','Bon'],['100%','#2D6A6A','Excellent']][p?s:0]||['0%','',''];
   bar.style.width=cfg[0];bar.style.background=cfg[1];lbl.textContent=p?('Force : '+cfg[2]):'Utilisez 8+ caractères, avec majuscule et chiffre.';
 }
 const f=document.getElementById('signupForm');
@@ -123,7 +150,7 @@ f.addEventListener('submit',async e=>{
     pwd2=document.getElementById('pwd2'),cgu=document.getElementById('cgu');
   [[prenom,!prenom.value.trim()],[nom,!nom.value.trim()],[email,!validEmail(email.value)],
    [pwd,pwd.value.length<8],[pwd2,pwd2.value!==pwd.value||!pwd2.value]].forEach(([el,bad])=>{setErr(el,bad);if(bad)ok=false;});
-  if(!cgu.checked){ok=false;cgu.parentElement.style.color='#eb5757';}else{cgu.parentElement.style.color='';}
+  if(!cgu.checked){ok=false;cgu.parentElement.style.color='#C0392B';}else{cgu.parentElement.style.color='';}
   if(!ok)return;
 
   const btn=f.querySelector('.btn');
