@@ -464,6 +464,9 @@ function refreshIni(i){
   partsDraft[i].ini = n.split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase() || '?';
 }
 function addPartRow(){ partsDraft.push({ini:'?',name:'',pct:0}); renderPartsRows(); }
+/* Répartition automatique à parts égales sommant exactement à 100 % (entiers) */
+function equalShares(n){ if(n<=0) return []; const base=Math.floor(100/n), rem=100-base*n; return Array.from({length:n},(_,i)=>base+(i<rem?1:0)); }
+function partsEqual(){ const n=partsDraft.length; if(!n){ toast('Ajoutez d’abord des co-indivisaires.'); return; } const sh=equalShares(n); partsDraft.forEach((p,i)=>{ p.pct=sh[i]; }); renderPartsRows(); updatePartsSum(); }
 function updatePartsSum(){
   const sum = partsDraft.reduce((a,p)=>a+(+p.pct||0),0);
   document.getElementById('partsSum').innerHTML = `<span class="parts-sum ${sum===100?'ok':'bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;

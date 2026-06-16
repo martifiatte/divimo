@@ -446,7 +446,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <div class="field" id="p-load-wrap" style="display:none"><label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Charger un bien enregistré</label><select id="p-load" onchange="pLoadBien()"><option value="">— Choisir un bien —</option></select></div>
         <div class="field"><label>Nom du bien <span class="hint">(pour l'historique)</span></label><input type="text" id="p-nom" list="p-nom-list" placeholder="Ex : Maison Annecy" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--gris-bord);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:.9rem"><datalist id="p-nom-list"></datalist></div>
         <div class="field"><label>Valeur totale du bien</label><div class="sfx-wrap"><input type="number" id="p-val" value="320000" oninput="partsCompute()"><span class="sfx">€</span></div><p class="note">Valeur inconnue ? <a href="#" onclick="switchTab('estimer');return false" style="color:var(--accent);font-weight:600">Utilisez le simulateur d'estimation.</a></p></div>
-        <div class="field"><label>Co-indivisaires <span class="hint">— nom et %</span></label><div id="p-rows"></div><button class="add-btn" onclick="addCoi()">+ Ajouter</button><div id="p-sum"></div></div>
+        <div class="field"><label>Co-indivisaires <span class="hint">— nom et %</span></label><div id="p-rows"></div><div style="display:flex;gap:8px"><button class="add-btn" onclick="addCoi()">+ Ajouter</button><button class="add-btn" onclick="coiEqual()" title="Répartir à parts égales"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:middle"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button></div><div id="p-sum"></div></div>
         <button class="btn pdf-btn" onclick="pSave()" style="background:var(--navy);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Enregistrer la simulation</button>
       </div>
       <div class="result-col" id="p-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><span>Renseignez la valeur et les parts.</span></div></div>
@@ -473,7 +473,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         </div>
         <p class="note" id="rc-regime-note">Succession, divorce, indivision familiale → droit de partage 2,5 % sur l'actif net.</p>
         <div class="field"><label>Honoraires du notaire <span class="hint">(barème officiel, modifiable)</span></label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-frais" value="0" oninput="rcCompute()" disabled><span class="sfx">%</span></div><label class="rc-check"><input type="checkbox" id="rc-frais-auto" checked onchange="rcFraisAutoToggle()"> Calcul automatique (barème). Décochez pour saisir un %.</label></div>
-        <div class="field"><label>Indivisaires <span class="hint">— nom, % et rôle</span></label><div id="rc-rows"></div><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><div id="rc-sum"></div></div>
+        <div class="field"><label>Indivisaires <span class="hint">— nom, % et rôle</span></label><div id="rc-rows"></div><div style="display:flex;gap:8px"><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><button class="add-btn" onclick="rcEqual()" title="Répartir à parts égales"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:middle"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button></div><div id="rc-sum"></div></div>
         <label class="rc-check"><input type="checkbox" id="rc-fees-buyer" checked onchange="rcCompute()"> Frais et droits à la charge des acheteurs</label>
       </div>
       <div class="result-col" id="rc-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div><span>Indiquez qui rachète et qui cède.</span></div></div>
@@ -930,6 +930,9 @@ function renderCoi(){
   partsCompute();
 }
 function addCoi(){coi.push({n:'',p:0});renderCoi();}
+/* Répartition automatique à parts égales sommant exactement à 100 % (entiers) */
+function equalShares(n){ if(n<=0) return []; const base=Math.floor(100/n), rem=100-base*n; return Array.from({length:n},(_,i)=>base+(i<rem?1:0)); }
+function coiEqual(){ const n=coi.length; if(!n){ simToast('Ajoutez d\'abord des co-indivisaires.'); return; } const sh=equalShares(n); coi.forEach((m,i)=>m.p=sh[i]); renderCoi(); }
 function partsCompute(){
   const val=+document.getElementById('p-val').value||0;
   const sum=coi.reduce((a,b)=>a+(+b.p||0),0);
@@ -956,6 +959,7 @@ function rcRender(){
   rcCompute();
 }
 function rcAdd(){ rcoi.push({n:'',p:0,role:'ceder'}); rcRender(); }
+function rcEqual(){ const n=rcoi.length; if(!n){ simToast('Ajoutez d\'abord des indivisaires.'); return; } const sh=equalShares(n); rcoi.forEach((m,i)=>m.p=sh[i]); rcRender(); }
 function rcFraisAutoToggle(){ document.getElementById('rc-frais').disabled = document.getElementById('rc-frais-auto').checked; rcCompute(); }
 /* Charger un bien enregistré dans l'espace (localStorage) */
 /* ── Biens enregistrés (partagés par les 3 simulateurs) ── */
