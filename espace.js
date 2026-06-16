@@ -220,7 +220,7 @@ function createGroupe(nom){
     nom: nom,
     biens:[], docs:[],
     coi:[{n:'Marti (vous)',r:'100% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'}],
-    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}
+    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[]
   };
   GROUPES[activeId] = S;
   activeId = id; S = GROUPES[id];
@@ -1722,23 +1722,26 @@ function guessFolder(d){
 }
 function demoVotes(){
   const c=S.coi||[]; const ini=c.map(x=>x.ini); const me=(meCoi()||{}).ini;
-  const biens=S.biens||[]; const b0=(biens[0]||{}).nom||'__all__'; const b1=(biens[1]||biens[0]||{}).nom||'__all__';
+  const biens=S.biens||[]; if(!biens.length) return []; /* groupe sans bien : pas de démo */
+  const b0=biens[0].nom, b0s=b0.split('—')[0].trim();
+  const b1=(biens[1]||biens[0]).nom, b1s=b1.split('—')[0].trim();
   const v=[];
-  v.push({ id:'v'+Date.now(), titre:'Réfection de la toiture', bien:b0,
-    desc:"Devis de 12 400 € pour la réfection complète de la toiture suite aux infiltrations, réparti au prorata des quotes-parts.",
+  v.push({ id:'v'+Date.now(), titre:'Réfection de la toiture — '+b0s, bien:b0,
+    desc:"Devis de 12 400 € pour la réfection de la toiture de "+b0s+", réparti au prorata des quotes-parts.",
     options:['Pour','Contre','Abstention'], deadline:_plusDays(12), status:'open',
     ballots: ini[1]?{[ini[1]]:0}:{}, signatures:[], createdBy:me });
   const ballots={}; ini.forEach((x,k)=>{ ballots[x]=k===1?1:0; });
-  v.push({ id:'v'+(Date.now()+1), titre:'Mandat de vente', bien:b1,
-    desc:"Donner mandat à l'agence pour la mise en vente du bien au prix convenu.",
+  v.push({ id:'v'+(Date.now()+1), titre:'Mandat de vente — '+b1s, bien:b1,
+    desc:"Donner mandat à l'agence pour la mise en vente de "+b1s+" au prix convenu.",
     options:['Pour','Contre','Abstention'], deadline:_minusDays(5), status:'closed',
     ballots, signatures:[], createdBy:me });
   return v;
 }
 function demoMessages(){
   const c=S.coi||[]; const a=c[1]||c[0]||{n:'Paul',ini:'PD'}; const b=c[0]||{n:'Vous',ini:'MF'}; const now=Date.now();
+  const bn=((S.biens||[])[0]||{}).nom; const bns=bn?bn.split('—')[0].trim():'notre bien';
   return [
-    {ini:a.ini, name:(a.n||'').replace(/\s*\(vous\)/i,''), text:"Bonjour à tous, j'ai reçu le devis pour la toiture, je le dépose dans les documents.", date:new Date(now-30*3600e3).toISOString()},
+    {ini:a.ini, name:(a.n||'').replace(/\s*\(vous\)/i,''), text:"Bonjour à tous, j'ai reçu le devis concernant "+bns+", je le dépose dans les documents.", date:new Date(now-30*3600e3).toISOString()},
     {ini:b.ini, name:(b.n||'').replace(/\s*\(vous\)/i,''), text:"Parfait, merci. Je crée une décision pour qu'on vote dessus.", date:new Date(now-28*3600e3).toISOString()},
   ];
 }
@@ -1782,7 +1785,7 @@ function renderVotes(){
   }).join('');
 }
 function castVote(id,oi){ const v=S.votes.find(x=>x.id===id); if(!v||v.status!=='open')return; const me=(meCoi()||{}).ini; if(!me)return; v.ballots=v.ballots||{}; v.ballots[me]=oi; save(); renderVotes(); toast('Vote enregistré.'); }
-function closeVoteDecision(id){ const v=S.votes.find(x=>x.id===id); if(!v)return; v.status='closed'; v.deadline=cToday(); save(); renderVotes(); toast('Décision clôturée.'); }
+function closeVoteDecision(id){ const v=S.votes.find(x=>x.id===id); if(!v)return; if(!confirm("Clôturer définitivement cette décision ?\n\nLes votes seront figés et vous pourrez générer le procès-verbal.")) return; v.status='closed'; v.deadline=cToday(); save(); renderVotes(); toast('Décision clôturée.'); }
 function openVoteModal(){
   document.getElementById('voteTitle').value=''; document.getElementById('voteDesc').value=''; document.getElementById('voteDeadline').value=_plusDays(14);
   const bs=document.getElementById('voteBien');
