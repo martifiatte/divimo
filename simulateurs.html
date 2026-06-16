@@ -926,17 +926,19 @@ function openResult(){
 /* ── PARTS ── */
 let coi=[{n:'Marie',p:45},{n:'Paul',p:30},{n:'Léa',p:25}];
 function renderCoi(){
-  document.getElementById('p-rows').innerHTML=coi.map((m,i)=>`<div class="coi-row"><input type="text" placeholder="Prénom" value="${m.n}" oninput="coi[${i}].n=this.value;partsCompute()"><div class="sfx-wrap"><input type="number" min="0" max="100" value="${m.p}" oninput="coi[${i}].p=+this.value;partsCompute()"><span class="sfx">%</span></div><button class="del-btn" onclick="coi.splice(${i},1);renderCoi()">×</button></div>`).join('');
+  document.getElementById('p-rows').innerHTML=coi.map((m,i)=>`<div class="coi-row"><input type="text" placeholder="Prénom" value="${m.n}" oninput="coi[${i}].n=this.value;partsCompute()"><div class="sfx-wrap"><input type="number" min="0" max="100" step="any" value="${m.p}" oninput="coi[${i}].p=+this.value;partsCompute()"><span class="sfx">%</span></div><button class="del-btn" onclick="coi.splice(${i},1);renderCoi()">×</button></div>`).join('');
   partsCompute();
 }
 function addCoi(){coi.push({n:'',p:0});renderCoi();}
-/* Répartition automatique à parts égales sommant exactement à 100 % (entiers) */
-function equalShares(n){ if(n<=0) return []; const base=Math.floor(100/n), rem=100-base*n; return Array.from({length:n},(_,i)=>base+(i<rem?1:0)); }
+/* Répartition à parts STRICTEMENT égales : chacun 100/n (ex. 3 → 33,33 chacun) */
+function equalShares(n){ if(n<=0) return []; const v=Math.round(10000/n)/100; return Array(n).fill(v); }
+function pctComplete(sum){ return Math.round(sum)===100; }
+function pctDisplay(sum){ return pctComplete(sum)?100:Math.round(sum*100)/100; }
 function coiEqual(){ const n=coi.length; if(!n){ simToast('Ajoutez d\'abord des co-indivisaires.'); return; } const sh=equalShares(n); coi.forEach((m,i)=>m.p=sh[i]); renderCoi(); }
 function partsCompute(){
   const val=+document.getElementById('p-val').value||0;
   const sum=coi.reduce((a,b)=>a+(+b.p||0),0);
-  document.getElementById('p-sum').innerHTML=`<span class="sum-p ${sum===100?'sum-ok':'sum-bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  document.getElementById('p-sum').innerHTML=`<span class="sum-p ${pctComplete(sum)?'sum-ok':'sum-bad'}">Total : ${pctDisplay(sum)}%${pctComplete(sum)?' ✓':' — doit faire 100%'}</span>`;
   const res=document.getElementById('p-result');
   if(val<=0||sum===0){res.innerHTML='<div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>Renseignez la valeur et les parts.</div>';return;}
   let off=0;const circ=2*Math.PI*15.9;
@@ -949,7 +951,7 @@ let rcoi=[{n:'Marie',p:50,role:'buyer'},{n:'Paul',p:30,role:'ceder'},{n:'Léa',p
 function rcRender(){
   document.getElementById('rc-rows').innerHTML=rcoi.map((m,i)=>`<div class="rc-row">
     <input type="text" placeholder="Prénom" value="${m.n}" oninput="rcoi[${i}].n=this.value;rcCompute()">
-    <div class="sfx-wrap" style="max-width:96px"><input type="number" min="0" max="100" value="${m.p}" oninput="rcoi[${i}].p=+this.value;rcCompute()"><span class="sfx">%</span></div>
+    <div class="sfx-wrap" style="max-width:96px"><input type="number" min="0" max="100" step="any" value="${m.p}" oninput="rcoi[${i}].p=+this.value;rcCompute()"><span class="sfx">%</span></div>
     <div class="role-seg">
       <button class="rs ${m.role==='buyer'?'on buy':''}" onclick="rcoi[${i}].role='buyer';rcRender()">Rachète</button>
       <button class="rs ${m.role==='ceder'?'on sell':''}" onclick="rcoi[${i}].role='ceder';rcRender()">Cède</button>
@@ -1143,7 +1145,7 @@ function rcCompute(){
   const tauxPct=+document.getElementById('rc-taux').value||0;
   const feesBuyer=document.getElementById('rc-fees-buyer').checked;
   const sum=rcoi.reduce((a,b)=>a+(+b.p||0),0);
-  document.getElementById('rc-sum').innerHTML=`<span class="sum-p ${sum===100?'sum-ok':'sum-bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  document.getElementById('rc-sum').innerHTML=`<span class="sum-p ${pctComplete(sum)?'sum-ok':'sum-bad'}">Total : ${pctDisplay(sum)}%${pctComplete(sum)?' ✓':' — doit faire 100%'}</span>`;
   const res=document.getElementById('rc-result');
   const buyers=rcoi.filter(m=>m.role==='buyer');
   const ceders=rcoi.filter(m=>m.role==='ceder' && (+m.p||0)>0);

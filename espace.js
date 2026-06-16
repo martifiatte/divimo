@@ -427,7 +427,7 @@ function renderPortfolio(){
         </div>`).join('')}
       </div>
       <div class="bien-card-pills">
-        <span class="pill ${sum===100?'pill-ok':'pill-warn'}">${parts.length} part${parts.length>1?'s':''} · ${sum}%</span>
+        <span class="pill ${pctComplete(sum)?'pill-ok':'pill-warn'}">${parts.length} part${parts.length>1?'s':''} · ${pctDisplay(sum)}%</span>
         <span class="pill pill-info">${nDocs} doc${nDocs>1?'s':''}</span>
         ${i>0?`<span class="del" onclick="S.biens.splice(${i},1);save()" title="Supprimer" style="margin-left:auto">×</span>`:''}
       </div>
@@ -454,7 +454,7 @@ function renderPartsRows(){
   document.getElementById('partsRows').innerHTML = partsDraft.map((p,i)=>`
     <div class="parts-edit-row">
       <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="partsDraft[${i}].name=this.value;refreshIni(${i})">
-      <div style="position:relative"><input type="number" min="0" max="100" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:24px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
+      <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:24px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
       <button class="del-btn" onclick="partsDraft.splice(${i},1);renderPartsRows()">×</button>
     </div>`).join('');
   updatePartsSum();
@@ -464,16 +464,19 @@ function refreshIni(i){
   partsDraft[i].ini = n.split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase() || '?';
 }
 function addPartRow(){ partsDraft.push({ini:'?',name:'',pct:0}); renderPartsRows(); }
-/* Répartition automatique à parts égales sommant exactement à 100 % (entiers) */
-function equalShares(n){ if(n<=0) return []; const base=Math.floor(100/n), rem=100-base*n; return Array.from({length:n},(_,i)=>base+(i<rem?1:0)); }
+/* Répartition à parts STRICTEMENT égales : chacun 100/n (ex. 3 → 33,33 chacun) */
+function equalShares(n){ if(n<=0) return []; const v=Math.round(10000/n)/100; return Array(n).fill(v); }
+/* Total considéré complet si arrondi à 100 (tolère l'arrondi des parts égales) */
+function pctComplete(sum){ return Math.round(sum)===100; }
+function pctDisplay(sum){ return pctComplete(sum)?100:Math.round(sum*100)/100; }
 function partsEqual(){ const n=partsDraft.length; if(!n){ toast('Ajoutez d’abord des co-indivisaires.'); return; } const sh=equalShares(n); partsDraft.forEach((p,i)=>{ p.pct=sh[i]; }); renderPartsRows(); updatePartsSum(); }
 function updatePartsSum(){
   const sum = partsDraft.reduce((a,p)=>a+(+p.pct||0),0);
-  document.getElementById('partsSum').innerHTML = `<span class="parts-sum ${sum===100?'ok':'bad'}">Total : ${sum}%${sum===100?' ✓':' — doit faire 100%'}</span>`;
+  document.getElementById('partsSum').innerHTML = `<span class="parts-sum ${pctComplete(sum)?'ok':'bad'}">Total : ${pctDisplay(sum)}%${pctComplete(sum)?' ✓':' — doit faire 100%'}</span>`;
 }
 function savePartsModal(){
   const sum = partsDraft.reduce((a,p)=>a+(+p.pct||0),0);
-  if(sum!==100){ toast('Le total des parts doit faire 100%.'); return; }
+  if(!pctComplete(sum)){ toast('Le total des parts doit faire 100%.'); return; }
   if(partsDraft.some(p=>!p.name.trim())){ toast('Renseignez tous les prénoms.'); return; }
   partsDraft.forEach(p=>{ if(!p.ini||p.ini==='?'){ p.ini=p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'; }});
   S.biens[partsEditIdx].parts = partsDraft.map(p=>({ini:p.ini,name:p.name.trim(),pct:+p.pct}));
