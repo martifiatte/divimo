@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 .btn-teal:hover { background: var(--teal-light); }
 
 /* ── CARDS ── */
-.card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.card { background: #fff; border: 1px solid var(--gris-bord); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(15,31,61,.04), 0 12px 28px -18px rgba(15,31,61,.16); }
 .card-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .96rem; color: var(--navy); margin-bottom: 4px; }
 .card-sub { color: var(--texte-doux); font-size: .82rem; margin-bottom: 14px; }
 .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
@@ -329,7 +329,7 @@ a { color: inherit; text-decoration: none; }
 .modal { background: #fff; border-radius: 18px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(15,31,61,.3); animation: modalUp .25s cubic-bezier(.2,.7,.2,1); max-height: 90vh; overflow-y: auto; }
 @keyframes modalUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .modal-head { padding: 20px 22px 0; display: flex; justify-content: space-between; align-items: flex-start; }
-.modal-head h3 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--navy); }
+.modal-head h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.4rem; letter-spacing: -.005em; color: var(--navy); }
 .modal-close { background: none; border: none; cursor: pointer; color: var(--texte-doux); font-size: 1.4rem; line-height: 1; padding: 2px 6px; border-radius: 6px; transition: .15s; }
 .modal-close:hover { background: var(--gris-clair); color: var(--navy); }
 .modal-body { padding: 16px 22px 22px; }
