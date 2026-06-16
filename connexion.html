@@ -36,7 +36,7 @@ a{color:inherit;text-decoration:none}
 .brand .logo{display:inline-flex;align-items:center;gap:.6rem;font-family:'Montserrat';font-weight:800;font-size:1.45rem;color:#fff}
 .brand .back{font-size:.86rem;color:rgba(255,255,255,.72);display:inline-flex;gap:.4rem;align-items:center;transition:.15s}
 .brand .back:hover{color:#fff}
-.brand .slogan h2{font-size:clamp(2rem,3vw,2.7rem);font-weight:600;line-height:1.12;letter-spacing:-.02em;margin-bottom:1.1rem}
+.brand .slogan h2{font-size:clamp(2.4rem,3.6vw,3.3rem);font-weight:600;line-height:1.1;letter-spacing:-.01em;margin-bottom:1.1rem}
 .brand .slogan h2 em{font-style:italic;font-weight:500;color:#A8C7E8}
 .brand .slogan p{color:rgba(255,255,255,.72);font-size:1.06rem;line-height:1.7;max-width:400px}
 .brand .pts{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
@@ -45,13 +45,16 @@ a{color:inherit;text-decoration:none}
 .brand .foot{font-size:.82rem;color:rgba(255,255,255,.4)}
 
 /* ── Panneau formulaire (droite) ── */
-.form-side{display:flex;align-items:center;justify-content:center;padding:48px 26px;background:#FAFBFE}
-.form-box{width:100%;max-width:404px}
+.form-side{display:grid;grid-template-rows:1fr auto;justify-items:center;padding:40px 26px;background:#FAFBFE}
+.form-box{width:100%;max-width:404px;align-self:center}
+.form-foot{width:100%;max-width:404px;text-align:center;font-size:.8rem;color:var(--texte-leger,#8896A7);padding-top:18px;border-top:1px solid var(--gris-bord)}
+.form-foot a{color:var(--texte-doux);font-weight:600}
+.form-foot a:hover{color:var(--navy)}
 .back-m{display:none}
 @media(max-width:880px){.back-m{display:inline-flex;color:var(--texte-doux);margin-bottom:22px;font-size:.9rem;gap:.4rem;align-items:center}}
 .form-box .eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-family:'Montserrat';font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.72rem;color:var(--accent)}
 .form-box .eyebrow::before{content:"";width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--teal-light))}
-.form-box h1{font-size:clamp(1.7rem,2.4vw,2.1rem);font-weight:600;color:var(--navy);margin:.7rem 0 .35rem;letter-spacing:-.015em}
+.form-box h1{font-size:clamp(2rem,2.8vw,2.6rem);font-weight:600;color:var(--navy);margin:.6rem 0 .35rem;letter-spacing:-.005em}
 .form-box .sub{color:var(--texte-doux);font-size:.97rem;margin-bottom:28px}
 .field{margin-bottom:18px}
 .field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.85rem;color:var(--navy);margin-bottom:.45rem}
@@ -92,7 +95,7 @@ input.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
     </a>
   </div>
   <div class="slogan">
-    <h2>Simplifiez l'indivision,<br><em>renforcez les liens.</em></h2>
+    <h2>Simplifiez l'indivision,<br><em>renforcez les relations.</em></h2>
     <p>Vos biens, vos documents et vos co-indivisaires réunis au même endroit, en toute clarté.</p>
     <div class="pts">
       <div><span class="c"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Documents centralisés et sécurisés</div>
@@ -135,6 +138,7 @@ input.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
     </form>
     <p class="alt-link">Pas encore de compte ? <a href="creer-compte.html">Créer un compte</a></p>
   </div>
+  <div class="form-foot">Connexion chiffrée · <a href="mentions-legales.html">Mentions légales</a> · <a href="politique-confidentialite.html">Confidentialité</a></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
