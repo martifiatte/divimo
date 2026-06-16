@@ -53,6 +53,9 @@ function go(v){
   window.scrollTo({top:0,behavior:'smooth'});
   if(v==='dash') setTimeout(animateDashboard,60);
   if(v==='carte')setTimeout(initMap,80);
+  if(v==='votes') renderVotes();
+  if(v==='messages'){ renderMessages(); setTimeout(scrollMsg,60); }
+  if(v==='docs') renderDocs();
   if(v==='admin'){loadAdminData();clearInterval(window._adminTimer);window._adminTimer=setInterval(loadAdminData,30000);}
 }
 document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
@@ -300,6 +303,7 @@ function renderAll(){
   renderKpis(); renderDashBiens(); renderDashChart(); renderPortfolio(); renderDocs(); renderCoi();
   renderEstim(); renderRdv(); renderEvents();
   renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
+  renderVotes(); renderMessages();
 }
 
 function renderKpis(){
@@ -1693,6 +1697,200 @@ function _countUp(el){
   (function step(t){ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3); el.textContent=fmt(target*e); if(p<1) requestAnimationFrame(step); else el.textContent=raw; })(performance.now());
 }
 function animateDashboard(){ ['kBiens','kCoi','kDocs','kEstim','dashTotalVal','dashMyVal'].forEach(id=>_countUp(document.getElementById(id))); }
+
+/* ════════════════════════════════════════════════════════════════
+   COLLABORATION (démo) — Décisions & votes, PV, signature
+   électronique, messagerie, visionneuse de documents, invitations
+   ════════════════════════════════════════════════════════════════ */
+function cEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function cToday(){ return new Date().toISOString().slice(0,10); }
+function cFrDate(d){ try{ return new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}); }catch(_){ return d||''; } }
+function cFrDateTime(d){ try{ const x=new Date(d); return x.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+x.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }catch(_){ return ''; } }
+function _plusDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function _minusDays(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+function coiPct(c){ const m=String(c&&c.r||'').match(/(\d+(?:[.,]\d+)?)\s*%/); return m?parseFloat(m[1].replace(',','.')):0; }
+function coiByIni(ini){ return (S.coi||[]).find(c=>c.ini===ini) || null; }
+
+const DOC_FOLDERS = ['Actes','Factures','Juridique','Assurance','Divers'];
+function guessFolder(d){
+  const n=(d&&d.name||'').toLowerCase();
+  if(/acte|notari|titre|propri/.test(n)) return 'Actes';
+  if(/factur|travaux|devis|reçu|recu/.test(n)) return 'Factures';
+  if(/assur/.test(n)) return 'Assurance';
+  if(/règlement|reglement|copropri|bail|statut|mandat|juridi|pv\b|procès|proces/.test(n)) return 'Juridique';
+  return 'Divers';
+}
+function demoVotes(){
+  const c=S.coi||[]; const ini=c.map(x=>x.ini); const me=(meCoi()||{}).ini;
+  const v=[];
+  v.push({ id:'v'+Date.now(), titre:'Réfection de la toiture (Maison Annecy)',
+    desc:"Devis de 12 400 € pour la réfection complète de la toiture suite aux infiltrations, réparti au prorata des quotes-parts.",
+    options:['Pour','Contre','Abstention'], deadline:_plusDays(12), status:'open',
+    ballots: ini[1]?{[ini[1]]:0}:{}, signatures:[], createdBy:me });
+  const ballots={}; ini.forEach((x,k)=>{ ballots[x]=k===1?1:0; });
+  v.push({ id:'v'+(Date.now()+1), titre:'Mandat de vente — Appartement Lyon',
+    desc:"Donner mandat à l'agence pour la mise en vente de l'appartement de Lyon au prix de 265 000 €.",
+    options:['Pour','Contre','Abstention'], deadline:_minusDays(5), status:'closed',
+    ballots, signatures:[], createdBy:me });
+  return v;
+}
+function demoMessages(){
+  const c=S.coi||[]; const a=c[1]||c[0]||{n:'Paul',ini:'PD'}; const b=c[0]||{n:'Vous',ini:'MF'}; const now=Date.now();
+  return [
+    {ini:a.ini, name:(a.n||'').replace(/\s*\(vous\)/i,''), text:"Bonjour à tous, j'ai reçu le devis pour la toiture, je le dépose dans les documents.", date:new Date(now-30*3600e3).toISOString()},
+    {ini:b.ini, name:(b.n||'').replace(/\s*\(vous\)/i,''), text:"Parfait, merci. Je crée une décision pour qu'on vote dessus.", date:new Date(now-28*3600e3).toISOString()},
+  ];
+}
+function normalizeCollab(){
+  let changed=false;
+  if(!Array.isArray(S.votes)){ S.votes=demoVotes(); changed=true; }
+  if(!Array.isArray(S.messages)){ S.messages=demoMessages(); changed=true; }
+  (S.docs||[]).forEach(d=>{ if(!d.dossier){ d.dossier=guessFolder(d); changed=true; } });
+  if(changed) save();
+}
+
+/* ── Décisions & votes ── */
+function voteResult(v){
+  const res=(v.options||[]).map(o=>({label:o,pct:0,names:[]}));
+  let voted=0;
+  Object.entries(v.ballots||{}).forEach(([ini,opt])=>{
+    const c=coiByIni(ini); const p=c?coiPct(c):0;
+    if(res[opt]){ res[opt].pct+=p; if(c) res[opt].names.push((c.n||'').replace(/\s*\(vous\)/i,'')); voted+=p; }
+  });
+  return {res,voted};
+}
+function renderVotes(){
+  const el=document.getElementById('votesList'); if(!el) return;
+  normalizeCollab();
+  const me=(meCoi()||{}).ini;
+  const total=(S.coi||[]).reduce((a,c)=>a+coiPct(c),0)||100;
+  if(!S.votes.length){ el.innerHTML='<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucune décision. Lancez-en une pour recueillir l’avis des co-indivisaires.</div>'; return; }
+  el.innerHTML=S.votes.map(v=>{
+    const {res,voted}=voteResult(v); const myBallot=(v.ballots||{})[me]; const open=v.status==='open';
+    const bars=res.map((r,oi)=>{ const w=total?Math.round(r.pct/total*100):0; const col=oi===0?'var(--teal)':oi===1?'#C0392B':'var(--texte-leger,#8896A7)';
+      return `<div class="vote-bar-row"><span class="vbl">${cEsc(r.label)}</span><div class="vbar"><i style="width:${w}%;background:${col}"></i></div><span class="vbp">${w}%</span></div>`; }).join('');
+    const opts=open?`<div class="vote-opts">`+v.options.map((o,oi)=>`<button class="vote-opt${myBallot===oi?' chosen':''}" onclick="castVote('${v.id}',${oi})">${cEsc(o)}${myBallot===oi?' ✓':''}</button>`).join('')+`</div>`:'';
+    return `<div class="card vote-card">
+      <div class="vote-top"><div><span class="vote-status ${open?'open':'closed'}">${open?'Ouvert':'Clôturé'}</span><h3 class="vote-title">${cEsc(v.titre)}</h3></div>
+        <span class="vote-deadline">${open?('Échéance : '+cFrDate(v.deadline)):('Clôturé le '+cFrDate(v.deadline))}</span></div>
+      <p class="vote-desc">${cEsc(v.desc)}</p>${opts}
+      <div class="vote-result">${bars}</div>
+      <div class="vote-foot"><span class="vote-part">${Math.round(voted)}% des parts exprimées</span>
+        <div class="vote-actions">${open?`<button class="mini-link" onclick="closeVoteDecision('${v.id}')">Clôturer</button>`:`<button class="mini-link" onclick="generatePV('${v.id}')">${v.pvId?'Voir le PV':'Générer le PV'}</button>`}</div></div>
+    </div>`;
+  }).join('');
+}
+function castVote(id,oi){ const v=S.votes.find(x=>x.id===id); if(!v||v.status!=='open')return; const me=(meCoi()||{}).ini; if(!me)return; v.ballots=v.ballots||{}; v.ballots[me]=oi; save(); renderVotes(); toast('Vote enregistré.'); }
+function closeVoteDecision(id){ const v=S.votes.find(x=>x.id===id); if(!v)return; v.status='closed'; v.deadline=cToday(); save(); renderVotes(); toast('Décision clôturée.'); }
+function openVoteModal(){ document.getElementById('voteTitle').value=''; document.getElementById('voteDesc').value=''; document.getElementById('voteDeadline').value=_plusDays(14); document.getElementById('voteModal').classList.add('open'); }
+function closeVoteModal(){ document.getElementById('voteModal').classList.remove('open'); }
+function saveVote(){
+  const t=document.getElementById('voteTitle').value.trim(); if(!t){ toast('Donnez un objet à la décision.'); return; }
+  S.votes=S.votes||[];
+  S.votes.unshift({ id:'v'+Date.now(), titre:t, desc:document.getElementById('voteDesc').value.trim(), options:['Pour','Contre','Abstention'], deadline:document.getElementById('voteDeadline').value||_plusDays(14), status:'open', ballots:{}, signatures:[], createdBy:(meCoi()||{}).ini });
+  save(); closeVoteModal(); renderVotes(); toast('Décision créée — les co-indivisaires peuvent voter.');
+}
+
+/* ── PV d'assemblée + signature électronique ── */
+function generatePV(id){
+  const v=S.votes.find(x=>x.id===id); if(!v)return;
+  if(!v.pvId){ v.pvId='pv'+Date.now(); S.docs=S.docs||[];
+    S.docs.unshift({ name:'PV — '+v.titre, meta:'Assemblée du '+cFrDate(v.deadline), ic:'file', bien:'__all__', dossier:'Juridique', pvOf:v.id });
+    save(); renderDocs(); }
+  openPV(id);
+}
+function openPV(id){
+  const v=S.votes.find(x=>x.id===id); if(!v)return; window._pvId=id;
+  const {res}=voteResult(v); const total=(S.coi||[]).reduce((a,c)=>a+coiPct(c),0)||100;
+  const leading=res.reduce((a,b)=>b.pct>a.pct?b:a,res[0]||{label:'—',pct:0});
+  const adopted=leading.label==='Pour' && leading.pct>total/2;
+  const rows=(S.coi||[]).map(c=>{ const b=(v.ballots||{})[c.ini]; const vote=b==null?'—':v.options[b];
+    return `<tr><td>${cEsc((c.n||'').replace(/\s*\(vous\)/i,''))}</td><td>${coiPct(c)} %</td><td>${cEsc(vote)}</td></tr>`; }).join('');
+  const sigs=(v.signatures||[]).length? v.signatures.map(s=>`<div class="pv-sig"><span class="pv-sig-name">${cEsc(s.name)}</span><span class="pv-sig-meta">Signé électroniquement le ${cFrDate(s.date)}</span></div>`).join('') : '<p class="pv-nosig">Aucune signature pour le moment.</p>';
+  const me=meCoi()||{}; const signed=(v.signatures||[]).some(s=>s.ini===me.ini);
+  document.getElementById('pvBody').innerHTML=`<div class="pv-doc">
+    <div class="pv-head"><div class="pv-brand">${svgIcon('scale',20)} Divimo</div><div class="pv-meta">Procès-verbal d'assemblée<br>${cEsc(S.nom||'Indivision')}</div></div>
+    <h2 class="pv-h2">Procès-verbal de décision</h2>
+    <p class="pv-line"><b>Objet :</b> ${cEsc(v.titre)}</p>
+    <p class="pv-line"><b>Date :</b> ${cFrDate(v.deadline)}</p>
+    <p class="pv-line">${cEsc(v.desc)}</p>
+    <table class="pv-table"><thead><tr><th>Co-indivisaire</th><th>Quote-part</th><th>Vote</th></tr></thead><tbody>${rows}</tbody></table>
+    <p class="pv-result ${adopted?'ok':'no'}"><b>Résultat :</b> « ${cEsc(leading.label)} » l'emporte avec ${Math.round(leading.pct)} % des quotes-parts exprimées. Décision ${adopted?'<b>adoptée</b>':'non adoptée à la majorité requise'}.</p>
+    <div class="pv-sigs"><h4>Signatures</h4>${sigs}</div></div>`;
+  const sb=document.getElementById('pvSignBtn'); if(sb) sb.style.display=signed?'none':'inline-flex';
+  document.getElementById('pvModal').classList.add('open');
+}
+function closePV(){ document.getElementById('pvModal').classList.remove('open'); }
+function signPV(){
+  const v=S.votes.find(x=>x.id===window._pvId); if(!v)return; const me=meCoi()||{ini:'?',n:'Vous'};
+  if((v.signatures||[]).some(s=>s.ini===me.ini))return;
+  v.signatures=v.signatures||[]; v.signatures.push({ini:me.ini, name:(me.n||'Vous').replace(/\s*\(vous\)/i,''), date:new Date().toISOString()});
+  save(); openPV(v.id); toast('Document signé électroniquement.');
+}
+function printPV(){ window.print(); }
+
+/* ── Messagerie ── */
+function scrollMsg(){ const el=document.getElementById('msgThread'); if(el) el.scrollTop=el.scrollHeight; }
+function renderMessages(){
+  const el=document.getElementById('msgThread'); if(!el) return; normalizeCollab();
+  const me=(meCoi()||{}).ini;
+  el.innerHTML=S.messages.map(m=>{ const mine=m.ini===me; const ci=Math.abs((m.ini||'?').charCodeAt(0))%PAL.length;
+    return `<div class="msg ${mine?'mine':''}"><div class="msg-av" style="background:linear-gradient(135deg,${PAL[ci]},${PAL[(ci+1)%PAL.length]})">${cEsc(m.ini||'?')}</div><div class="msg-bub"><div class="msg-meta">${cEsc(m.name||'')} · ${cFrDateTime(m.date)}</div><div class="msg-txt">${cEsc(m.text)}</div></div></div>`; }).join('') || '<div class="empty">Aucun message. Démarrez la conversation.</div>';
+  scrollMsg();
+}
+function postMessage_(){
+  const inp=document.getElementById('msgInput'); const t=(inp.value||'').trim(); if(!t)return;
+  const me=meCoi()||{ini:'MF',n:'Vous'}; S.messages=S.messages||[];
+  S.messages.push({ini:me.ini, name:(me.n||'Vous').replace(/\s*\(vous\)/i,''), text:t, date:new Date().toISOString()});
+  inp.value=''; save(); renderMessages();
+}
+function msgKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); postMessage_(); } }
+
+/* ── Documents : dossiers + visionneuse ── */
+let docFolder='__allfold__';
+function renderDocs(){
+  const el=document.getElementById('docsList'); if(!el) return; normalizeCollab();
+  const up=document.getElementById('docUploadBien');
+  if(up){ const cur=up.value; up.innerHTML=`<option value="__all__">Tous les biens (commun)</option>`+S.biens.map(b=>`<option value="${cEsc(b.nom)}">${cEsc(b.nom)}</option>`).join(''); if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur; }
+  const fb=document.getElementById('docFilterBar');
+  if(fb){ fb.innerHTML=`<span class="bf-chip${docFilter==='__all_filter__'?' sel':''}" onclick="docFilter='__all_filter__';renderDocs()">Tous les biens</span>`+S.biens.map(b=>`<span class="bf-chip${docFilter===b.nom?' sel':''}" onclick="docFilter='${cEsc(b.nom).replace(/'/g,"\\'")}';renderDocs()">${cEsc(b.nom.split('—')[0].trim())}</span>`).join('')+`<span class="bf-chip${docFilter==='__all__'?' sel':''}" onclick="docFilter='__all__';renderDocs()">Communs</span>`; }
+  const fol=document.getElementById('docFolderBar');
+  if(fol){ fol.innerHTML=`<span class="fold-chip${docFolder==='__allfold__'?' sel':''}" onclick="docFolder='__allfold__';renderDocs()">${svgIcon('folder',13)} Tous les dossiers</span>`+DOC_FOLDERS.map(f=>{ const n=S.docs.filter(d=>d.dossier===f).length; return `<span class="fold-chip${docFolder===f?' sel':''}" onclick="docFolder='${f}';renderDocs()">${cEsc(f)}<i class="fold-n">${n}</i></span>`; }).join(''); }
+  const list=S.docs.map((d,i)=>({...d,i})).filter(d=>{
+    const okB= docFilter==='__all_filter__'?true: docFilter==='__all__'? d.bien==='__all__' : (d.bien===docFilter||d.bien==='__all__');
+    const okF= docFolder==='__allfold__'?true: d.dossier===docFolder; return okB&&okF; });
+  el.innerHTML=list.map(d=>{ const isAll=d.bien==='__all__'; const bienLabel=isAll?'Commun':(d.bien?d.bien.split('—')[0].trim():'—');
+    return `<div class="row-item doc-row" onclick="openDoc(${d.i})">
+      <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon(d.pvOf?'scale':'file',18)}</div>
+      <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-bien-tag ${isAll?'all':''}">${cEsc(bienLabel)}</span> · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
+      <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="S.docs.splice(${d.i},1);save();renderDocs()">×</span></div>
+    </div>`; }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document pour ce filtre.</div>';
+}
+function docExt(name){ const m=String(name||'').match(/\.([a-z0-9]+)$/i); return m?m[1].toUpperCase():'DOC'; }
+function openDoc(i){
+  const d=S.docs[i]; if(!d)return; window._docI=i; const isAll=d.bien==='__all__';
+  document.getElementById('docModalTitle').textContent=d.name;
+  const opts=DOC_FOLDERS.map(f=>`<option value="${f}"${(d.dossier||'Divers')===f?' selected':''}>${f}</option>`).join('');
+  document.getElementById('docBody').innerHTML=`<div class="doc-preview"><div class="doc-preview-ic">${svgIcon(d.pvOf?'scale':'file',46)}</div><div class="doc-preview-ext">${cEsc(docExt(d.name))}</div><p class="doc-preview-note">Aperçu indisponible en démonstration${d.pvOf?' — document généré depuis une décision votée.':'.'}</p></div>
+    <div class="doc-info"><div><span>Bien</span><b>${cEsc(isAll?'Commun à l’indivision':(d.bien||'—'))}</b></div><div><span>Ajouté</span><b>${cEsc(d.meta||'—')}</b></div><div class="doc-move"><span>Dossier</span><select id="docFolderSel" onchange="moveDoc(window._docI,this.value)">${opts}</select></div></div>`;
+  document.getElementById('docModal').classList.add('open');
+}
+function closeDoc(){ document.getElementById('docModal').classList.remove('open'); }
+function moveDoc(i,f){ if(!S.docs[i])return; S.docs[i].dossier=f; save(); renderDocs(); toast('Document rangé dans « '+f+' ».'); }
+function addDoc(name, meta){ S.docs.unshift({name, meta, ic:ICONS[di++%ICONS.length], bien:uploadBienValue(), dossier:guessFolder({name})}); }
+
+/* ── Invitation par email ── */
+function inviteCoi(){ ['inviteEmail','inviteName','invitePct'].forEach(id=>{const e=document.getElementById(id); if(e)e.value='';}); document.getElementById('inviteModal').classList.add('open'); }
+function closeInviteModal(){ document.getElementById('inviteModal').classList.remove('open'); }
+function sendInvite(){
+  const email=document.getElementById('inviteEmail').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Adresse email invalide.'); return; }
+  const name=document.getElementById('inviteName').value.trim()||email.split('@')[0];
+  const pct=document.getElementById('invitePct').value.trim()||'0';
+  const ini=name.split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'??';
+  S.coi.push({n:name, r:pct+'% · Co-indivisaire', ini, st:'Invité', cls:'pill-warn', email});
+  save(); renderCoi(); closeInviteModal(); toast('Invitation envoyée à '+email+'.');
+}
 
 renderGroupSelector();
 renderAll();
