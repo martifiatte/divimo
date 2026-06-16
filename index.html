@@ -9,6 +9,7 @@
 /* Redirection instantanée (avant rendu) : connecté → espace, pas la landing */
 (function(){
   try{
+    if(/[?&]site\b/.test(location.search)) return; /* « Retour au site » : rester sur le public */
     var p=JSON.parse(localStorage.getItem('sb-anrwoxsibhabivtkepqt-auth-token')||'');
     var u=p&&(p.user||(p.currentSession&&p.currentSession.user));
     var e=p&&(p.expires_at||(p.currentSession&&p.currentSession.expires_at));

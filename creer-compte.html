@@ -32,9 +32,9 @@ a{color:inherit;text-decoration:none}
 .brand .foot{font-size:.82rem;color:rgba(255,255,255,.4)}
 
 /* ── Panneau formulaire (droite) ── */
-.form-side{display:grid;grid-template-rows:1fr auto;justify-items:center;padding:40px 26px;background:#FAFBFE}
-.form-box{width:100%;max-width:430px;align-self:center}
-.form-foot{width:100%;max-width:430px;text-align:center;font-size:.8rem;color:var(--texte-leger,#8896A7);padding-top:18px;border-top:1px solid var(--gris-bord)}
+.form-side{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 26px;background:#FAFBFE}
+.form-box{width:100%;max-width:430px}
+.form-foot{width:100%;max-width:430px;text-align:center;font-size:.8rem;color:var(--texte-leger,#8896A7);margin-top:28px;padding-top:18px;border-top:1px solid var(--gris-bord)}
 .form-foot a{color:var(--texte-doux);font-weight:600}.form-foot a:hover{color:var(--navy)}
 .back-m{display:none}
 @media(max-width:880px){.back-m{display:inline-flex;color:var(--texte-doux);margin-bottom:18px;font-size:.9rem;gap:.4rem;align-items:center}}
@@ -76,8 +76,8 @@ input.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
 <body>
 <div class="brand">
   <div class="top">
-    <a href="index.html" class="logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A9B8E"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
-    <a href="index.html" class="back" aria-label="Retour au site">
+    <a href="index.html?site=1" class="logo"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A9B8E"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
+    <a href="index.html?site=1" class="back" aria-label="Retour au site">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Retour au site
     </a>
@@ -96,7 +96,7 @@ input.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
 
 <div class="form-side">
   <div class="form-box">
-    <a href="index.html" class="back-m">
+    <a href="index.html?site=1" class="back-m">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Retour au site
     </a>
