@@ -612,6 +612,15 @@ a { color: inherit; text-decoration: none; }
 .doc-group:last-child{margin-bottom:0}
 .doc-group-h{display:flex;align-items:center;gap:.5rem;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--texte-leger,#8896A7);margin-bottom:6px;padding-bottom:7px;border-bottom:1px solid var(--gris-clair)}
 .doc-group-h span{font-size:.68rem;background:var(--gris-clair);padding:.05rem .45rem;border-radius:99px;color:var(--texte-doux)}
+/* Vue par bien (avec dossiers en sous-sections) */
+.doc-bien-block{margin-bottom:24px}
+.doc-bien-block:last-child{margin-bottom:0}
+.doc-bien-head{display:flex;align-items:center;gap:.5rem;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:1.3rem;color:var(--navy);letter-spacing:-.005em;margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid var(--gris-bord)}
+.doc-bien-head svg{color:var(--accent);flex-shrink:0}
+.doc-bien-head span{margin-left:auto;font-family:'Montserrat',sans-serif;font-size:.68rem;font-weight:700;background:var(--gris-clair);color:var(--texte-doux);padding:.1rem .5rem;border-radius:99px}
+.doc-sub{margin:0 0 12px}
+.doc-sub:last-child{margin-bottom:0}
+.doc-sub-head{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin:10px 0 4px;padding-left:2px}
 .doc-preview{text-align:center;padding:26px;background:var(--gris-clair);border-radius:12px;margin-bottom:16px}
 .doc-preview-ic{color:var(--accent);margin-bottom:8px}
 .doc-preview-ext{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem;color:var(--navy);letter-spacing:.05em}

@@ -1895,30 +1895,57 @@ function msgKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); post
 let docFolder='__allfold__';
 function folderIcon(f){ return f==='Actes'?'file':f==='Factures'?'receipt':f==='Juridique'?'scale':f==='Assurance'?'shield':'box'; }
 function docPick(){ const dz=document.getElementById('dropZone'); if(dz) dz.click(); }
+let docBien='all';
+function docRow(d){
+  return `<div class="row-item doc-row" onclick="openDoc(${d.i})">
+    <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon(d.pvOf?'scale':'file',18)}</div>
+    <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
+    <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="S.docs.splice(${d.i},1);save();renderDocs()">×</span></div>
+  </div>`;
+}
 function renderDocs(){
   const el=document.getElementById('docsList'); if(!el) return; normalizeCollab();
   /* Cible de dépôt = biens du groupe actif */
   const up=document.getElementById('docUploadBien');
   if(up){ const cur=up.value; up.innerHTML=`<option value="__all__">Commun à l'indivision</option>`+S.biens.map(b=>`<option value="${cEsc(b.nom)}">${cEsc(b.nom.split('—')[0].trim())}</option>`).join(''); if(cur && [...up.options].some(o=>o.value===cur)) up.value=cur; }
+  /* Filtre par bien (comme l'inventaire) */
+  const bb=document.getElementById('docBienBar');
+  if(bb){
+    const names=(S.biens||[]).map(b=>b.nom);
+    const hasCommun=S.docs.some(d=>d.bien==='__all__');
+    const targets=['all', ...names.filter(n=>S.docs.some(d=>d.bien===n)), ...(hasCommun?['__all__']:[])];
+    if(!targets.includes(docBien)) docBien='all';
+    bb.innerHTML=targets.map(t=>{
+      const label=t==='all'?'Tous les biens':t==='__all__'?'Commun':t.split('—')[0].trim();
+      const cnt=t==='all'?S.docs.length:S.docs.filter(d=>d.bien===t).length;
+      return `<span class="bf-chip ${docBien===t?'sel':''}" onclick="docBien='${String(t).replace(/'/g,"\\'")}';renderDocs()">${cEsc(label)} <span style="opacity:.55">${cnt}</span></span>`;
+    }).join('');
+  }
   /* Dossiers en cartes */
   const fol=document.getElementById('docFolderBar');
   if(fol){
-    const fcard=(key,label,icon)=>{ const n=key==='__allfold__'?S.docs.length:S.docs.filter(d=>d.dossier===key).length; return `<button class="doc-folder${docFolder===key?' sel':''}" onclick="docFolder='${key}';renderDocs()"><span class="df-ic">${icon}</span><span class="df-name">${cEsc(label)}</span><span class="df-n">${n}</span></button>`; };
+    const fcard=(key,label,icon)=>{ const n=key==='__allfold__'?S.docs.length:S.docs.filter(d=>(d.dossier||'Divers')===key).length; return `<button class="doc-folder${docFolder===key?' sel':''}" onclick="docFolder='${key}';renderDocs()"><span class="df-ic">${icon}</span><span class="df-name">${cEsc(label)}</span><span class="df-n">${n}</span></button>`; };
     fol.innerHTML=fcard('__allfold__','Tous',svgIcon('folder',17))+DOC_FOLDERS.map(f=>fcard(f,f,svgIcon(folderIcon(f),17))).join('');
   }
-  /* Documents du dossier sélectionné, regroupés par bien */
-  const docs=S.docs.map((d,i)=>({...d,i})).filter(d=> docFolder==='__allfold__'?true:d.dossier===docFolder);
-  if(!docs.length){ el.innerHTML='<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document dans ce dossier.</div>'; return; }
-  const groups=[];
-  (S.biens||[]).forEach(b=>{ const items=docs.filter(d=>d.bien===b.nom); if(items.length) groups.push({label:b.nom.split('—')[0].trim(), items}); });
-  const commun=docs.filter(d=>d.bien==='__all__'); if(commun.length) groups.push({label:"Commun à l'indivision", items:commun});
-  const known=new Set((S.biens||[]).map(b=>b.nom)); const orph=docs.filter(d=>d.bien!=='__all__'&&!known.has(d.bien)); if(orph.length) groups.push({label:'Autres', items:orph});
-  el.innerHTML=groups.map(g=>`<div class="doc-group"><div class="doc-group-h">${cEsc(g.label)}<span>${g.items.length}</span></div>`
-    +g.items.map(d=>`<div class="row-item doc-row" onclick="openDoc(${d.i})">
-      <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon(d.pvOf?'scale':'file',18)}</div>
-      <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
-      <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="S.docs.splice(${d.i},1);save();renderDocs()">×</span></div>
-    </div>`).join('')+`</div>`).join('');
+  /* Filtre combiné bien + dossier */
+  const docs=S.docs.map((d,i)=>({...d,i})).filter(d=>{
+    const okB = docBien==='all'?true:d.bien===docBien;
+    const okF = docFolder==='__allfold__'?true:(d.dossier||'Divers')===docFolder;
+    return okB&&okF;
+  });
+  if(!docs.length){ el.innerHTML='<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document pour cette sélection.</div>'; return; }
+  /* Vue par bien, avec les dossiers (sous-sections) conservés */
+  const blocks=[];
+  (S.biens||[]).forEach(b=>{ const items=docs.filter(d=>d.bien===b.nom); if(items.length) blocks.push({label:b.nom.split('—')[0].trim(), items}); });
+  const commun=docs.filter(d=>d.bien==='__all__'); if(commun.length) blocks.push({label:"Commun à l'indivision", items:commun});
+  const known=new Set((S.biens||[]).map(b=>b.nom)); const orph=docs.filter(d=>d.bien!=='__all__'&&!known.has(d.bien)); if(orph.length) blocks.push({label:'Autres', items:orph});
+  const homeIc=svgIcon('home',16);
+  el.innerHTML=blocks.map(bg=>{
+    const subs=DOC_FOLDERS.map(f=>({f,items:bg.items.filter(d=>(d.dossier||'Divers')===f)})).filter(x=>x.items.length);
+    return `<div class="doc-bien-block"><div class="doc-bien-head">${homeIc} ${cEsc(bg.label)}<span>${bg.items.length}</span></div>`
+      + subs.map(s=>`<div class="doc-sub"><div class="doc-sub-head">${cEsc(s.f)}</div>${s.items.map(docRow).join('')}</div>`).join('')
+      + `</div>`;
+  }).join('');
 }
 function docExt(name){ const m=String(name||'').match(/\.([a-z0-9]+)$/i); return m?m[1].toUpperCase():'DOC'; }
 function openDoc(i){
