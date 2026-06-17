@@ -2,6 +2,9 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Open Sans', sans-serif; color: var(--texte); background: #F4F6FA; -webkit-font-smoothing: antialiased; }
 h1,h2,h3,h4 { font-family: 'Montserrat', sans-serif; color: var(--navy); line-height: 1.2; }
+/* Champs numériques : retirer les flèches natives (évite le chevauchement avec le suffixe) */
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 a { color: inherit; text-decoration: none; }
 
 /* ── HEADER CONNECTÉ ── */

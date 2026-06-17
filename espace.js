@@ -454,7 +454,7 @@ function renderPartsRows(){
   document.getElementById('partsRows').innerHTML = partsDraft.map((p,i)=>`
     <div class="parts-edit-row">
       <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="partsDraft[${i}].name=this.value;refreshIni(${i})">
-      <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:24px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
+      <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:28px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
       <button class="del-btn" onclick="partsDraft.splice(${i},1);renderPartsRows()">×</button>
     </div>`).join('');
   updatePartsSum();
