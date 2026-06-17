@@ -1524,6 +1524,9 @@ function openBienModal(){
        <span class="tc-ico">${svgIcon(t.ic,24)}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
   ['bienNom','bienVille','bienSurface','bienVal'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('bienPhotos').innerHTML='';
+  const me=meCoi();
+  wizParts = [{ ini:(me&&me.ini)||'MF', name:((me&&me.n)||'Vous').replace(/\s*\(vous\)/i,'').trim()||'Vous', pct:100 }];
+  renderWizParts();
   wizGo(1);
   document.getElementById('bienModal').classList.add('open');
 }
@@ -1535,13 +1538,13 @@ function selectBienType(k){
 function wizGo(step){
   wizStep = step;
   document.querySelectorAll('#bienModal .wiz-pane').forEach(p=>p.hidden = (+p.dataset.step!==step));
-  document.getElementById('wizBarFill').style.width = (step/4*100)+'%';
+  document.getElementById('wizBarFill').style.width = (step/5*100)+'%';
   document.querySelectorAll('#wizSteps .wiz-step').forEach((s,i)=>{
     s.classList.toggle('active', i+1===step);
     s.classList.toggle('done', i+1<step);
   });
   document.getElementById('wizPrev').style.visibility = step===1 ? 'hidden' : 'visible';
-  document.getElementById('wizNext').textContent = step===4 ? 'Créer le bien ✓' : 'Suivant →';
+  document.getElementById('wizNext').textContent = step===5 ? 'Créer le bien ✓' : 'Suivant →';
   const focusId = {2:'bienNom',3:'bienVal'}[step];
   if(focusId) setTimeout(()=>document.getElementById(focusId)?.focus(),80);
 }
@@ -1555,7 +1558,12 @@ function wizNext(){
     wizData.surface=document.getElementById('bienSurface').value.trim();
   }
   if(wizStep===3){ wizData.val=document.getElementById('bienVal').value.trim(); }
-  if(wizStep===4){ saveBien(); return; }
+  if(wizStep===4){
+    if(wizParts.some(p=>!(p.name||'').trim())){ toast('Renseignez le nom de chaque indivisaire.'); return; }
+    const sum=wizParts.reduce((a,p)=>a+(+p.pct||0),0);
+    if(!pctComplete(sum)){ toast('Le total des quote-parts doit faire 100%.'); return; }
+  }
+  if(wizStep===5){ saveBien(); return; }
   wizGo(wizStep+1);
 }
 function formatBienVal(el){
@@ -1596,8 +1604,27 @@ function saveBien(){
   const info = (wizData.ville || 'Localisation non précisée')+surf;
   const digits=(wizData.val||'').replace(/[^\d]/g,'');
   const val = digits ? (Number(digits).toLocaleString('fr-FR').replace(/\s/g,' ')+' €') : '—';
-  S.biens.push({ nom:wizData.nom, info, val, type:wizData.type, surface:wizData.surface, photos:wizData.photos, lat, lng });
+  const parts = wizParts.map(p=>({ ini:(p.ini&&p.ini!=='?')?p.ini:((p.name||'').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'), name:(p.name||'').trim(), pct:+p.pct||0 }));
+  S.biens.push({ nom:wizData.nom, info, val, type:wizData.type, surface:wizData.surface, photos:wizData.photos, parts, lat, lng });
   save(); closeBienModal(); toast('Bien ajouté ✓'); go('portfolio');
+}
+/* Éditeur d'indivisaires du wizard d'ajout de bien */
+let wizParts=[];
+function renderWizParts(){
+  const el=document.getElementById('wizPartsRows'); if(!el) return;
+  el.innerHTML = wizParts.map((p,i)=>`
+    <div class="parts-edit-row">
+      <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="wizParts[${i}].name=this.value;updateWizSum()">
+      <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="wizParts[${i}].pct=+this.value;updateWizSum()" style="padding-right:28px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
+      <button class="del-btn" onclick="wizParts.splice(${i},1);renderWizParts()">×</button>
+    </div>`).join('');
+  updateWizSum();
+}
+function addWizPart(){ wizParts.push({ini:'?',name:'',pct:0}); renderWizParts(); }
+function wizPartsEqual(){ const n=wizParts.length; if(!n){ toast('Ajoutez d’abord un indivisaire.'); return; } const sh=equalShares(n); wizParts.forEach((p,i)=>{ p.pct=sh[i]; }); renderWizParts(); }
+function updateWizSum(){
+  const sum=wizParts.reduce((a,p)=>a+(+p.pct||0),0);
+  const el=document.getElementById('wizPartsSum'); if(el) el.innerHTML=`<span class="parts-sum ${pctComplete(sum)?'ok':'bad'}">Total : ${pctDisplay(sum)}%${pctComplete(sum)?' ✓':' — doit faire 100%'}</span>`;
 }
 /* Drag & drop sur la zone photo du wizard */
 (function(){
