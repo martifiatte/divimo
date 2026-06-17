@@ -621,6 +621,13 @@ a { color: inherit; text-decoration: none; }
 .doc-sub{margin:0 0 12px}
 .doc-sub:last-child{margin-bottom:0}
 .doc-sub-head{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin:10px 0 4px;padding-left:2px}
+/* Autocomplétion d'adresse (wizard d'ajout de bien) */
+.addr-sug{position:absolute;left:0;right:0;top:100%;z-index:40;background:#fff;border:1.5px solid var(--gris-bord);border-radius:10px;box-shadow:0 14px 34px -10px rgba(15,31,61,.3);margin-top:4px;max-height:240px;overflow-y:auto;display:none}
+.addr-item{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;font-size:.86rem;color:var(--texte);cursor:pointer;border-bottom:1px solid var(--gris-clair)}
+.addr-item:last-child{border-bottom:none}
+.addr-item:hover{background:var(--gris-clair)}
+.addr-item svg{color:var(--accent);flex-shrink:0}
+.addr-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .doc-preview{text-align:center;padding:26px;background:var(--gris-clair);border-radius:12px;margin-bottom:16px}
 .doc-preview-ic{color:var(--accent);margin-bottom:8px}
 .doc-preview-ext{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem;color:var(--navy);letter-spacing:.05em}

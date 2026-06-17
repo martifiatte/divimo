@@ -1518,7 +1518,7 @@ let wizStep = 1, wizData = {};
 function addBien(){ openBienModal(); }
 
 function openBienModal(){
-  wizData = {type:'maison', nom:'', ville:'', surface:'', val:'', photos:[]};
+  wizData = {type:'maison', nom:'', ville:'', surface:'', val:'', photos:[], lat:null, lng:null};
   document.getElementById('bienTypeGrid').innerHTML = BIEN_TYPES.map(t=>
     `<div class="type-card${t.k===wizData.type?' sel':''}" data-k="${t.k}" onclick="selectBienType('${t.k}')">
        <span class="tc-ico">${svgIcon(t.ic,24)}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
@@ -1598,8 +1598,13 @@ function renderWizPhotos(){
 function saveBien(){
   const VILLES={paris:[48.85,2.35],lyon:[45.76,4.84],marseille:[43.30,5.37],annecy:[45.90,6.13],bordeaux:[44.84,-0.58],lille:[50.63,3.06],toulouse:[43.60,1.44],nantes:[47.22,-1.55],nice:[43.71,7.26],strasbourg:[48.58,7.75],montpellier:[43.61,3.88],rennes:[48.11,-1.68]};
   const ville=(wizData.ville||'').toLowerCase();
-  let lat=46.6+(Math.random()-.5)*2,lng=2.4+(Math.random()-.5)*3;
-  for(const v in VILLES){ if(ville.includes(v)){ lat=VILLES[v][0]; lng=VILLES[v][1]; break; } }
+  let lat, lng;
+  if(typeof wizData.lat==='number' && typeof wizData.lng==='number'){
+    lat=wizData.lat; lng=wizData.lng; /* coordonnées précises issues de l'adresse choisie */
+  } else {
+    lat=46.6+(Math.random()-.5)*2; lng=2.4+(Math.random()-.5)*3;
+    for(const v in VILLES){ if(ville.includes(v)){ lat=VILLES[v][0]; lng=VILLES[v][1]; break; } }
+  }
   const surf = wizData.surface ? (' · '+wizData.surface+' m²') : '';
   const info = (wizData.ville || 'Localisation non précisée')+surf;
   const digits=(wizData.val||'').replace(/[^\d]/g,'');
@@ -1621,6 +1626,32 @@ function renderWizParts(){
   updateWizSum();
 }
 function addWizPart(){ wizParts.push({ini:'?',name:'',pct:0}); renderWizParts(); }
+/* Autocomplétion d'adresse (Base Adresse Nationale) + coordonnées pour la carte */
+let _bienAddrT=null, _bienAddrFeatures=[];
+function bienAddrInput(v){
+  wizData.lat=null; wizData.lng=null; /* tant qu'aucune adresse n'est choisie, pas de coordonnées précises */
+  const sug=document.getElementById('bienAddrSug'); if(!sug) return;
+  if((v||'').trim().length<3){ sug.style.display='none'; sug.innerHTML=''; return; }
+  clearTimeout(_bienAddrT);
+  _bienAddrT=setTimeout(async()=>{
+    try{
+      const res=await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(v)}&limit=6&autocomplete=1`);
+      const json=await res.json(); const feats=json.features||[]; _bienAddrFeatures=feats;
+      if(!feats.length){ sug.style.display='none'; sug.innerHTML=''; return; }
+      sug.innerHTML=feats.map((f,i)=>`<div class="addr-item" onmousedown="bienAddrPick(${i})">${svgIcon('pin',14)}<span>${cEsc(f.properties.label)}</span></div>`).join('');
+      sug.style.display='block';
+    }catch(e){ sug.style.display='none'; }
+  },220);
+}
+function bienAddrPick(i){
+  const f=_bienAddrFeatures[i]; if(!f) return;
+  const p=f.properties||{}, c=f.geometry&&f.geometry.coordinates;
+  const inp=document.getElementById('bienVille'); if(inp) inp.value=p.label||'';
+  wizData.ville=p.label||'';
+  if(c && c.length===2){ wizData.lng=+c[0]; wizData.lat=+c[1]; }
+  bienAddrHide();
+}
+function bienAddrHide(){ const sug=document.getElementById('bienAddrSug'); if(sug){ sug.style.display='none'; } }
 function wizPartsEqual(){ const n=wizParts.length; if(!n){ toast('Ajoutez d’abord un indivisaire.'); return; } const sh=equalShares(n); wizParts.forEach((p,i)=>{ p.pct=sh[i]; }); renderWizParts(); }
 function updateWizSum(){
   const sum=wizParts.reduce((a,p)=>a+(+p.pct||0),0);
