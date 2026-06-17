@@ -585,9 +585,10 @@
           <label>Nom du bien</label>
           <input type="text" id="bienNom" placeholder="Ex : Maison familiale" autocomplete="off">
         </div>
-        <div class="modal-field">
-          <label>Ville / adresse</label>
-          <input type="text" id="bienVille" placeholder="Ex : 74000 Annecy" autocomplete="off">
+        <div class="modal-field" style="position:relative">
+          <label>Adresse du bien</label>
+          <input type="text" id="bienVille" placeholder="Commencez à taper une adresse…" autocomplete="off" oninput="bienAddrInput(this.value)" onblur="setTimeout(bienAddrHide,150)">
+          <div class="addr-sug" id="bienAddrSug"></div>
         </div>
         <div class="modal-field">
           <label>Surface <span style="font-weight:400;color:var(--texte-doux)">(option.)</span></label>
