@@ -4,66 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact — Divimo</title>
-<meta name="description" content="Une question sur l'indivision ou sur Divimo ? Contactez notre équipe par email, téléphone ou via le formulaire.">
+<meta name="description" content="Une question sur l'indivision ou sur Divimo ? Choisissez votre besoin et trouvez le bon interlocuteur : indivisaire, offres, juridique, support ou partenariat.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#F7F8FE;line-height:1.65;-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--bleu-roi);line-height:1.2}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#FAFBFE;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--navy);line-height:1.2}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-.eyebrow{font-family:'Montserrat';font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.76rem;color:var(--bleu-violet)}
-.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Montserrat';font-weight:600;font-size:.96rem;padding:.8rem 1.5rem;border-radius:999px;cursor:pointer;border:none;transition:.25s}
-.btn-primary{background:var(--bleu-violet);color:#fff;box-shadow:0 8px 22px rgba(92,107,192,.32)}
-.btn-primary:hover{background:var(--bleu-roi);transform:translateY(-2px)}
-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--gris-bord)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:70px;max-width:var(--maxw);margin:0 auto;padding:0 24px}
-.logo{display:flex;align-items:center;gap:.6rem;font-family:'Montserrat';font-weight:800;font-size:1.35rem;color:var(--bleu-roi)}
-.nav-links{display:flex;gap:1.8rem}.nav-links a{font-weight:600;font-size:.94rem;transition:.2s}.nav-links a:hover{color:var(--bleu-violet)}
-@media(max-width:780px){.nav-links{display:none}}
-.page-hero{background:linear-gradient(160deg,#EEF0FB,#F7F8FE 70%);text-align:center;padding:74px 0 50px}
-.page-hero h1{font-size:clamp(2.1rem,4.4vw,3rem);font-weight:800}
-.page-hero p{color:var(--texte-doux);font-size:1.15rem;max-width:560px;margin:1rem auto 0}
-.contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:36px;padding:20px 0 80px;align-items:start}
-@media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
-.info-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:32px}
-.info-item{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--gris-bord)}
-.info-item:first-of-type{border-top:none}
-.info-item .ic{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--bleu-violet),var(--bleu-roi));display:flex;align-items:center;justify-content:center;font-size:1.2rem}
-.info-item h4{font-size:1rem;margin-bottom:.15rem}
-.info-item a,.info-item span{color:var(--texte-doux);font-size:.95rem}
-.info-item a:hover{color:var(--bleu-violet)}
-.form-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:36px}
-.form-card h2{font-size:1.5rem;margin-bottom:.4rem}
-.form-card .sub{color:var(--texte-doux);font-size:.96rem;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.96rem;padding:.85rem 1.6rem;border-radius:11px;cursor:pointer;border:none;transition:transform .2s cubic-bezier(.3,.7,.3,1),box-shadow .25s,background .2s}
+.btn-primary{background:var(--navy);color:#fff;box-shadow:0 10px 26px -8px rgba(15,31,61,.5)}
+.btn-primary:hover{background:var(--accent);transform:translateY(-2px);box-shadow:0 16px 34px -10px rgba(15,31,61,.5)}
+
+/* ── HERO ── */
+.c-hero{position:relative;overflow:hidden;background:var(--navy);color:#fff;text-align:center;padding:66px 0 56px}
+.c-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(44,82,130,.55) 0%,transparent 65%),radial-gradient(ellipse 45% 50% at 90% 100%,rgba(45,106,106,.3) 0%,transparent 60%)}
+.c-hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:linear-gradient(180deg,#000,transparent 80%);mask-image:linear-gradient(180deg,#000,transparent 80%)}
+.c-hero>*{position:relative;z-index:1}
+.c-eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.72rem;color:#A8C7E8;margin-bottom:14px}
+.c-eyebrow::before{content:"";width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent-light),var(--teal-light))}
+.c-hero h1{color:#fff;font-size:clamp(2rem,4.4vw,2.9rem);font-weight:800;letter-spacing:-.02em}
+.c-hero p{color:rgba(255,255,255,.7);font-size:1.1rem;max-width:560px;margin:14px auto 0}
+
+/* ── SECTION ── */
+.section{padding:54px 0}
+.section-head{text-align:center;max-width:620px;margin:0 auto 32px}
+.section-head .k{font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;color:var(--accent)}
+.section-head h2{font-size:clamp(1.5rem,2.6vw,2rem);font-weight:800;margin:.5rem 0 .4rem}
+.section-head p{color:var(--texte-doux);font-size:1rem}
+
+/* ── CARTES BESOIN ── */
+.needs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:880px){.needs{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.needs{grid-template-columns:1fr}}
+.need{display:flex;flex-direction:column;gap:10px;text-align:left;background:#fff;border:1.5px solid var(--gris-bord);border-radius:16px;padding:22px;cursor:pointer;transition:transform .22s cubic-bezier(.3,.7,.3,1),box-shadow .22s,border-color .22s}
+.need:hover{transform:translateY(-4px);box-shadow:0 16px 34px -18px rgba(15,31,61,.28);border-color:var(--accent-light)}
+.need .n-ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(44,82,130,.09);color:var(--accent);flex-shrink:0}
+.need.teal .n-ic{background:rgba(45,106,106,.12);color:var(--teal)}
+.need h3{font-size:1.06rem}
+.need p{color:var(--texte-doux);font-size:.9rem;line-height:1.55;flex:1}
+.need .n-go{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.82rem;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:2px}
+.need:hover .n-go{gap:.5rem}
+
+/* ── ZONE FORMULAIRE + INFOS ── */
+.contact-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:start}
+@media(max-width:880px){.contact-grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;box-shadow:0 1px 2px rgba(15,31,61,.04),0 18px 40px -26px rgba(15,31,61,.22);padding:32px}
+.form-card h2{font-size:1.4rem;margin-bottom:.3rem}
+.form-card .sub{color:var(--texte-doux);font-size:.95rem;margin-bottom:8px}
+.need-badge{display:none;align-items:center;gap:.5rem;background:rgba(44,82,130,.07);border:1px solid var(--gris-bord);border-radius:10px;padding:.5rem .8rem;font-size:.85rem;color:var(--navy);margin:6px 0 20px}
+.need-badge.show{display:inline-flex}
+.need-badge b{font-family:'Montserrat',sans-serif;font-weight:700}
 .field{margin-bottom:18px}
-.field label{display:block;font-family:'Montserrat';font-weight:600;font-size:.88rem;color:var(--bleu-roi);margin-bottom:.45rem}
-.field label .req{color:#eb5757}
+.field label{display:block;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.86rem;color:var(--navy);margin-bottom:.45rem}
+.field label .req{color:#C0392B}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:520px){.row2{grid-template-columns:1fr}}
-input,select,textarea{width:100%;padding:.8rem .95rem;border:1.6px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans';font-size:.98rem;background:#fff;transition:.2s;color:var(--texte)}
+input,select,textarea{width:100%;padding:.82rem .95rem;border:1.5px solid var(--gris-bord);border-radius:12px;font-family:'Open Sans',sans-serif;font-size:.98rem;background:#fff;transition:border-color .18s,box-shadow .18s;color:var(--texte)}
 textarea{resize:vertical;min-height:130px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--bleu-violet);box-shadow:0 0 0 3px rgba(92,107,192,.13)}
-input.err,textarea.err{border-color:#eb5757;box-shadow:0 0 0 3px rgba(235,87,87,.12)}
-.err-msg{color:#eb5757;font-size:.82rem;margin-top:.3rem;display:none}
-.err-msg.show{display:block}
-.submit-btn{width:100%;justify-content:center;margin-top:6px}
-.alert{border-radius:14px;padding:18px 20px;margin-bottom:22px;font-size:.96rem;display:none;align-items:center;gap:.6rem}
-.alert.ok{background:rgba(165,196,189,.22);color:#2c6e5b;display:flex}
-.alert.bad{background:rgba(235,87,87,.1);color:#c0392b;display:flex}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-light);box-shadow:0 0 0 4px rgba(74,127,181,.15)}
+input.err,textarea.err{border-color:#C0392B;box-shadow:0 0 0 4px rgba(192,57,43,.12)}
+.err-msg{color:#C0392B;font-size:.82rem;margin-top:.3rem;display:none}.err-msg.show{display:block}
+.submit-btn{width:100%;margin-top:4px}
+.alert{border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:.93rem;display:none;align-items:center;gap:.6rem}
+.alert.ok{background:rgba(45,106,106,.1);color:#1f5e4d;border:1px solid rgba(45,106,106,.25);display:flex}
+.alert.bad{background:rgba(192,57,43,.08);color:#C0392B;border:1px solid rgba(192,57,43,.2);display:flex}
 .privacy{font-size:.8rem;color:var(--texte-doux);margin-top:14px;text-align:center}
-.map-strip{background:#EEF0FB;border-radius:14px;padding:18px;margin-top:20px;font-size:.9rem;color:var(--texte-doux);display:flex;gap:10px;align-items:center}
-footer{background:var(--bleu-roi);color:rgba(255,255,255,.72);padding:50px 0 26px;margin-top:0}
+
+/* ── COLONNE INFOS ── */
+.side-card{background:#fff;border:1px solid var(--gris-bord);border-radius:18px;padding:26px;margin-bottom:16px}
+.side-card h3{font-size:1rem;margin-bottom:4px}
+.side-card .sc-sub{font-size:.84rem;color:var(--texte-doux);margin-bottom:16px}
+.info-item{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--gris-clair)}
+.info-item:first-of-type{border-top:none;padding-top:0}
+.info-item .ic{flex-shrink:0;width:40px;height:40px;border-radius:11px;background:rgba(44,82,130,.08);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.info-item h4{font-size:.92rem;margin-bottom:.1rem}
+.info-item a,.info-item span{color:var(--texte-doux);font-size:.9rem}
+.info-item a:hover{color:var(--accent)}
+.resp{display:flex;align-items:center;gap:.6rem;background:rgba(45,106,106,.08);border:1px solid rgba(45,106,106,.2);border-radius:12px;padding:.7rem .9rem;font-size:.86rem;color:#1f5e4d;margin-top:4px}
+.resp svg{flex-shrink:0;color:var(--teal)}
+.quick a{display:flex;align-items:center;gap:.7rem;padding:12px 0;border-top:1px solid var(--gris-clair);font-size:.9rem;color:var(--navy);font-family:'Montserrat',sans-serif;font-weight:600;transition:.15s}
+.quick a:first-of-type{border-top:none}
+.quick a:hover{color:var(--accent)}
+.quick a .qi{width:34px;height:34px;border-radius:9px;background:var(--gris-clair);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0}
+.quick a .qa{margin-left:auto;color:var(--texte-leger,#8896A7)}
+
+/* ── FOOTER ── */
+footer{background:var(--navy);color:rgba(255,255,255,.72);padding:50px 0 26px;margin-top:30px}
 .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
-footer .logo{color:#fff;margin-bottom:1rem}footer p{font-size:.92rem;max-width:280px}
+footer .logo{display:flex;align-items:center;gap:.5rem;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:1rem}
+footer p{font-size:.92rem;max-width:280px}
 .foot-col h4{color:#fff;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
 .foot-col a{display:block;font-size:.92rem;margin-bottom:.55rem;color:rgba(255,255,255,.72);transition:.2s}.foot-col a:hover{color:#fff}
 .foot-bottom{border-top:1px solid rgba(255,255,255,.15);margin-top:42px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.85rem}
 @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.need:hover,.btn-primary:hover{transform:none}}
 </style>
   <link rel="stylesheet" href="premium.css">
 </head>
@@ -91,46 +129,114 @@ footer .logo{color:#fff;margin-bottom:1rem}footer p{font-size:.92rem;max-width:2
   </div>
 </header>
 
-<div class="page-hero">
-  <span class="eyebrow">Contact</span>
-  <h1>Une question ? Contactez-nous</h1>
-  <p>Notre équipe vous répond dans les meilleurs délais, que vous soyez indivisaire ou professionnel de l'immobilier.</p>
+<div class="c-hero">
+  <span class="c-eyebrow">Contact</span>
+  <h1>Comment pouvons-nous vous aider&nbsp;?</h1>
+  <p>Choisissez votre besoin ci-dessous : on vous oriente vers le bon interlocuteur, et on pré-remplit votre demande.</p>
 </div>
 
-<div class="wrap">
-  <div class="contact-grid">
-    <!-- Infos -->
-    <div>
-      <div class="info-card">
-        <div class="info-item"><div class="ic">✉️</div><div><h4>Email</h4><a href="mailto:contact@divimo.com">contact@divimo.com</a></div></div>
-        <div class="info-item"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div><div><h4>Téléphone</h4><a href="tel:+33180000000">01 80 00 00 00</a><br><span style="font-size:.82rem">Du lundi au vendredi, 9h–18h</span></div></div>
-        <div class="info-item"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h4>Adresse</h4><span>Divimo, France<br>Hébergement des données en France <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M4 22V4M4 4h13l-2.5 4L17 12H4"/></svg></span></div></div>
-      </div>
-      <div class="map-strip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Vos messages sont traités de manière confidentielle et ne sont jamais partagés.</div>
+<!-- ── ÉTAPE 1 : CHOISIR SON BESOIN ── -->
+<div class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="k">Étape 1</div>
+      <h2>Quel est l'objet de votre demande&nbsp;?</h2>
+      <p>Sélectionnez la situation qui vous correspond le mieux.</p>
     </div>
+    <div class="needs">
+      <div class="need" onclick="pickNeed('Particulier','Question générale','Votre indivision ou votre compte')">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg></div>
+        <h3>Je suis indivisaire</h3>
+        <p>Une question sur votre indivision, votre patrimoine ou votre compte Divimo.</p>
+        <span class="n-go">Écrire à l'équipe <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="need" onclick="pickNeed('Particulier','Les offres & abonnements','Offres, tarifs et abonnements')">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4L13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4a1 1 0 0 1 1-1h7.9a2 2 0 0 1 1.5.6l7.4 7.4a2 2 0 0 1 0 2.4z"/><circle cx="7.5" cy="7.5" r="1"/></svg></div>
+        <h3>Découvrir les offres</h3>
+        <p>Tarifs, abonnements, démonstration de la plateforme avant de vous lancer.</p>
+        <span class="n-go">Parler des offres <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <a class="need teal" href="services-juridiques.html" style="text-decoration:none">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l14 0M7 7l-3 7a4 4 0 0 0 6 0L7 7zM17 7l-3 7a4 4 0 0 0 6 0L17 7z"/></svg></div>
+        <h3>Conseil juridique</h3>
+        <p>Notaire, droit de l'indivision, partage, rachat de parts, succession.</p>
+        <span class="n-go">Voir le conseil juridique <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <div class="need" onclick="pickNeed('','Support technique','Support technique')">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.2l-6.4 6.4a2 2 0 1 0 2.8 2.8l6.4-6.4a4 4 0 0 0 5.2-5.6l-2.5 2.5-2.1-.6-.6-2.1z"/></svg></div>
+        <h3>Support technique</h3>
+        <p>Un souci sur le site, votre espace, une simulation ou la connexion.</p>
+        <span class="n-go">Contacter le support <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="need" onclick="pickNeed('Professionnel','Partenariat','Professionnels & partenariats')">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></div>
+        <h3>Professionnel & partenariat</h3>
+        <p>Notaire, administrateur de biens, ou projet de partenariat avec Divimo.</p>
+        <span class="n-go">Nous présenter votre projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="need" onclick="pickNeed('Autre','Question générale','Autre demande')">
+        <div class="n-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Autre demande</h3>
+        <p>Presse, suggestion, ou toute autre question : on vous lit avec attention.</p>
+        <span class="n-go">Nous écrire <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <!-- Formulaire -->
-    <div class="form-card">
-      <h2>Envoyez-nous un message</h2>
-      <p class="sub">Remplissez ce formulaire et nous reviendrons vers vous rapidement.</p>
-      <div class="alert ok" id="alertOk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M20 6L9 17l-5-5"/></svg> Message envoyé ! Merci de nous avoir contactés, notre équipe vous répondra dans les meilleurs délais.</div>
-      <div class="alert bad" id="alertBad"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> Veuillez vérifier les champs en rouge avant d'envoyer.</div>
-      <form id="contactForm" novalidate>
-        <div class="row2">
-          <div class="field"><label>Prénom <span class="req">*</span></label><input type="text" id="prenom"><div class="err-msg">Champ requis</div></div>
-          <div class="field"><label>Nom <span class="req">*</span></label><input type="text" id="nom"><div class="err-msg">Champ requis</div></div>
+<!-- ── ÉTAPE 2 : ÉCRIRE / INFOS ── -->
+<div class="section" style="padding-top:0" id="ecrire">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="k">Étape 2</div>
+      <h2>Écrivez-nous</h2>
+      <p>Quelques informations et votre message : on revient vers vous rapidement.</p>
+    </div>
+    <div class="contact-grid">
+      <!-- Formulaire -->
+      <div class="card form-card">
+        <div class="need-badge" id="needBadge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Demande&nbsp;: <b id="needBadgeTxt"></b></div>
+        <div class="alert ok" id="alertOk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Message envoyé. Merci, notre équipe vous répondra sous 24h ouvrées.</div>
+        <div class="alert bad" id="alertBad"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> Veuillez vérifier les champs en rouge avant d'envoyer.</div>
+        <form id="contactForm" novalidate>
+          <div class="row2">
+            <div class="field"><label for="prenom">Prénom <span class="req">*</span></label><input type="text" id="prenom" autocomplete="given-name"><div class="err-msg">Champ requis</div></div>
+            <div class="field"><label for="nom">Nom <span class="req">*</span></label><input type="text" id="nom" autocomplete="family-name"><div class="err-msg">Champ requis</div></div>
+          </div>
+          <div class="field"><label for="email">Email <span class="req">*</span></label><input type="email" id="email" autocomplete="email" placeholder="vous@email.com"><div class="err-msg">Email invalide</div></div>
+          <div class="row2">
+            <div class="field"><label for="profil">Vous êtes</label>
+              <select id="profil"><option>Particulier (indivisaire)</option><option>Professionnel (administrateur, notaire…)</option><option>Autre</option></select>
+            </div>
+            <div class="field"><label for="sujet">Objet</label>
+              <select id="sujet"><option>Question générale</option><option>Les offres &amp; abonnements</option><option>Les simulateurs</option><option>Support technique</option><option>Partenariat</option></select>
+            </div>
+          </div>
+          <div class="field"><label for="message">Votre message <span class="req">*</span></label><textarea id="message" placeholder="Décrivez votre demande en quelques lignes…"></textarea><div class="err-msg">Merci d'écrire votre message</div></div>
+          <button type="submit" class="btn btn-primary submit-btn">Envoyer ma demande</button>
+          <p class="privacy">En envoyant ce formulaire, vous acceptez notre politique de confidentialité.</p>
+        </form>
+      </div>
+
+      <!-- Colonne infos -->
+      <div>
+        <div class="side-card">
+          <h3>Nous joindre directement</h3>
+          <div class="sc-sub">Une réponse humaine, pas un robot.</div>
+          <div class="info-item"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></div><div><h4>Email</h4><a href="mailto:contact@divimo.com">contact@divimo.com</a></div></div>
+          <div class="info-item"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div><div><h4>Téléphone</h4><a href="tel:+33180000000">01 80 00 00 00</a><br><span style="font-size:.8rem">Lun–Ven, 9h–18h</span></div></div>
+          <div class="info-item"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h4>Données hébergées en France</h4><span>Confidentialité et hébergement européen.</span></div></div>
+          <div class="resp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Réponse sous <b style="margin:0 .25rem;color:#1f5e4d">24h ouvrées</b> en moyenne.</div>
         </div>
-        <div class="field"><label>Email <span class="req">*</span></label><input type="text" id="email"><div class="err-msg">Email invalide</div></div>
-        <div class="field"><label>Vous êtes</label>
-          <select id="profil"><option>Particulier (indivisaire)</option><option>Professionnel (administrateur, notaire…)</option><option>Autre</option></select>
+
+        <div class="side-card quick">
+          <h3>Réponse immédiate</h3>
+          <div class="sc-sub">Beaucoup de réponses sont déjà disponibles.</div>
+          <a href="index.html#faq"><span class="qi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span> Consulter la FAQ <span class="qa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></a>
+          <a href="simulateurs.html"><span class="qi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span> Estimer ou simuler <span class="qa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></a>
+          <a href="connexion.html"><span class="qi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg></span> Accéder à mon espace <span class="qa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></a>
         </div>
-        <div class="field"><label>Sujet</label>
-          <select id="sujet"><option>Question générale</option><option>Les offres &amp; abonnements</option><option>Les simulateurs</option><option>Support technique</option><option>Partenariat</option></select>
-        </div>
-        <div class="field"><label>Votre message <span class="req">*</span></label><textarea id="message" placeholder="Décrivez votre demande…"></textarea><div class="err-msg">Merci d'écrire votre message</div></div>
-        <button type="submit" class="btn btn-primary submit-btn">Envoyer ma demande →</button>
-        <p class="privacy">En envoyant ce formulaire, vous acceptez notre politique de confidentialité.</p>
-      </form>
+      </div>
     </div>
   </div>
 </div>
@@ -142,15 +248,31 @@ footer .logo{color:#fff;margin-bottom:1rem}footer p{font-size:.92rem;max-width:2
         <a href="index.html" class="logo"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#A5C4BD"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
         <p>La plateforme qui simplifie, sécurise et apaise la gestion d'un bien immobilier en indivision.</p>
       </div>
-      <div class="foot-col"><h4>Produit</h4><a href="simulateurs.html">Simulateurs</a><a href="index.html#documents">Documents</a><a href="index.html#offres">Nos offres</a></div>
+      <div class="foot-col"><h4>Produit</h4><a href="simulateurs.html">Simulateurs</a><a href="index.html#documents">Documents</a><a href="offres.html">Nos offres</a></div>
       <div class="foot-col"><h4>Entreprise</h4><a href="apropos.html">À propos</a><a href="contact.html">Contact</a><a href="index.html#faq">FAQ</a></div>
-      <div class="foot-col"><h4>Légal</h4><a href="#">CGU</a><a href="#">Confidentialité</a><a href="#">Mentions légales</a></div>
+      <div class="foot-col"><h4>Légal</h4><a href="mentions-legales.html">Mentions légales</a><a href="politique-confidentialite.html">Confidentialité</a></div>
     </div>
-    <div class="foot-bottom"><span>© 2026 Divimo. Tous droits réservés.</span><span>contact@divimo.com · Hébergé en France <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M4 22V4M4 4h13l-2.5 4L17 12H4"/></svg></span></div>
+    <div class="foot-bottom"><span>© 2026 Divimo. Tous droits réservés.</span><span>contact@divimo.com · Hébergé en France</span></div>
   </div>
 </footer>
 
 <script>
+/* Pré-remplissage du formulaire selon le besoin choisi */
+function setSelect(id, text){
+  const s=document.getElementById(id); if(!s||!text) return;
+  const o=[...s.options].find(op=>op.textContent.trim().toLowerCase().startsWith(text.trim().toLowerCase()));
+  if(o) s.value=o.value;
+}
+function pickNeed(profil, sujet, label){
+  setSelect('profil', profil);
+  setSelect('sujet', sujet);
+  const b=document.getElementById('needBadge'), t=document.getElementById('needBadgeTxt');
+  if(label){ t.textContent=label; b.classList.add('show'); }
+  document.getElementById('ecrire').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>document.getElementById('prenom').focus({preventScroll:true}),420);
+}
+
+/* Validation du formulaire */
 const form=document.getElementById('contactForm');
 const reqIds=['prenom','nom','email','message'];
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
@@ -169,6 +291,7 @@ form.addEventListener('submit',e=>{
   if(ok){
     document.getElementById('alertOk').style.display='flex';
     form.reset();
+    document.getElementById('needBadge').classList.remove('show');
     document.getElementById('alertOk').scrollIntoView({behavior:'smooth',block:'center'});
   }else{
     document.getElementById('alertBad').scrollIntoView({behavior:'smooth',block:'center'});
