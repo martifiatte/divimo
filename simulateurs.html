@@ -90,6 +90,22 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .res-line:first-child{border-top:none}
 .res-line b{font-family:'Montserrat',sans-serif;color:var(--navy)}
 .nm{display:flex;align-items:center;gap:.4rem}.dotc{width:8px;height:8px;border-radius:2px;display:inline-block}
+.res-subline{display:flex;justify-content:space-between;font-size:.74rem;color:var(--texte-doux);padding:0 0 .3rem 0;margin-top:-.2rem}
+.res-subline span:last-child{font-variant-numeric:tabular-nums}
+/* Bouton « Calculer le rachat » */
+.rc-cta{margin-top:16px;width:100%;padding:.85rem 1rem;border:none;border-radius:10px;background:var(--navy);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.92rem;letter-spacing:.01em;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;box-shadow:0 6px 18px rgba(15,31,61,.18)}
+.rc-cta:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 9px 22px rgba(15,31,61,.24)}
+.rc-cta:disabled{background:#E3E8F0;color:var(--texte-doux);cursor:not-allowed;box-shadow:none}
+/* Panneau indicateur (avant calcul) */
+.rc-guide{display:flex;flex-direction:column;gap:14px}
+.rc-guide-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.15rem;color:var(--navy);line-height:1.2}
+.rc-guide-amount{font-family:'Montserrat',sans-serif;font-weight:800;font-size:2.1rem;color:#C4CCD8;line-height:1.1;letter-spacing:-.02em}
+.rc-guide-sub{font-size:.85rem;color:var(--texte-doux);line-height:1.5}
+.rc-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.rc-step{display:flex;align-items:center;gap:9px;font-size:.85rem;color:var(--texte-doux)}
+.rc-step .tick{width:20px;height:20px;flex:0 0 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;background:#E3E8F0;color:#9AA6B6}
+.rc-step.done{color:var(--navy)}
+.rc-step.done .tick{background:rgba(25,169,116,.16);color:#13855B}
 .src-note{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55}
 .pdf-btn{margin-top:10px;width:100%;justify-content:center;font-size:.82rem;background:var(--gris-clair);color:var(--navy);border:1px solid var(--gris-bord)}
 .pdf-btn:hover{background:var(--gris-bord)}
@@ -479,8 +495,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <div class="field"><label>Honoraires du notaire <span class="hint">(barème officiel, modifiable)</span></label><div class="sfx-wrap"><input type="number" step="0.1" id="rc-frais" value="0" oninput="rcCompute()" disabled><span class="sfx">%</span></div><label class="rc-check"><input type="checkbox" id="rc-frais-auto" checked onchange="rcFraisAutoToggle()"> Calcul automatique (barème). Décochez pour saisir un %.</label></div>
         <div class="field"><label>Indivisaires <span class="hint">— nom, % et rôle</span></label><div id="rc-rows"></div><div style="display:flex;gap:8px"><button class="add-btn" onclick="rcAdd()">+ Ajouter</button><button class="add-btn" onclick="rcEqual()" title="Répartir à parts égales"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:middle"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button></div><div id="rc-sum"></div></div>
         <label class="rc-check"><input type="checkbox" id="rc-fees-buyer" checked onchange="rcCompute()"> Frais et droits à la charge des acheteurs</label>
+        <button class="rc-cta" id="rc-cta" onclick="rcReveal()" disabled>Complétez le formulaire pour calculer</button>
       </div>
-      <div class="result-col" id="rc-result"><div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div><span>Indiquez qui rachète et qui cède.</span></div></div>
+      <div class="result-col" id="rc-result"></div>
     </div>
   </div>
 
@@ -1186,6 +1203,30 @@ function rcSaveToEspace(){
   lines.push(['Coût total', euro(L.cout)]);
   saveSimulation('vente','Vente / rachat de parts', document.getElementById('rc-nom').value, 'Coût total '+euro(L.cout)+' · soulte '+euro(L.soulte), lines);
 }
+let rcShown=false;
+function rcReveal(){
+  rcShown=true;
+  rcCompute();
+  const r=document.getElementById('rc-result');
+  if(r) r.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function rcGuide(V,sum,buyers,ceders,complete){
+  const step=(ok,label)=>`<li class="rc-step ${ok?'done':''}"><span class="tick">${ok?'✓':'•'}</span>${label}</li>`;
+  return `<div class="rc-guide">
+    <div class="res-label">Votre simulation</div>
+    <div class="rc-guide-title">Coût du rachat de parts</div>
+    <div class="rc-guide-amount">— €</div>
+    <div class="rc-guide-sub">${complete
+      ? 'Tout est prêt. Cliquez sur <b>Calculer le rachat</b> pour afficher le coût total, la soulte des cédants et la part de frais de chaque acheteur.'
+      : 'Renseignez l’ensemble du formulaire. Le résultat détaillé s’affichera ici une fois la saisie complète.'}</div>
+    <ul class="rc-steps">
+      ${step(V>0,'Valeur du bien renseignée')}
+      ${step(buyers.length>0,'Au moins un acheteur')}
+      ${step(ceders.length>0,'Au moins un cédant')}
+      ${step(pctComplete(sum),'Répartition des parts à 100 %')}
+    </ul>
+  </div>`;
+}
 function rcCompute(){
   const V=+document.getElementById('rc-val').value||0;
   const D=+document.getElementById('rc-dette').value||0;
@@ -1197,8 +1238,11 @@ function rcCompute(){
   const res=document.getElementById('rc-result');
   const buyers=rcoi.filter(m=>m.role==='buyer');
   const ceders=rcoi.filter(m=>m.role==='ceder' && (+m.p||0)>0);
-  if(V<=0||sum<=0||!buyers.length||!ceders.length){
-    res.innerHTML='<div class="res-empty"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div><span>Indiquez au moins un acheteur et un cédant.</span></div>';
+  const complete = V>0 && pctComplete(sum) && buyers.length>0 && ceders.length>0;
+  const cta=document.getElementById('rc-cta');
+  if(cta){ cta.disabled=!complete; cta.textContent = complete ? 'Calculer le rachat' : 'Complétez le formulaire pour calculer'; }
+  if(!rcShown || !complete){
+    res.innerHTML=rcGuide(V,sum,buyers,ceders,complete);
     return;
   }
   const actifNet=Math.max(0,V-D);
@@ -1251,7 +1295,8 @@ function rcCompute(){
 
     <div class="res-card">
       <div class="res-sub-label">Acheteurs — versent${feesBuyer?' (soulte + frais)':''}</div>
-      ${perBuyer.map(b=>`<div class="res-line"><span class="nm">${b.n} <span class="hint">→ ${b.newPct.toLocaleString('fr-FR',{maximumFractionDigits:1})}%</span></span><b>${euro(b.pays)}</b></div>`).join('')}
+      ${perBuyer.map(b=>`<div class="res-line"><span class="nm">${b.n} <span class="hint">→ ${b.newPct.toLocaleString('fr-FR',{maximumFractionDigits:1})}%</span></span><b>${euro(b.pays)}</b></div>${feesBuyer&&buyers.length>1?`<div class="res-subline"><span>dont soulte ${euro(b.equity)} · frais de notaire</span><span>${euro(b.fees)}</span></div>`:feesBuyer?`<div class="res-subline"><span>dont frais de notaire</span><span>${euro(b.fees)}</span></div>`:''}`).join('')}
+      ${feesBuyer&&buyers.length>1?`<div class="res-line tot"><span>Frais répartis entre les ${buyers.length} acheteurs</span><b>${euro(droit+fraisNotaire)}</b></div>`:''}
     </div>
 
     <div class="res-card">
