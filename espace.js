@@ -69,6 +69,34 @@ function toast(msg){
   clearTimeout(_tt); _tt = setTimeout(()=>t.classList.remove('show'),2800);
 }
 
+/* ━━━━ ICÔNE & CONFIRMATION DE SUPPRESSION ━━━━ */
+const DELSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+function askDelete(msg, onYes){
+  let m = document.getElementById('confirmModal');
+  if(!m){
+    m = document.createElement('div'); m.id = 'confirmModal'; m.className = 'confirm-overlay';
+    m.innerHTML = `<div class="confirm-box" role="dialog" aria-modal="true">
+      <div class="confirm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></div>
+      <h3>Confirmer la suppression</h3>
+      <p id="confirmMsg"></p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" id="confirmNo">Annuler</button>
+        <button class="confirm-del" id="confirmYes">Supprimer</button>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', e=>{ if(e.target===m) closeConfirm(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('show')) closeConfirm(); });
+  }
+  document.getElementById('confirmMsg').textContent = msg;
+  const yes = document.getElementById('confirmYes');
+  const fresh = yes.cloneNode(true); yes.parentNode.replaceChild(fresh, yes);
+  fresh.addEventListener('click', ()=>{ closeConfirm(); onYes(); });
+  document.getElementById('confirmNo').onclick = closeConfirm;
+  requestAnimationFrame(()=>{ m.classList.add('show'); fresh.focus(); });
+}
+function closeConfirm(){ const m = document.getElementById('confirmModal'); if(m) m.classList.remove('show'); }
+
 /* ━━━━ NAV ━━━━ */
 function go(v){
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.toggle('active',n.dataset.v===v));
@@ -253,11 +281,12 @@ function createGroupe(nom){
 }
 function deleteGroupe(id){
   if(Object.keys(GROUPES).length<=1){ toast('Vous devez garder au moins un groupe.'); return; }
-  if(!confirm('Supprimer ce groupe et toutes ses données ?')) return;
-  delete GROUPES[id];
-  if(activeId===id){ activeId=Object.keys(GROUPES)[0]; S=GROUPES[activeId]; }
-  save(); renderAll(); renderGroupSelector();
-  toast('Groupe supprimé.');
+  askDelete('Supprimer ce groupe et toutes ses données ? Cette action est définitive.', ()=>{
+    delete GROUPES[id];
+    if(activeId===id){ activeId=Object.keys(GROUPES)[0]; S=GROUPES[activeId]; }
+    save(); renderAll(); renderGroupSelector();
+    toast('Groupe supprimé.');
+  });
 }
 function renameGroupe(id){
   const n = prompt('Renommer le groupe :', GROUPES[id]?.nom||''); if(!n)return;
@@ -453,7 +482,7 @@ function renderPortfolio(){
       <div class="bien-card-pills">
         <span class="pill ${pctComplete(sum)?'pill-ok':'pill-warn'}">${parts.length} part${parts.length>1?'s':''} · ${pctDisplay(sum)}%</span>
         <span class="pill pill-info">${nDocs} doc${nDocs>1?'s':''}</span>
-        ${i>0?`<span class="del" onclick="S.biens.splice(${i},1);save()" title="Supprimer" style="margin-left:auto">×</span>`:''}
+        ${i>0?`<span class="del" onclick="askDelete('Supprimer ce bien ?', ()=>{ S.biens.splice(${i},1); save(); })" title="Supprimer" style="margin-left:auto">${DELSVG}</span>`:''}
       </div>
       <div class="bien-manage" onclick="openPartsModal(${i})">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
@@ -479,7 +508,7 @@ function renderPartsRows(){
     <div class="parts-edit-row">
       <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="partsDraft[${i}].name=this.value;refreshIni(${i})">
       <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="partsDraft[${i}].pct=+this.value;updatePartsSum()" style="padding-right:28px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
-      <button class="del-btn" onclick="partsDraft.splice(${i},1);renderPartsRows()">×</button>
+      <button class="del-btn" onclick="askDelete('Retirer ce co-indivisaire ?', ()=>{ partsDraft.splice(${i},1); renderPartsRows(); })" title="Supprimer">${DELSVG}</button>
     </div>`).join('');
   updatePartsSum();
 }
@@ -538,7 +567,7 @@ function renderDocs(){
     return `<div class="row-item">
       <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('file',18)}</div>
       <div style="flex:1;min-width:0"><b>${d.name}</b><span>${d.meta} · <span class="doc-bien-tag ${isAll?'all':''}">${bienLabel}</span></span></div>
-      <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="S.docs.splice(${d.i},1);save()">×</span></div>
+      <div class="row-act"><span class="mini-link" onclick="toast('Téléchargement — bientôt disponible.')">Télécharger</span><span class="del" onclick="askDelete('Supprimer ce document ?', ()=>{ S.docs.splice(${d.i},1); save(); })" title="Supprimer">${DELSVG}</span></div>
     </div>`;
   }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('folder',24)+'</div>Aucun document pour ce filtre.</div>';
 }
@@ -550,7 +579,7 @@ function renderCoi(){
     <div class="row-item">
       <div class="r-ic" style="background:linear-gradient(135deg,${PAL[i%PAL.length]},${PAL[(i+1)%PAL.length]});color:#fff;font-family:'Montserrat';font-weight:700;font-size:.75rem">${c.ini}</div>
       <div><b>${c.n}</b><span>${c.r}</span></div>
-      <div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="S.coi.splice(${i},1);save()">×</span>`:''}</div>
+      <div class="row-act"><span class="pill ${c.cls}">${c.st}</span>${i>0?`<span class="del" onclick="askDelete('Retirer ce co-indivisaire ?', ()=>{ S.coi.splice(${i},1); save(); })" title="Supprimer">${DELSVG}</span>`:''}</div>
     </div>`).join('');
 }
 
@@ -605,7 +634,7 @@ function copyShareLink(){
 
 /* Simulations : stockage dédié, totalement séparé des biens/patrimoine */
 function divimoSims(){ try{ const a=JSON.parse(ssGet('divimo_sims')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-function deleteSim(idx){ const a=divimoSims(); a.splice(idx,1); ssSet('divimo_sims', JSON.stringify(a)); renderEstim(); }
+function deleteSim(idx){ askDelete('Supprimer cette simulation enregistrée ?', ()=>{ const a=divimoSims(); a.splice(idx,1); ssSet('divimo_sims', JSON.stringify(a)); renderEstim(); toast('Simulation supprimée.'); }); }
 function renderEstim(){
   const el = document.getElementById('estimList');
   if(!el) return;
@@ -621,7 +650,7 @@ function renderEstim(){
       <summary>
         <span class="r-ic" style="background:rgba(44,82,130,.1)">${svgIcon(t.ic,18)}</span>
         <span class="sim-main"><b>${e.titre||t.lbl}</b><span>${sub||e.detail||''}</span></span>
-        <span class="del" onclick="event.preventDefault();event.stopPropagation();deleteSim(${i})">×</span>
+        <span class="del" onclick="event.preventDefault();event.stopPropagation();deleteSim(${i})" title="Supprimer">${DELSVG}</span>
       </summary>
       <div class="sim-det">${body}</div>
     </details>`;
@@ -635,7 +664,7 @@ function renderRdv(){
     <div class="row-item">
       <div class="r-ic" style="background:rgba(45,106,106,.1)">${svgIcon('scale',18)}</div>
       <div><b>${r.pro}</b><span>${r.when}</span></div>
-      <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="S.rdv.splice(${i},1);save()">×</span></div>
+      <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="askDelete('Annuler cette demande de rendez-vous ?', ()=>{ S.rdv.splice(${i},1); save(); })" title="Supprimer">${DELSVG}</span></div>
     </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun rendez-vous planifié.</div>';
 }
 
@@ -764,7 +793,7 @@ function renderDayPanel(){
         <span class="cal-ev-export" onclick="exportOneICS(${e.idx})" title="Ajouter à mon agenda (.ics)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
         </span>
-        <span class="cal-ev-del" onclick="deleteEvent(${e.idx})" title="Supprimer">×</span>
+        <span class="cal-ev-del" onclick="deleteEvent(${e.idx})" title="Supprimer">${DELSVG}</span>
       </div>
     </div>`;
   }).join('');
@@ -773,7 +802,7 @@ function renderDayPanel(){
 function selectDay(iso){ selectedDay = iso; renderCalendar(); renderDayPanel(); }
 function calShift(n){ calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()+n, 1); renderCalendar(); }
 function calToday(){ calCursor = new Date(); selectedDay = _todayISO; renderCalendar(); renderDayPanel(); }
-function deleteEvent(idx){ S.events.splice(idx,1); save(); toast('Événement supprimé.'); }
+function deleteEvent(idx){ askDelete('Supprimer cet événement de l\'agenda ?', ()=>{ S.events.splice(idx,1); save(); toast('Événement supprimé.'); }); }
 
 /* ── MODAL ── */
 function openEventModal(presetDate){
@@ -1203,7 +1232,7 @@ function renderBudget(){
       </div>
       <div class="tx-right">
         <span class="tx-amount ${pos?'pos':'neg'}">${pos?'+':'−'}${eur(Math.abs(t.montant))}</span>
-        <span class="del" onclick="event.stopPropagation();S.transactions.splice(${t.i},1);save()">×</span>
+        <span class="del" onclick="event.stopPropagation();askDelete('Supprimer cette opération ?', ()=>{ S.transactions.splice(${t.i},1); save(); })" title="Supprimer">${DELSVG}</span>
       </div>
     </div>`;
   }).join('') || '<div class="empty">Aucune transaction.</div>';
@@ -1345,7 +1374,7 @@ function renderInventaire(){
             <span class="inv-ico">${svgIcon(x.it.ic||'box',20)}</span>
             <span class="inv-acts">
               <button class="inv-act" onclick="openInvModal(${x.i})" title="Modifier">${svgIcon('edit',13)}</button>
-              <button class="inv-act del" onclick="deleteInv(${x.i})" title="Supprimer">×</button>
+              <button class="inv-act del" onclick="deleteInv(${x.i})" title="Supprimer">${DELSVG}</button>
             </span>
           </div>
           <div class="inv-name">${x.it.nom}</div>
@@ -1386,8 +1415,9 @@ function saveInv(){
 }
 function deleteInv(idx){
   const it=S.inventaire[idx]; if(!it) return;
-  if(!confirm('Supprimer « '+it.nom+' » de l\'inventaire ?')) return;
-  S.inventaire.splice(idx,1); save(); toast('Élément supprimé.');
+  askDelete('Supprimer « '+it.nom+' » de l\'inventaire ?', ()=>{
+    S.inventaire.splice(idx,1); save(); toast('Élément supprimé.');
+  });
 }
 
 /* ── INCIDENTS ── */
@@ -1463,7 +1493,7 @@ function renderIncidents(){
           ${['declare','encours','resolu'].map(s=>`<button class="iss ${inc.statut===s?('on '+INC_STATUTS[s].cls):''}" onclick="setIncStatus(${i},'${s}')">${INC_STATUTS[s].label}</button>`).join('')}
         </div>
       </div>
-      <button class="del" onclick="deleteIncident(${i})" title="Supprimer">×</button>
+      <button class="del" onclick="deleteIncident(${i})" title="Supprimer">${DELSVG}</button>
     </div>`;
   }).join('') || '<div class="empty">Aucun incident pour ce filtre.</div>';
 
@@ -1488,8 +1518,9 @@ function setIncStatus(i,s){
 }
 function deleteIncident(i){
   const inc=S.incidents[i]; if(!inc) return;
-  if(!confirm('Supprimer l\'incident « '+inc.titre+' » ?')) return;
-  S.incidents.splice(i,1); save(); toast('Incident supprimé.');
+  askDelete('Supprimer l\'incident « '+inc.titre+' » ?', ()=>{
+    S.incidents.splice(i,1); save(); toast('Incident supprimé.');
+  });
 }
 
 /* ── MODAL DÉCLARATION D'INCIDENT ── */
@@ -1619,7 +1650,7 @@ function handleBienPhotos(files){
 }
 function renderWizPhotos(){
   document.getElementById('bienPhotos').innerHTML = wizData.photos.map((src,i)=>
-    `<div class="wiz-photo"><img src="${src}" alt=""><button class="wp-del" onclick="wizData.photos.splice(${i},1);renderWizPhotos()" title="Retirer">×</button></div>`).join('');
+    `<div class="wiz-photo"><img src="${src}" alt=""><button class="wp-del" onclick="wizData.photos.splice(${i},1);renderWizPhotos()" title="Retirer">${DELSVG}</button></div>`).join('');
 }
 function saveBien(){
   const VILLES={paris:[48.85,2.35],lyon:[45.76,4.84],marseille:[43.30,5.37],annecy:[45.90,6.13],bordeaux:[44.84,-0.58],lille:[50.63,3.06],toulouse:[43.60,1.44],nantes:[47.22,-1.55],nice:[43.71,7.26],strasbourg:[48.58,7.75],montpellier:[43.61,3.88],rennes:[48.11,-1.68]};
@@ -1647,7 +1678,7 @@ function renderWizParts(){
     <div class="parts-edit-row">
       <input type="text" placeholder="Prénom" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="wizParts[${i}].name=this.value;updateWizSum()">
       <div style="position:relative"><input type="number" min="0" max="100" step="any" placeholder="0" value="${p.pct}" oninput="wizParts[${i}].pct=+this.value;updateWizSum()" style="padding-right:28px"><span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--texte-doux);font-size:.8rem">%</span></div>
-      <button class="del-btn" onclick="wizParts.splice(${i},1);renderWizParts()">×</button>
+      <button class="del-btn" onclick="askDelete('Retirer ce co-indivisaire ?', ()=>{ wizParts.splice(${i},1); renderWizParts(); })" title="Supprimer">${DELSVG}</button>
     </div>`).join('');
   updateWizSum();
 }
@@ -1957,7 +1988,7 @@ function docRow(d){
   return `<div class="row-item doc-row" onclick="openDoc(${d.i})">
     <div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon(d.pvOf?'scale':'file',18)}</div>
     <div style="flex:1;min-width:0"><b>${cEsc(d.name)}</b><span>${cEsc(d.meta)} · <span class="doc-fold-tag">${cEsc(d.dossier||'Divers')}</span></span></div>
-    <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="S.docs.splice(${d.i},1);save();renderDocs()">×</span></div>
+    <div class="row-act" onclick="event.stopPropagation()"><span class="mini-link" onclick="openDoc(${d.i})">Ouvrir</span><span class="del" onclick="askDelete('Supprimer ce document ?', ()=>{ S.docs.splice(${d.i},1); save(); renderDocs(); })" title="Supprimer">${DELSVG}</span></div>
   </div>`;
 }
 function renderDocs(){
