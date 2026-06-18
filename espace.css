@@ -168,6 +168,15 @@ a { color: inherit; text-decoration: none; }
 .parts-sum { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; padding: .35rem .7rem; border-radius: 99px; display: inline-block; margin-top: 4px; }
 .parts-sum.ok { background: rgba(45,106,106,.15); color: var(--teal); }
 .parts-sum.bad { background: rgba(192,57,57,.12); color: #C03939; }
+/* Boutons de l'éditeur d'indivisaires (moderne, minimaliste) */
+.parts-actions { display: flex; gap: 10px; margin-top: 12px; }
+.pa-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; padding: .62rem .9rem; border-radius: 10px; cursor: pointer; border: 1px solid var(--gris-bord); background: #fff; color: var(--texte-doux); transition: border-color .15s, background .15s, color .15s, transform .15s; }
+.pa-btn svg { flex-shrink: 0; }
+.pa-add { color: var(--accent); background: rgba(44,82,130,.06); }
+.pa-add:hover { background: rgba(44,82,130,.11); border-color: var(--accent-light); }
+.pa-equal:hover { color: var(--navy); border-color: var(--accent-light); background: var(--gris-clair); }
+.pa-btn:active { transform: translateY(1px); }
+@media (max-width: 480px) { .parts-actions { flex-direction: column; } }
 
 /* ── BUDGET ── */
 /* ═══════ BUDGET v2 ═══════ */

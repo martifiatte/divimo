@@ -521,9 +521,9 @@
         <label>Répartition de la propriété</label>
         <div style="font-size:.76rem;color:var(--texte-doux);line-height:1.5;margin-bottom:10px">Indiquez le nom et le % de chaque co-indivisaire pour ce bien. Le total doit faire 100 %.</div>
         <div id="partsRows"></div>
-        <div style="display:flex;gap:8px">
-          <button class="add-btn" onclick="addPartRow()">+ Ajouter un co-indivisaire</button>
-          <button class="add-btn" onclick="partsEqual()" title="Répartir à parts égales"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:middle"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button>
+        <div class="parts-actions">
+          <button type="button" class="pa-btn pa-add" onclick="addPartRow()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Ajouter un co-indivisaire</button>
+          <button type="button" class="pa-btn pa-equal" onclick="partsEqual()" title="Répartir à parts égales"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button>
         </div>
         <div id="partsSum"></div>
       </div>
@@ -611,9 +611,9 @@
       <div class="wiz-pane" data-step="4" hidden>
         <div class="wiz-q">Qui sont les indivisaires de ce bien ?</div>
         <div id="wizPartsRows"></div>
-        <div style="display:flex;gap:8px;margin-top:2px">
-          <button class="add-btn" onclick="addWizPart()">+ Ajouter un indivisaire</button>
-          <button class="add-btn" onclick="wizPartsEqual()" title="Répartir à parts égales"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:middle"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button>
+        <div class="parts-actions">
+          <button type="button" class="pa-btn pa-add" onclick="addWizPart()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Ajouter un indivisaire</button>
+          <button type="button" class="pa-btn pa-equal" onclick="wizPartsEqual()" title="Répartir à parts égales"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 9h14M5 15h14"/></svg> Parts égales</button>
         </div>
         <div id="wizPartsSum" style="margin-top:10px"></div>
       </div>
