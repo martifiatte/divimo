@@ -74,8 +74,24 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .btn-g:hover{border-color:var(--accent-light)}
 .coi-row{display:grid;grid-template-columns:1fr 90px 32px;gap:7px;margin-bottom:7px;align-items:center}
 .coi-row input{margin:0}
-.del-btn{background:rgba(192,57,57,.1);border:none;border-radius:8px;height:38px;cursor:pointer;color:#C03939;transition:.15s;font-size:.95rem}
-.del-btn:hover{background:rgba(192,57,57,.2)}
+.del-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:38px;background:transparent;border:none;border-radius:8px;cursor:pointer;color:#A6B0BE;transition:.15s}
+.del-btn:hover{background:rgba(192,57,57,.1);color:#C03939}
+.del-btn:active{transform:scale(.92)}
+.del-btn svg{width:16px;height:16px;display:block}
+/* Modale de confirmation de suppression */
+.sim-modal{position:fixed;inset:0;background:rgba(15,31,61,.45);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
+.sim-modal.show{opacity:1;pointer-events:auto}
+.sim-modal-box{background:#fff;border-radius:16px;padding:24px 24px 20px;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(15,31,61,.3);transform:translateY(8px) scale(.98);transition:transform .18s}
+.sim-modal.show .sim-modal-box{transform:none}
+.sim-modal-ic{width:46px;height:46px;border-radius:50%;background:rgba(192,57,57,.1);color:#C03939;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.sim-modal-box h4{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.05rem;color:var(--navy);margin-bottom:6px}
+.sim-modal-box p{font-size:.86rem;color:var(--texte-doux);line-height:1.5;margin-bottom:18px}
+.sim-modal-actions{display:flex;gap:10px}
+.sim-modal-actions button{flex:1;padding:.7rem 1rem;border-radius:9px;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.86rem;cursor:pointer;transition:.15s;border:1.5px solid transparent}
+.sim-btn-cancel{background:#fff;border-color:var(--gris-bord);color:var(--texte-doux)}
+.sim-btn-cancel:hover{background:var(--gris-clair)}
+.sim-btn-del{background:#C03939;color:#fff}
+.sim-btn-del:hover{background:#A82F2F}
 .add-btn{background:rgba(44,82,130,.07);border:1.5px dashed rgba(44,82,130,.3);color:var(--accent);border-radius:9px;padding:.62rem;width:100%;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;transition:.15s;margin-top:3px}
 .add-btn:hover{background:rgba(44,82,130,.13)}
 .sum-p{font-size:.76rem;font-weight:600;font-family:'Montserrat',sans-serif;padding:.22rem .6rem;border-radius:99px;display:inline-block;margin-top:6px}
@@ -1023,7 +1039,7 @@ function openResult(){
 /* ── PARTS ── */
 let coi=[{n:'Marie',p:45},{n:'Paul',p:30},{n:'Léa',p:25}];
 function renderCoi(){
-  document.getElementById('p-rows').innerHTML=coi.map((m,i)=>`<div class="coi-row"><input type="text" placeholder="Prénom" value="${m.n}" oninput="coi[${i}].n=this.value;partsCompute()"><div class="sfx-wrap"><input type="number" min="0" max="100" step="any" value="${m.p}" oninput="coi[${i}].p=+this.value;partsCompute()"><span class="sfx">%</span></div><button class="del-btn" onclick="coi.splice(${i},1);renderCoi()">×</button></div>`).join('');
+  document.getElementById('p-rows').innerHTML=coi.map((m,i)=>`<div class="coi-row"><input type="text" placeholder="Prénom" value="${m.n}" oninput="coi[${i}].n=this.value;partsCompute()"><div class="sfx-wrap"><input type="number" min="0" max="100" step="any" value="${m.p}" oninput="coi[${i}].p=+this.value;partsCompute()"><span class="sfx">%</span></div><button class="del-btn" onclick="delCoi(${i})" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join('');
   partsCompute();
 }
 function addCoi(){coi.push({n:'',p:0});renderCoi();}
@@ -1053,7 +1069,7 @@ function rcRender(){
       <button class="rs ${m.role==='buyer'?'on buy':''}" onclick="rcoi[${i}].role='buyer';rcRender()">Rachète</button>
       <button class="rs ${m.role==='ceder'?'on sell':''}" onclick="rcoi[${i}].role='ceder';rcRender()">Cède</button>
     </div>
-    <button class="del-btn" onclick="rcoi.splice(${i},1);rcRender()">×</button>
+    <button class="del-btn" onclick="delRcoi(${i})" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>`).join('');
   rcCompute();
 }
@@ -1212,6 +1228,33 @@ function emolNotaire(assiette, regime){
   return em;
 }
 function initiales(n){ return (n||'?').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'; }
+function simConfirm(msg, onYes){
+  let m=document.getElementById('simConfirm');
+  if(!m){
+    m=document.createElement('div'); m.id='simConfirm'; m.className='sim-modal';
+    m.innerHTML=`<div class="sim-modal-box" role="dialog" aria-modal="true">
+      <div class="sim-modal-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></div>
+      <h4>Confirmer la suppression</h4>
+      <p id="simConfirmMsg"></p>
+      <div class="sim-modal-actions">
+        <button class="sim-btn-cancel" id="simConfirmNo">Annuler</button>
+        <button class="sim-btn-del" id="simConfirmYes">Supprimer</button>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', e=>{ if(e.target===m) simConfirmClose(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('show')) simConfirmClose(); });
+  }
+  document.getElementById('simConfirmMsg').textContent=msg;
+  const yes=document.getElementById('simConfirmYes');
+  const fresh=yes.cloneNode(true); yes.parentNode.replaceChild(fresh, yes);
+  fresh.addEventListener('click', ()=>{ simConfirmClose(); onYes(); });
+  document.getElementById('simConfirmNo').onclick=simConfirmClose;
+  requestAnimationFrame(()=>{ m.classList.add('show'); fresh.focus(); });
+}
+function simConfirmClose(){ const m=document.getElementById('simConfirm'); if(m) m.classList.remove('show'); }
+function delCoi(i){ simConfirm(`Retirer ${coi[i] && coi[i].n ? coi[i].n : 'cet indivisaire'} de la simulation ?`, ()=>{ coi.splice(i,1); renderCoi(); }); }
+function delRcoi(i){ simConfirm(`Retirer ${rcoi[i] && rcoi[i].n ? rcoi[i].n : 'cet indivisaire'} de la simulation ?`, ()=>{ rcoi.splice(i,1); rcRender(); }); }
 function simToast(msg){
   let t=document.getElementById('simToast');
   if(!t){ t=document.createElement('div'); t.id='simToast'; document.body.appendChild(t); }
