@@ -482,7 +482,7 @@ function renderPortfolio(){
       <div class="bien-card-pills">
         <span class="pill ${pctComplete(sum)?'pill-ok':'pill-warn'}">${parts.length} part${parts.length>1?'s':''} · ${pctDisplay(sum)}%</span>
         <span class="pill pill-info">${nDocs} doc${nDocs>1?'s':''}</span>
-        ${i>0?`<span class="del" onclick="askDelete('Supprimer ce bien ?', ()=>{ S.biens.splice(${i},1); save(); })" title="Supprimer" style="margin-left:auto">${DELSVG}</span>`:''}
+        <span class="del" onclick="askDelete('Supprimer ce bien ?', ()=>{ S.biens.splice(${i},1); save(); })" title="Supprimer" style="margin-left:auto">${DELSVG}</span>
       </div>
       <div class="bien-manage" onclick="openPartsModal(${i})">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
