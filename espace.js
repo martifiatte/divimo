@@ -4,6 +4,28 @@ function ssGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function ssSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 async function logout(){await sb.auth.signOut();window.location.href='connexion.html';}
 
+let OWNER = null;
+/* Remplace le titulaire de démo (« Marti »/« (vous) ») par le vrai nom de l'utilisateur,
+   dans tous les groupes : co-indivisaires, quotes-parts, incidents. */
+function applyOwnerName(){
+  if(!OWNER || !GROUPES) return;
+  const full = OWNER.full, short = OWNER.short, ini = OWNER.ini;
+  const nameVous = (full||short) + ' (vous)';
+  let changed = false;
+  Object.values(GROUPES).forEach(g=>{
+    if(!g) return;
+    const owner = (g.coi||[]).find(c=>/\(vous\)/i.test(c.n||''));
+    if(!owner) return;
+    const oldIni = owner.ini, oldShort = (owner.n||'').replace(/\s*\(vous\)/i,'').trim();
+    if(owner.n!==nameVous){ owner.n = nameVous; changed = true; }
+    if(owner.ini!==ini){ owner.ini = ini; changed = true; }
+    (g.biens||[]).forEach(b=>(b.parts||[]).forEach(p=>{
+      if(p.ini===oldIni || p.name===oldShort){ if(p.name!==short||p.ini!==ini){ p.name=short; p.ini=ini; changed=true; } }
+    }));
+    (g.incidents||[]).forEach(it=>{ if(it.by===oldShort && it.by!==short){ it.by=short; changed=true; } });
+  });
+  if(changed) save();
+}
 function applyUser(user){
   const m = user.user_metadata || {};
   const prenom = (m.prenom||'').trim();
@@ -11,6 +33,8 @@ function applyUser(user){
   const name = prenom || user.email.split('@')[0];
   const initials = ((prenom[0]||'')+(nom[0]||'')).toUpperCase() || name.slice(0,2).toUpperCase();
   const isAdmin = m.role === 'admin';
+  OWNER = { full:[prenom,nom].filter(Boolean).join(' ').trim() || name, short:prenom || name, ini:initials };
+  applyOwnerName();
 
   /* Le header est géré par header-auth.js — on met à jour uniquement l'intérieur */
   document.getElementById('greet').textContent = 'Bonjour, ' + name;
@@ -219,7 +243,7 @@ function createGroupe(nom){
   GROUPES[id] = {
     nom: nom,
     biens:[], docs:[],
-    coi:[{n:'Marti (vous)',r:'100% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'}],
+    coi:[{n:((OWNER&&(OWNER.full||OWNER.short))||'Vous')+' (vous)',r:'100% · Administrateur',ini:(OWNER&&OWNER.ini)||'MF',st:'Actif',cls:'pill-ok'}],
     estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[]
   };
   GROUPES[activeId] = S;
@@ -1524,8 +1548,10 @@ function openBienModal(){
        <span class="tc-ico">${svgIcon(t.ic,24)}</span><span class="tc-lbl">${t.lbl}</span></div>`).join('');
   ['bienNom','bienVille','bienSurface','bienVal'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('bienPhotos').innerHTML='';
-  const me=meCoi();
-  wizParts = [{ ini:(me&&me.ini)||'MF', name:((me&&me.n)||'Vous').replace(/\s*\(vous\)/i,'').trim()||'Vous', pct:100 }];
+  /* Pré-remplir avec les co-indivisaires réels de l'indivision (et non le seul titulaire) */
+  wizParts = (S.coi||[]).map(c=>({ ini:c.ini||'?', name:(c.n||'').replace(/\s*\(vous\)/i,'').trim()||'—', pct:0 }));
+  if(!wizParts.length){ const me=meCoi()||{}; wizParts=[{ini:me.ini||'?', name:(me.n||'Vous').replace(/\s*\(vous\)/i,'').trim()||'Vous', pct:100}]; }
+  else { const sh=equalShares(wizParts.length); wizParts.forEach((p,i)=>p.pct=sh[i]); }
   renderWizParts();
   wizGo(1);
   document.getElementById('bienModal').classList.add('open');
