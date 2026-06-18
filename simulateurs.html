@@ -106,6 +106,38 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .rc-step .tick{width:20px;height:20px;flex:0 0 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;background:#E3E8F0;color:#9AA6B6}
 .rc-step.done{color:var(--navy)}
 .rc-step.done .tick{background:rgba(25,169,116,.16);color:#13855B}
+/* Résultat détaillé du rachat */
+.rc-hero{margin-bottom:2px}
+.rc-section{margin-top:18px}
+.rc-section-title{display:flex;align-items:center;gap:7px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--texte-doux);margin-bottom:10px}
+.rc-section-title svg{flex:0 0 auto;color:var(--accent)}
+.rc-break{background:#fff;border-radius:12px;padding:14px 15px;box-shadow:0 2px 8px rgba(15,31,61,.06)}
+.rc-bar{display:flex;height:11px;border-radius:6px;overflow:hidden;background:#EEF2F8;margin-bottom:12px}
+.rc-bar .seg{height:100%}
+.seg.soulte{background:var(--navy)}.seg.frais{background:var(--accent)}
+.rc-break-legend{display:flex;flex-direction:column;gap:8px}
+.rc-break-legend>div{display:flex;align-items:center;font-size:.84rem;color:var(--texte-doux)}
+.rc-break-legend b{margin-left:auto;padding-left:10px;font-family:'Montserrat',sans-serif;color:var(--navy);font-variant-numeric:tabular-nums}
+.rc-break-legend .dot{width:10px;height:10px;border-radius:3px;margin-right:8px;flex:0 0 auto}
+.dot.soulte{background:var(--navy)}.dot.frais{background:var(--accent)}
+.rc-break-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--navy);margin-top:12px;padding-top:11px;font-family:'Montserrat',sans-serif;font-weight:700;color:var(--navy)}
+.rc-break-total b{font-size:1.06rem;font-variant-numeric:tabular-nums}
+.rc-person{background:#fff;border-radius:12px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,31,61,.06);margin-bottom:10px}
+.rc-person:last-of-type{margin-bottom:0}
+.rc-person-head{display:flex;align-items:center;gap:11px}
+.rc-ava{width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem;background:rgba(44,82,130,.1);color:var(--navy)}
+.rc-ava.out{background:rgba(192,57,57,.1);color:#C03939}
+.rc-person-id{flex:1;min-width:0}
+.rc-person-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.92rem;color:var(--navy);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-person-meta{font-size:.76rem;color:var(--texte-doux);margin-top:2px}
+.rc-person-meta b{color:var(--teal);font-weight:700}
+.rc-person-amt{text-align:right;flex:0 0 auto;font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.06rem;color:var(--navy);line-height:1.1;font-variant-numeric:tabular-nums}
+.rc-person-amt span{display:block;font-weight:600;font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--texte-doux);margin-top:3px}
+.rc-person-amt.receive{color:#13855B}
+.rc-person-lines{margin-top:11px;padding-top:10px;border-top:1px dashed var(--gris-bord);display:flex;flex-direction:column;gap:6px}
+.rc-pl{display:flex;justify-content:space-between;font-size:.8rem;color:var(--texte-doux)}
+.rc-pl span:last-child{font-family:'Montserrat',sans-serif;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+.rc-split-note{font-size:.74rem;color:var(--texte-doux);line-height:1.5;margin-top:9px;padding-left:2px}
 .src-note{font-size:.7rem;color:var(--texte-doux);margin-top:8px;line-height:1.55}
 .pdf-btn{margin-top:10px;width:100%;justify-content:center;font-size:.82rem;background:var(--gris-clair);color:var(--navy);border:1px solid var(--gris-bord)}
 .pdf-btn:hover{background:var(--gris-bord)}
@@ -1277,32 +1309,70 @@ function rcCompute(){
     const equity = soulteTotal*w;
     const fees = feesBuyer ? (droit+fraisNotaire)*w : 0;
     const acquiredPct = pctCed*w;                       /* points de % acquis */
+    const oldPct = ((+m.p||0)/sum)*100;                 /* quote-part actuelle */
     const newPct = (((+m.p||0)+acquiredPct)/sum)*100;   /* nouvelle quote-part */
-    return {n:m.n||'—', pays:equity+fees, equity, fees, newPct};
+    return {n:m.n||'—', pays:equity+fees, equity, fees, oldPct, newPct};
   });
   window._rcLast={ val:V, regime, taux:tauxPct, credit:D, soulte:soulteTotal, droit, frais:fraisNotaire, notaire:droit+fraisNotaire, cout:coutTotal,
     ceders:perCeder.map(c=>({n:c.n,p:c.p,montant:c.montant})), buyers:perBuyer.map(b=>({n:b.n,pays:b.pays,newPct:b.newPct})) };
+  const fraisTot=droit+fraisNotaire;
+  const soultePct=coutTotal>0?soulteTotal/coutTotal*100:0;
+  const fraisPctBar=coutTotal>0?fraisTot/coutTotal*100:0;
+  const ini=n=>(n||'').split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase()||'·';
+  const fmtPct=p=>p.toLocaleString('fr-FR',{maximumFractionDigits:1});
   res.innerHTML=`
-    <div class="res-label">Montant total de l'opération</div>
-    <div class="res-big">${euro(coutTotal)}</div>
-    <div class="res-range">${ceders.length} cédant(s) · ${buyers.length} acheteur(s) · ${Math.round(fracCed*100)}% des parts rachetées${D>0?` · crédit repris ${euro(D)}`:''}</div>
-
-    <div class="res-card">
-      <div class="res-sub-label">Cédants — reçoivent</div>
-      ${perCeder.map(c=>`<div class="res-line"><span class="nm">${c.n} cède ${c.p}%</span><b>${euro(c.montant)}</b></div>`).join('')}
-      <div class="res-line tot"><span>Total soulte</span><b>${euro(soulteTotal)}</b></div>
+    <div class="rc-hero">
+      <div class="res-label">Coût total de l'opération</div>
+      <div class="res-big">${euro(coutTotal)}</div>
+      <div class="res-range">${Math.round(fracCed*100)}% des parts rachetées · ${buyers.length} acheteur(s), ${ceders.length} cédant(s)${D>0?` · crédit repris ${euro(D)}`:''}</div>
     </div>
 
-    <div class="res-card">
-      <div class="res-sub-label">Acheteurs — versent${feesBuyer?' (soulte + frais)':''}</div>
-      ${perBuyer.map(b=>`<div class="res-line"><span class="nm">${b.n} <span class="hint">→ ${b.newPct.toLocaleString('fr-FR',{maximumFractionDigits:1})}%</span></span><b>${euro(b.pays)}</b></div>${feesBuyer&&buyers.length>1?`<div class="res-subline"><span>dont soulte ${euro(b.equity)} · frais de notaire</span><span>${euro(b.fees)}</span></div>`:feesBuyer?`<div class="res-subline"><span>dont frais de notaire</span><span>${euro(b.fees)}</span></div>`:''}`).join('')}
-      ${feesBuyer&&buyers.length>1?`<div class="res-line tot"><span>Frais répartis entre les ${buyers.length} acheteurs</span><b>${euro(droit+fraisNotaire)}</b></div>`:''}
+    <div class="rc-section">
+      <div class="rc-section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3.5" height="6"/><rect x="14" y="7" width="3.5" height="10"/></svg> De quoi se compose ce montant</div>
+      <div class="rc-break">
+        <div class="rc-bar"><span class="seg soulte" style="width:${soultePct}%"></span><span class="seg frais" style="width:${fraisPctBar}%"></span></div>
+        <div class="rc-break-legend">
+          <div><i class="dot soulte"></i> Soulte versée aux cédants <b>${euro(soulteTotal)}</b></div>
+          <div><i class="dot frais"></i> Frais de notaire <span class="hint">(tout compris)</span> <b>${euro(fraisTot)}</b></div>
+        </div>
+        <div class="rc-break-total"><span>Coût total</span><b>${euro(coutTotal)}</b></div>
+      </div>
     </div>
 
-    <div class="res-card">
-      <div class="res-line"><span>Soulte (parts rachetées)</span><b>${euro(soulteTotal)}</b></div>
-      <div class="res-line"><span>Frais de notaire <span class="hint">(tout compris)</span></span><b>${euro(droit+fraisNotaire)}</b></div>
-      <div class="res-line tot"><span>Coût total de l'opération</span><b>${euro(coutTotal)}</b></div>
+    <div class="rc-section">
+      <div class="rc-section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Ce que reçoit chaque cédant</div>
+      ${perCeder.map(c=>`
+        <div class="rc-person">
+          <div class="rc-person-head">
+            <span class="rc-ava out">${ini(c.n)}</span>
+            <div class="rc-person-id">
+              <div class="rc-person-name">${c.n}</div>
+              <div class="rc-person-meta">Cède ${c.p}% · quitte l'indivision</div>
+            </div>
+            <div class="rc-person-amt receive">${euro(c.montant)}<span>reçoit</span></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="rc-section">
+      <div class="rc-section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg> Ce que verse chaque acheteur</div>
+      ${perBuyer.map(b=>`
+        <div class="rc-person">
+          <div class="rc-person-head">
+            <span class="rc-ava">${ini(b.n)}</span>
+            <div class="rc-person-id">
+              <div class="rc-person-name">${b.n}</div>
+              <div class="rc-person-meta">Quote-part ${fmtPct(b.oldPct)}% <b>→ ${fmtPct(b.newPct)}%</b></div>
+            </div>
+            <div class="rc-person-amt">${euro(b.pays)}<span>à verser</span></div>
+          </div>
+          ${feesBuyer?`<div class="rc-person-lines">
+            <div class="rc-pl"><span>Soulte (rachat des parts)</span><span>${euro(b.equity)}</span></div>
+            <div class="rc-pl"><span>Part des frais de notaire</span><span>${euro(b.fees)}</span></div>
+          </div>`:''}
+        </div>`).join('')}
+      ${feesBuyer&&buyers.length>1?`<p class="rc-split-note">Les frais de notaire (${euro(fraisTot)}) sont répartis entre les ${buyers.length} acheteurs au prorata de leurs parts.</p>`:''}
+      ${!feesBuyer?`<p class="rc-split-note">Les frais et droits (${euro(fraisTot)}) ne sont pas mis à la charge des acheteurs dans cette simulation.</p>`:''}
     </div>
 
     <div class="res-note"><b>Frais de notaire, tout compris.</b> Ce montant réunit en une seule fois les honoraires du notaire (calculés sur un barème officiel), la TVA, les petites taxes obligatoires et les frais de dossier, plus l'impôt versé à l'État sur l'opération. ${regime==='partage' ? "Votre cas est un partage familial, par exemple une succession, un divorce ou une indivision de famille. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur nette du bien, c'est à dire après déduction du crédit." : "Votre cas est une licitation ou une cession hors cadre familial. L'impôt est ici de "+tauxPct.toLocaleString('fr-FR')+" %, appliqué sur la valeur des parts vendues."} Les acheteurs reprennent le crédit restant (${euro(D)}) et se répartissent les parts selon leurs quote-parts. Estimation indicative, à confirmer avec votre notaire.</div>
