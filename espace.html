@@ -723,6 +723,47 @@
   </div>
 </div>
 
+<!-- MODAL PRISE DE RENDEZ-VOUS -->
+<div class="modal-overlay" id="rdvModal" onclick="if(event.target===this)closeRdvModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Demander un rendez-vous</h3>
+      <button class="modal-close" onclick="closeRdvModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="rdv-with" id="rdvWith"></div>
+      <div class="modal-field">
+        <label>Date souhaitée</label>
+        <input type="date" id="rdvDate">
+      </div>
+      <div class="modal-field">
+        <label>Créneau</label>
+        <div class="rdv-slots" id="rdvSlots"></div>
+      </div>
+      <div class="modal-field">
+        <label>Motif</label>
+        <select id="rdvMotif">
+          <option>Premier échange</option>
+          <option>Rachat de parts</option>
+          <option>Succession</option>
+          <option>Vente d'un bien</option>
+          <option>Litige / médiation</option>
+          <option>Fiscalité</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Message <span style="font-weight:400;color:var(--texte-doux)">(facultatif)</span></label>
+        <textarea id="rdvNote" rows="3" placeholder="Précisez votre demande…"></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeRdvModal()">Annuler</button>
+        <button class="btn" onclick="confirmBook()">Demander le rendez-vous</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL DÉCLARATION D'INCIDENT -->
 <div class="modal-overlay" id="incModal" onclick="if(event.target===this)closeIncModal()">
   <div class="modal modal-wizard">

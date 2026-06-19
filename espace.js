@@ -669,12 +669,14 @@ function renderEstim(){
 function renderRdv(){
   const el = document.getElementById('rdvList');
   if(!el) return;
-  el.innerHTML = S.rdv.map((r,i)=>`
-    <div class="row-item">
+  el.innerHTML = S.rdv.map((r,i)=>{
+    const sub=[r.when||'', r.motif?('Motif : '+r.motif):''].filter(Boolean).join(' · ');
+    return `<div class="row-item">
       <div class="r-ic" style="background:rgba(45,106,106,.1)">${svgIcon('scale',18)}</div>
-      <div><b>${r.pro}</b><span>${r.when}</span></div>
+      <div style="flex:1;min-width:0"><b>${cEsc(r.pro)}</b><span>${cEsc(sub)}</span></div>
       <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="askDelete('Annuler cette demande de rendez-vous ?', ()=>{ S.rdv.splice(${i},1); save(); })" title="Supprimer">${DELSVG}</span></div>
-    </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun rendez-vous planifié.</div>';
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun rendez-vous planifié.</div>';
 }
 
 /* ── CONTACTS JURIDIQUES (privés à chaque indivision) ── */
@@ -1793,9 +1795,39 @@ function inviteCoi(){
   const ini=n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'??';
   S.coi.push({n,r:p+'% · Co-indivisaire',ini,st:'Invité',cls:'pill-warn'});save();toast('Invitation envoyée.');
 }
+/* ── Prise de rendez-vous (modal) ── */
+const RDV_SLOTS=['09:00','10:30','11:30','14:00','15:30','17:00'];
+let rdvSlot=RDV_SLOTS[0];
+function renderRdvSlots(){
+  const el=document.getElementById('rdvSlots'); if(!el) return;
+  el.innerHTML=RDV_SLOTS.map(s=>`<button type="button" class="rdv-slot${s===rdvSlot?' sel':''}" onclick="rdvSlot='${s}';renderRdvSlots()">${s}</button>`).join('');
+}
 function book(pro){
-  const w=prompt('Créneau souhaité :','');if(!w)return;
-  S.rdv.unshift({pro,when:w});save();toast('Demande envoyée.');go('juri');
+  const c=(S.juridique||[]).find(x=>x.name===pro);
+  const wel=document.getElementById('rdvWith');
+  if(wel){
+    const sub=c?[c.role,c.spec].filter(Boolean).join(' · '):'Contact juridique';
+    wel.innerHTML=`<div class="rw-ic">${cEsc(juriIni(pro))}</div><div><b>${cEsc(pro)}</b><span>${cEsc(sub)}</span></div>`;
+  }
+  const d=document.getElementById('rdvDate');
+  if(d){ const t=new Date(Date.now()+86400e3); d.min=new Date().toISOString().slice(0,10); d.value=t.toISOString().slice(0,10); }
+  rdvSlot=RDV_SLOTS[0]; renderRdvSlots();
+  const mt=document.getElementById('rdvMotif'); if(mt) mt.selectedIndex=0;
+  const nt=document.getElementById('rdvNote'); if(nt) nt.value='';
+  window._rdvPro=pro;
+  document.getElementById('rdvModal').classList.add('open');
+}
+function closeRdvModal(){ document.getElementById('rdvModal').classList.remove('open'); }
+function confirmBook(){
+  const pro=window._rdvPro; if(!pro) return;
+  const dv=document.getElementById('rdvDate').value;
+  if(!dv){ toast('Choisissez une date.'); return; }
+  const motif=document.getElementById('rdvMotif').value;
+  const note=document.getElementById('rdvNote').value.trim();
+  const dt=new Date(dv+'T00:00:00');
+  const dateStr=dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  S.rdv.unshift({pro, date:dv, heure:rdvSlot, motif, note, when:dateStr+' à '+rdvSlot});
+  closeRdvModal(); save(); renderRdv(); go('juri'); toast('Demande de rendez-vous envoyée.');
 }
 /* addEvent() conservé en alias de compatibilité → ouvre le modal */
 function addEvent(){ openEventModal(); }
