@@ -356,13 +356,13 @@
 
     <!-- JURIDIQUE -->
     <div class="view" id="v-juri">
-      <div class="page-head"><div><h1>Conseil juridique</h1><p>Experts disponibles pour votre indivision.</p></div></div>
+      <div class="page-head">
+        <div><h1>Conseil juridique</h1><p>Vos contacts juridiques, privés à cette indivision.</p></div>
+        <button class="btn" onclick="openJuriModal()">+ Ajouter un contact</button>
+      </div>
       <div class="card">
-        <div class="card-title">Nos experts</div>
-        <div class="card-sub">Premier échange sans engagement.</div>
-        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#0F1F3D,#2C5282);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">MD</div><div><b>Maître Dubois</b><span>Notaire · Indivision & successions</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Dubois')">Rendez-vous</button></div></div>
-        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#2D6A6A,#4A9B8E);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">ML</div><div><b>Maître Lambert</b><span>Avocate · Droit immobilier & médiation</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Lambert')">Rendez-vous</button></div></div>
-        <div class="row-item"><div class="r-ic" style="background:linear-gradient(135deg,#1E3A5F,#2D6A6A);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">MR</div><div><b>Maître Roux</b><span>Notaire · Rachat de parts</span></div><div class="row-act"><span class="pill pill-ok">Disponible</span><button class="btn btn-ghost btn-sm" onclick="book('Maître Roux')">Rendez-vous</button></div></div>
+        <div class="card-head"><div><div class="card-title">Mes contacts</div><div class="card-sub">Notaires, avocats et conseils propres à cette indivision. Visibles uniquement par vous.</div></div></div>
+        <div id="juriList"></div>
       </div>
       <div class="card"><div class="card-head"><div class="card-title">Mes rendez-vous</div></div><div id="rdvList"></div></div>
     </div>
@@ -678,6 +678,46 @@
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="closeInvModal()">Annuler</button>
         <button class="btn" onclick="saveInv()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTACT JURIDIQUE (ajout / modification) -->
+<div class="modal-overlay" id="juriModal" onclick="if(event.target===this)closeJuriModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="juriModalTitle">Ajouter un contact</h3>
+      <button class="modal-close" onclick="closeJuriModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Nom</label>
+        <input type="text" id="juriNom" placeholder="Ex : Maître Dubois" autocomplete="off">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Type</label>
+          <select id="juriRole"><option>Notaire</option><option>Avocat</option><option>Huissier</option><option>Expert-comptable</option><option>Autre conseil</option></select>
+        </div>
+        <div class="modal-field">
+          <label>Spécialité <span style="font-weight:400;color:var(--texte-doux)">(facultatif)</span></label>
+          <input type="text" id="juriSpec" placeholder="Ex : Indivision & successions" autocomplete="off">
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Téléphone <span style="font-weight:400;color:var(--texte-doux)">(facultatif)</span></label>
+          <input type="text" id="juriTel" placeholder="06 12 34 56 78" autocomplete="off">
+        </div>
+        <div class="modal-field">
+          <label>Email <span style="font-weight:400;color:var(--texte-doux)">(facultatif)</span></label>
+          <input type="text" id="juriEmail" placeholder="contact@etude.fr" autocomplete="off">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeJuriModal()">Annuler</button>
+        <button class="btn" onclick="saveJuri()">Enregistrer</button>
       </div>
     </div>
   </div>

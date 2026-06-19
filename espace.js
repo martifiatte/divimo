@@ -108,6 +108,7 @@ function go(v){
   if(v==='votes') renderVotes();
   if(v==='messages'){ renderMessages(); setTimeout(scrollMsg,60); }
   if(v==='docs') renderDocs();
+  if(v==='juri'){ renderJuri(); renderRdv(); }
   if(v==='admin'){loadAdminData();clearInterval(window._adminTimer);window._adminTimer=setInterval(loadAdminData,30000);}
 }
 document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
@@ -127,6 +128,10 @@ const DEFAULT = {
     {name:'Règlement copropriété.pdf',meta:'Lyon · 1,1 Mo',ic:'book',bien:'Appartement — Lyon'},
   ],
   coi:[{n:'Marti (vous)',r:'45% · Administrateur',ini:'MF',st:'Actif',cls:'pill-ok'},{n:'Paul Dupont',r:'30% · Co-indivisaire',ini:'PD',st:'Actif',cls:'pill-ok'},{n:'Léa Martin',r:'25% · Co-indivisaire',ini:'LM',st:'Invitée',cls:'pill-warn'}],
+  juridique:[
+    {name:'Maître Dubois',role:'Notaire',spec:'Indivision & successions',tel:'04 50 12 34 56',email:'dubois@etude-annecy.fr'},
+    {name:'Maître Lambert',role:'Avocat',spec:'Droit immobilier & médiation',tel:'04 78 22 11 00',email:'lambert@avocat-lyon.fr'},
+  ],
   estim:[],rdv:[],
   events:[
     {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy',heure:'10:00'},
@@ -186,6 +191,10 @@ const DEFAULT_GROUPE_2 = {
     {n:'Marti (vous)',r:'34% · Gérant',ini:'MF',st:'Actif',cls:'pill-ok'},
     {n:'Sophie Garnier',r:'33% · Associée',ini:'SG',st:'Actif',cls:'pill-ok'},
     {n:'Karim Rabah',r:'33% · Associé',ini:'KR',st:'Actif',cls:'pill-ok'},
+  ],
+  juridique:[
+    {name:'Maître Roux',role:'Notaire',spec:'Droit des sociétés & SCI',tel:'04 91 33 44 55',email:'roux@notaire-marseille.fr'},
+    {name:'Cabinet Olivetti',role:'Expert-comptable',spec:'Fiscalité immobilière',tel:'04 91 77 88 99',email:'contact@olivetti-expertise.fr'},
   ],
   estim:[], rdv:[],
   events:[
@@ -272,7 +281,7 @@ function createGroupe(nom){
     nom: nom,
     biens:[], docs:[],
     coi:[{n:((OWNER&&(OWNER.full||OWNER.short))||'Vous')+' (vous)',r:'100% · Administrateur',ini:(OWNER&&OWNER.ini)||'MF',st:'Actif',cls:'pill-ok'}],
-    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[]
+    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[], juridique:[]
   };
   GROUPES[activeId] = S;
   activeId = id; S = GROUPES[id];
@@ -354,7 +363,7 @@ const ICONS=['file','receipt','spreadsheet','clipboard','image'];
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
   renderKpis(); renderDashBiens(); renderDashChart(); renderPortfolio(); renderDocs(); renderCoi();
-  renderEstim(); renderRdv(); renderEvents();
+  renderEstim(); renderRdv(); renderJuri(); renderEvents();
   renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
   renderVotes(); renderMessages();
 }
@@ -666,6 +675,57 @@ function renderRdv(){
       <div><b>${r.pro}</b><span>${r.when}</span></div>
       <div class="row-act"><span class="pill pill-warn">En attente</span><span class="del" onclick="askDelete('Annuler cette demande de rendez-vous ?', ()=>{ S.rdv.splice(${i},1); save(); })" title="Supprimer">${DELSVG}</span></div>
     </div>`).join('') || '<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun rendez-vous planifié.</div>';
+}
+
+/* ── CONTACTS JURIDIQUES (privés à chaque indivision) ── */
+function juriIni(name){ return String(name||'').replace(/^(maître|maitre|me|cabinet|étude|etude|sci)\s+/i,'').split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?'; }
+function renderJuri(){
+  const el=document.getElementById('juriList'); if(!el) return;
+  if(!Array.isArray(S.juridique)) S.juridique=[];
+  const list=S.juridique;
+  if(!list.length){ el.innerHTML='<div class="empty"><div class="empty-ic">'+svgIcon('scale',24)+'</div>Aucun contact juridique. Ajoutez votre notaire, avocat ou conseil — ils resteront privés à cette indivision.</div>'; return; }
+  el.innerHTML=list.map((c,i)=>{
+    const sub=[c.role,c.spec].filter(Boolean).join(' · ');
+    const coord=[c.tel,c.email].filter(Boolean).join(' · ');
+    const nm=String(c.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="row-item">
+      <div class="r-ic" style="background:linear-gradient(135deg,var(--navy),var(--accent));color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">${cEsc(juriIni(c.name))}</div>
+      <div style="flex:1;min-width:0"><b>${cEsc(c.name)}</b><span>${cEsc(sub)}${coord?' · '+cEsc(coord):''}</span></div>
+      <div class="row-act"><button class="btn btn-ghost btn-sm" onclick="book('${nm}')">Rendez-vous</button><span class="mini-link" onclick="openJuriModal(${i})">Modifier</span><span class="del" onclick="deleteJuri(${i})" title="Supprimer">${DELSVG}</span></div>
+    </div>`;
+  }).join('');
+}
+let juriEditIdx=-1;
+function openJuriModal(idx){
+  juriEditIdx=(typeof idx==='number')?idx:-1;
+  const c=(juriEditIdx>=0 && S.juridique)?S.juridique[juriEditIdx]:null;
+  document.getElementById('juriModalTitle').textContent=c?'Modifier le contact':'Ajouter un contact';
+  document.getElementById('juriNom').value=c?c.name||'':'';
+  document.getElementById('juriRole').value=c?(c.role||'Notaire'):'Notaire';
+  document.getElementById('juriSpec').value=c?c.spec||'':'';
+  document.getElementById('juriTel').value=c?c.tel||'':'';
+  document.getElementById('juriEmail').value=c?c.email||'':'';
+  document.getElementById('juriModal').classList.add('open');
+  setTimeout(()=>document.getElementById('juriNom').focus(),50);
+}
+function closeJuriModal(){ document.getElementById('juriModal').classList.remove('open'); }
+function saveJuri(){
+  const name=document.getElementById('juriNom').value.trim();
+  if(!name){ toast('Indiquez au moins un nom.'); return; }
+  const c={ name,
+    role:document.getElementById('juriRole').value,
+    spec:document.getElementById('juriSpec').value.trim(),
+    tel:document.getElementById('juriTel').value.trim(),
+    email:document.getElementById('juriEmail').value.trim() };
+  if(!Array.isArray(S.juridique)) S.juridique=[];
+  if(juriEditIdx>=0) S.juridique[juriEditIdx]=c; else S.juridique.unshift(c);
+  closeJuriModal(); save(); renderJuri(); toast(juriEditIdx>=0?'Contact mis à jour.':'Contact ajouté.');
+}
+function deleteJuri(i){
+  if(!S.juridique||!S.juridique[i]) return;
+  askDelete('Supprimer « '+S.juridique[i].name+' » de vos contacts juridiques ?', ()=>{
+    S.juridique.splice(i,1); save(); renderJuri(); toast('Contact supprimé.');
+  });
 }
 
 /* ═══════ CALENDRIER ═══════ */
