@@ -1832,14 +1832,23 @@ function _minusDays(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.t
 function coiPct(c){ const m=String(c&&c.r||'').match(/(\d+(?:[.,]\d+)?)\s*%/); return m?parseFloat(m[1].replace(',','.')):0; }
 function coiByIni(ini){ return (S.coi||[]).find(c=>c.ini===ini) || null; }
 
-const DOC_FOLDERS = ['Actes','Factures','Juridique','Assurance','Divers'];
+const DEFAULT_FOLDERS = ['Actes','Factures',"PV d'Assemblée Générale",'Taxe foncière','Assurance','Divers'];
+/* Liste des dossiers du groupe actif (personnalisable). « Divers » reste un fourre-tout permanent. */
+function docFolders(){
+  const base = (Array.isArray(S.folders) && S.folders.length) ? S.folders.slice() : DEFAULT_FOLDERS.slice();
+  if(!base.includes('Divers')) base.push('Divers');
+  return base;
+}
+const FOLDER_ICONS = {'Actes':'file','Factures':'receipt',"PV d'Assemblée Générale":'clipboard','Taxe foncière':'building','Assurance':'shield','Divers':'box'};
 function guessFolder(d){
   const n=(d&&d.name||'').toLowerCase();
-  if(/acte|notari|titre|propri/.test(n)) return 'Actes';
-  if(/factur|travaux|devis|reçu|recu/.test(n)) return 'Factures';
-  if(/assur/.test(n)) return 'Assurance';
-  if(/règlement|reglement|copropri|bail|statut|mandat|juridi|pv\b|procès|proces/.test(n)) return 'Juridique';
-  return 'Divers';
+  let g='Divers';
+  if(/acte|notari|titre|propri/.test(n)) g='Actes';
+  else if(/factur|travaux|devis|reçu|recu/.test(n)) g='Factures';
+  else if(/assur/.test(n)) g='Assurance';
+  else if(/\bpv\b|procès|proces|assembl|\bag\b|syndic/.test(n)) g="PV d'Assemblée Générale";
+  else if(/taxe\s*fonci|fonci[èe]re|impôt|impot/.test(n)) g='Taxe foncière';
+  return docFolders().includes(g) ? g : 'Divers';
 }
 function demoVotes(){
   const c=S.coi||[]; const ini=c.map(x=>x.ini); const me=(meCoi()||{}).ini;
@@ -1870,7 +1879,12 @@ function normalizeCollab(){
   let changed=false;
   if(!Array.isArray(S.votes)){ S.votes=demoVotes(); changed=true; }
   if(!Array.isArray(S.messages)){ S.messages=demoMessages(); changed=true; }
-  (S.docs||[]).forEach(d=>{ if(!d.dossier){ d.dossier=guessFolder(d); changed=true; } });
+  if(!Array.isArray(S.folders)){ S.folders=DEFAULT_FOLDERS.slice(); changed=true; }
+  (S.docs||[]).forEach(d=>{
+    if(!d.dossier){ d.dossier=guessFolder(d); changed=true; }
+    if(d.dossier==='Juridique'){ d.dossier = (d.pvOf || /\bpv\b|procès|proces|assembl/i.test(d.name||'')) ? "PV d'Assemblée Générale" : 'Divers'; changed=true; }
+    if(!docFolders().includes(d.dossier)){ d.dossier='Divers'; changed=true; }
+  });
   if(changed) save();
 }
 
@@ -1927,7 +1941,7 @@ function saveVote(){
 function generatePV(id){
   const v=S.votes.find(x=>x.id===id); if(!v)return;
   if(!v.pvId){ v.pvId='pv'+Date.now(); S.docs=S.docs||[];
-    S.docs.unshift({ name:'PV — '+v.titre, meta:'Assemblée du '+cFrDate(v.deadline), ic:'file', bien:'__all__', dossier:'Juridique', pvOf:v.id });
+    S.docs.unshift({ name:'PV — '+v.titre, meta:'Assemblée du '+cFrDate(v.deadline), ic:'file', bien:'__all__', dossier:"PV d'Assemblée Générale", pvOf:v.id });
     save(); renderDocs(); }
   openPV(id);
 }
@@ -1981,7 +1995,7 @@ function msgKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); post
 
 /* ── Documents : dossiers + visionneuse ── */
 let docFolder='__allfold__';
-function folderIcon(f){ return f==='Actes'?'file':f==='Factures'?'receipt':f==='Juridique'?'scale':f==='Assurance'?'shield':'box'; }
+function folderIcon(f){ return FOLDER_ICONS[f] || 'folder'; }
 function docPick(){ const dz=document.getElementById('dropZone'); if(dz) dz.click(); }
 let docBien='all';
 function docRow(d){
@@ -2012,8 +2026,12 @@ function renderDocs(){
   /* Dossiers en cartes */
   const fol=document.getElementById('docFolderBar');
   if(fol){
-    const fcard=(key,label,icon)=>{ const n=key==='__allfold__'?S.docs.length:S.docs.filter(d=>(d.dossier||'Divers')===key).length; return `<button class="doc-folder${docFolder===key?' sel':''}" onclick="docFolder='${key}';renderDocs()"><span class="df-ic">${icon}</span><span class="df-name">${cEsc(label)}</span><span class="df-n">${n}</span></button>`; };
-    fol.innerHTML=fcard('__allfold__','Tous',svgIcon('folder',17))+DOC_FOLDERS.map(f=>fcard(f,f,svgIcon(folderIcon(f),17))).join('');
+    const escJs=s=>String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const fcard=(key,label,icon)=>{ const n=key==='__allfold__'?S.docs.length:S.docs.filter(d=>(d.dossier||'Divers')===key).length; return `<button class="doc-folder${docFolder===key?' sel':''}" onclick="docFolder='${escJs(key)}';renderDocs()"><span class="df-ic">${icon}</span><span class="df-name">${cEsc(label)}</span><span class="df-n">${n}</span></button>`; };
+    fol.innerHTML=fcard('__allfold__','Tous',svgIcon('folder',17))
+      +docFolders().map(f=>fcard(f,f,svgIcon(folderIcon(f),17))).join('')
+      +`<button class="doc-folder doc-folder-add" onclick="newFolder()" title="Créer un dossier"><span class="df-ic">+</span><span class="df-name">Nouveau dossier</span></button>`
+      +((docFolder!=='__allfold__'&&docFolder!=='Divers')?`<button class="doc-folder-del" onclick="deleteFolder('${escJs(docFolder)}')" title="Supprimer ce dossier">${DELSVG}<span>Supprimer « ${cEsc(docFolder)} »</span></button>`:'');
   }
   /* Filtre combiné bien + dossier */
   const docs=S.docs.map((d,i)=>({...d,i})).filter(d=>{
@@ -2029,7 +2047,7 @@ function renderDocs(){
   const known=new Set((S.biens||[]).map(b=>b.nom)); const orph=docs.filter(d=>d.bien!=='__all__'&&!known.has(d.bien)); if(orph.length) blocks.push({label:'Autres', items:orph});
   const homeIc=svgIcon('home',16);
   el.innerHTML=blocks.map(bg=>{
-    const subs=DOC_FOLDERS.map(f=>({f,items:bg.items.filter(d=>(d.dossier||'Divers')===f)})).filter(x=>x.items.length);
+    const subs=docFolders().map(f=>({f,items:bg.items.filter(d=>(d.dossier||'Divers')===f)})).filter(x=>x.items.length);
     return `<div class="doc-bien-block"><div class="doc-bien-head">${homeIc} ${cEsc(bg.label)}<span>${bg.items.length}</span></div>`
       + subs.map(s=>`<div class="doc-sub"><div class="doc-sub-head">${cEsc(s.f)}</div>${s.items.map(docRow).join('')}</div>`).join('')
       + `</div>`;
@@ -2039,13 +2057,33 @@ function docExt(name){ const m=String(name||'').match(/\.([a-z0-9]+)$/i); return
 function openDoc(i){
   const d=S.docs[i]; if(!d)return; window._docI=i; const isAll=d.bien==='__all__';
   document.getElementById('docModalTitle').textContent=d.name;
-  const opts=DOC_FOLDERS.map(f=>`<option value="${f}"${(d.dossier||'Divers')===f?' selected':''}>${f}</option>`).join('');
+  const opts=docFolders().map(f=>`<option value="${cEsc(f)}"${(d.dossier||'Divers')===f?' selected':''}>${cEsc(f)}</option>`).join('');
   document.getElementById('docBody').innerHTML=`<div class="doc-preview"><div class="doc-preview-ic">${svgIcon(d.pvOf?'scale':'file',46)}</div><div class="doc-preview-ext">${cEsc(docExt(d.name))}</div><p class="doc-preview-note">Aperçu indisponible en démonstration${d.pvOf?' — document généré depuis une décision votée.':'.'}</p></div>
     <div class="doc-info"><div><span>Bien</span><b>${cEsc(isAll?'Commun à l’indivision':(d.bien||'—'))}</b></div><div><span>Ajouté</span><b>${cEsc(d.meta||'—')}</b></div><div class="doc-move"><span>Dossier</span><select id="docFolderSel" onchange="moveDoc(window._docI,this.value)">${opts}</select></div></div>`;
   document.getElementById('docModal').classList.add('open');
 }
 function closeDoc(){ document.getElementById('docModal').classList.remove('open'); }
 function moveDoc(i,f){ if(!S.docs[i])return; S.docs[i].dossier=f; save(); renderDocs(); toast('Document rangé dans « '+f+' ».'); }
+function newFolder(){
+  const raw=prompt('Nom du nouveau dossier :'); if(raw===null) return;
+  const n=raw.trim().slice(0,40); if(!n) return;
+  if(!Array.isArray(S.folders)) S.folders=DEFAULT_FOLDERS.slice();
+  const exist=S.folders.find(f=>f.toLowerCase()===n.toLowerCase());
+  if(exist){ docFolder=exist; renderDocs(); toast('Ce dossier existe déjà.'); return; }
+  const di=S.folders.indexOf('Divers');
+  if(di>=0) S.folders.splice(di,0,n); else S.folders.push(n);
+  docFolder=n; save(); renderDocs(); toast('Dossier « '+n+' » créé.');
+}
+function deleteFolder(f){
+  if(f==='Divers') return;
+  askDelete('Supprimer le dossier « '+f+' » ? Les documents qu\'il contient seront déplacés dans « Divers ».', ()=>{
+    (S.docs||[]).forEach(d=>{ if((d.dossier||'Divers')===f) d.dossier='Divers'; });
+    if(!Array.isArray(S.folders)) S.folders=DEFAULT_FOLDERS.slice();
+    S.folders=S.folders.filter(x=>x!==f);
+    if(docFolder===f) docFolder='__allfold__';
+    save(); renderDocs(); toast('Dossier supprimé.');
+  });
+}
 function addDoc(name, meta){ S.docs.unshift({name, meta, ic:ICONS[di++%ICONS.length], bien:uploadBienValue(), dossier:guessFolder({name})}); }
 
 /* ── Invitation par email ── */
