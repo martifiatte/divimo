@@ -628,6 +628,42 @@ a { color: inherit; text-decoration: none; }
 .rdv-slot { padding: .5rem .95rem; border: 1.5px solid var(--gris-bord); border-radius: 999px; background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--texte-doux); transition: .15s; }
 .rdv-slot:hover { border-color: var(--accent-light); color: var(--navy); }
 .rdv-slot.sel { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* ━━━━ DÉCLARATION FISCALE ━━━━ */
+.fisc-years { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.fisc-seg { display: flex; gap: 10px; }
+.fisc-seg-btn { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: .7rem 1rem; border: 1.5px solid var(--gris-bord); border-radius: 11px; background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .9rem; color: var(--navy); transition: .15s; }
+.fisc-seg-btn span { font-family: 'Open Sans', sans-serif; font-weight: 400; font-size: .74rem; color: var(--texte-doux); }
+.fisc-seg-btn:hover:not(:disabled) { border-color: var(--accent-light); }
+.fisc-seg-btn.sel { background: var(--navy); border-color: var(--navy); color: #fff; }
+.fisc-seg-btn.sel span { color: rgba(255,255,255,.75); }
+.fisc-seg-btn:disabled { opacity: .5; cursor: not-allowed; }
+.fisc-table { margin-top: 4px; }
+.fisc-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr .9fr; gap: 10px; align-items: center; padding: .55rem 0; border-top: 1px solid var(--gris-bord); }
+.fisc-row.fisc-head { border-top: none; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; color: var(--texte-leger, #8896A7); }
+.fisc-row.fisc-head span:nth-child(n+2), .fisc-net, .fisc-total span:nth-child(n+2) { text-align: right; }
+.fisc-bien { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .88rem; color: var(--navy); }
+.fisc-num { position: relative; }
+.fisc-num input { width: 100%; padding: .45rem 1.5rem .45rem .6rem; border: 1.5px solid var(--gris-bord); border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: .85rem; color: var(--navy); text-align: right; transition: .15s; }
+.fisc-num input:focus { outline: none; border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(44,82,130,.1); }
+.fisc-num input:disabled { background: var(--gris-clair); color: var(--texte-doux); }
+.fisc-num i { position: absolute; right: .55rem; top: 50%; transform: translateY(-50%); font-style: normal; font-size: .8rem; color: var(--texte-doux); pointer-events: none; }
+.fisc-net { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--navy); }
+.fisc-row.fisc-total { border-top: 2px solid var(--navy); margin-top: 3px; padding-top: .7rem; font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--navy); }
+.fisc-net.neg, .fisc-part.neg, .fisc-total span.neg { color: #13855B; }
+.fisc-part { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.02rem; color: var(--navy); text-align: right; }
+.fisc-note { font-size: .76rem; color: var(--texte-doux); line-height: 1.5; margin-top: 12px; background: var(--gris-clair); border-radius: 9px; padding: 10px 12px; }
+.fisc-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fisc-check { display: flex; flex-direction: column; gap: 9px; margin-top: 6px; }
+.fisc-check-row { display: flex; align-items: center; gap: 9px; font-size: .85rem; color: var(--texte); }
+.fisc-check-row svg { color: var(--teal); flex-shrink: 0; }
+.fisc-disclaimer { font-size: .74rem; color: var(--texte-doux); line-height: 1.5; margin-top: 16px; text-align: center; }
+@media(max-width: 720px) {
+  .fisc-2col { grid-template-columns: 1fr; }
+  .fisc-row { grid-template-columns: 1.2fr 1fr 1fr; }
+  .fisc-row span:nth-child(4), .fisc-row.fisc-head span:nth-child(4) { display: none; }
+  .fisc-seg { flex-direction: column; }
+}
 .doc-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--gris-bord)}
 .doc-toolbar label{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.8rem;color:var(--navy)}
 .doc-toolbar select{width:auto;min-width:170px;padding:.5rem .8rem;border:1.5px solid var(--gris-bord);border-radius:9px;font-family:'Open Sans',sans-serif;font-size:.85rem}

@@ -109,6 +109,7 @@ function go(v){
   if(v==='messages'){ renderMessages(); setTimeout(scrollMsg,60); }
   if(v==='docs') renderDocs();
   if(v==='juri'){ renderJuri(); renderRdv(); }
+  if(v==='fiscal') renderFiscal();
   if(v==='admin'){loadAdminData();clearInterval(window._adminTimer);window._adminTimer=setInterval(loadAdminData,30000);}
 }
 document.querySelectorAll('.nav-i').forEach(n=>n.onclick=()=>go(n.dataset.v));
@@ -363,7 +364,7 @@ const ICONS=['file','receipt','spreadsheet','clipboard','image'];
 /* ━━━━ RENDERERS ━━━━ */
 function renderAll(){
   renderKpis(); renderDashBiens(); renderDashChart(); renderPortfolio(); renderDocs(); renderCoi();
-  renderEstim(); renderRdv(); renderJuri(); renderEvents();
+  renderEstim(); renderRdv(); renderJuri(); renderFiscal(); renderEvents();
   renderBudget(); renderInventaire(); renderIncidents(); renderSharing();
   renderVotes(); renderMessages();
 }
@@ -1037,6 +1038,121 @@ const TX_CATS = {
   autre:     {label:'Autre',         ic:'receipt', color:'#6B7280'},
 };
 function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'receipt', color:'#6B7280'}; }
+
+/* ━━━━ DÉCLARATION FISCALE (revenus fonciers, privé au groupe) ━━━━ */
+const FISC_DEDUCT = new Set(['taxe','travaux','copro','assurance']); /* charges déductibles des revenus fonciers */
+let fiscalYear = null;
+function fiscalYears(){
+  const ys=new Set();
+  (S.transactions||[]).forEach(t=>{ const y=String(t.date||'').slice(0,4); if(/^\d{4}$/.test(y)) ys.add(y); });
+  const cur=new Date().getFullYear(); ys.add(String(cur)); ys.add(String(cur-1));
+  return [...ys].sort().reverse();
+}
+function fiscalCfg(y){ if(!S.fiscal) S.fiscal={}; if(!S.fiscal[y]) S.fiscal[y]={regime:'auto',ov:{}}; if(!S.fiscal[y].ov) S.fiscal[y].ov={}; return S.fiscal[y]; }
+function txBelongsTo(t,b){
+  if(!t.bien||!b) return false;
+  if(t.bien===b.nom) return true;
+  const toks=s=>(String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').match(/[a-z0-9]{4,}/g)||[]);
+  const bt=new Set(toks(b.nom));
+  return toks(t.bien).some(x=>bt.has(x));
+}
+function fiscalRows(y){
+  const txs=(S.transactions||[]).filter(t=>String(t.date||'').slice(0,4)===String(y));
+  const biens=(S.biens||[]);
+  const assign=txs.map(t=>biens.findIndex(b=>txBelongsTo(t,b)));
+  const cfg=fiscalCfg(y);
+  const mk=(nom,key,parts,bi)=>{
+    let rev=0,chg=0;
+    txs.forEach((t,ti)=>{ if(assign[ti]!==bi) return; if(t.montant>0) rev+=t.montant; else if(FISC_DEDUCT.has(t.cat)) chg+=Math.abs(t.montant); });
+    const ov=cfg.ov[key]||{};
+    return { nom, key, parts, revAuto:Math.round(rev), chgAuto:Math.round(chg),
+      rev:(ov.rev!=null?ov.rev:Math.round(rev)), chg:(ov.chg!=null?ov.chg:Math.round(chg)) };
+  };
+  const rows=biens.map((b,bi)=>mk(b.nom,b.nom,bienParts(b),bi));
+  const commun=mk("Commun à l'indivision",'__commun__',coiParts(),-1);
+  if(commun.revAuto||commun.chgAuto||(cfg.ov['__commun__'])) rows.push(commun);
+  return rows;
+}
+function fiscalSet(y,key,field,val){ const cfg=fiscalCfg(y); if(!cfg.ov[key]) cfg.ov[key]={}; cfg.ov[key][field]=Math.max(0,Math.round(+val||0)); save(); renderFiscal(); }
+function fiscalRegime(y,r){ fiscalCfg(y).regime=r; save(); renderFiscal(); }
+function fiscalYearSel(y){ fiscalYear=y; renderFiscal(); }
+function renderFiscal(){
+  const el=document.getElementById('fiscalBody'); if(!el) return;
+  const escJs=s=>String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const years=fiscalYears();
+  if(!fiscalYear || !years.includes(fiscalYear)) fiscalYear=years[0];
+  const y=fiscalYear;
+  const rows=fiscalRows(y);
+  const revBrut=rows.reduce((a,r)=>a+r.rev,0);
+  const chgTot=rows.reduce((a,r)=>a+r.chg,0);
+  const cfg=fiscalCfg(y);
+  const microEligible=revBrut>0 && revBrut<15000;
+  let regime=cfg.regime; if(regime==='auto') regime=microEligible?'micro':'reel';
+  const isMicro=regime==='micro';
+  const netImposable=isMicro?Math.round(revBrut*0.7):(revBrut-chgTot);
+  const perPers={};
+  rows.forEach(r=>{
+    const net=isMicro?r.rev*0.7:(r.rev-r.chg);
+    const sumP=r.parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
+    r.parts.forEach(p=>{ const k=p.name; if(!perPers[k]) perPers[k]={name:p.name,ini:p.ini,amount:0}; perPers[k].amount+=net*(+p.pct||0)/sumP; });
+  });
+  const persList=Object.values(perPers).sort((a,b)=>b.amount-a.amount);
+  el.innerHTML=`
+    <div class="fisc-years">${years.map(yy=>`<button class="bf-chip ${yy===y?'sel':''}" onclick="fiscalYearSel('${yy}')">${yy}</button>`).join('')}</div>
+
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Régime d'imposition ${y}</div><div class="card-sub">${microEligible?'Revenus fonciers bruts sous 15 000 €: le micro-foncier (abattement de 30 %) est possible.':'Revenus fonciers bruts au-dessus de 15 000 €: régime réel applicable.'}</div></div></div>
+      <div class="fisc-seg">
+        <button class="fisc-seg-btn ${isMicro?'sel':''}" ${microEligible?'':'disabled'} onclick="fiscalRegime('${y}','micro')">Micro-foncier<span>abattement 30 %</span></button>
+        <button class="fisc-seg-btn ${!isMicro?'sel':''}" onclick="fiscalRegime('${y}','reel')">Réel<span>charges déduites</span></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Revenus et charges par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Ajustez chaque montant si besoin.</div></div></div>
+      <div class="fisc-table">
+        <div class="fisc-row fisc-head"><span>Bien</span><span>Revenus fonciers</span><span>Charges déductibles</span><span>Résultat net</span></div>
+        ${rows.map(r=>{ const net=isMicro?Math.round(r.rev*0.7):(r.rev-r.chg); return `<div class="fisc-row">
+          <span class="fisc-bien">${cEsc(String(r.nom).split('—')[0].trim())}</span>
+          <span class="fisc-num"><input type="number" min="0" value="${r.rev}" onchange="fiscalSet('${y}','${escJs(r.key)}','rev',this.value)"><i>€</i></span>
+          <span class="fisc-num"><input type="number" min="0" value="${r.chg}" ${isMicro?'disabled':''} onchange="fiscalSet('${y}','${escJs(r.key)}','chg',this.value)"><i>€</i></span>
+          <span class="fisc-net ${net<0?'neg':''}">${eur(net)}</span>
+        </div>`; }).join('')||'<div class="empty">Aucun bien dans cette indivision.</div>'}
+        <div class="fisc-row fisc-total"><span>Total ${y}</span><span>${eur(revBrut)}</span><span>${isMicro?'—':eur(chgTot)}</span><span class="${netImposable<0?'neg':''}">${eur(netImposable)}</span></div>
+      </div>
+      <p class="fisc-note">${isMicro?'Micro-foncier: le résultat imposable correspond à 70 % des revenus bruts (abattement forfaitaire de 30 %). Les charges réelles ne sont pas déduites.':'Régime réel: résultat imposable = revenus fonciers moins charges déductibles (taxe foncière, travaux, charges de copropriété non récupérables, assurance). Un résultat négatif est un déficit foncier.'}</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Part de chaque indivisaire</div><div class="card-sub">Résultat foncier réparti au prorata des quotes-parts. Chacun reporte sa part sur sa propre déclaration.</div></div></div>
+      ${persList.map((p,i)=>{ const col=PAL[i%PAL.length]; return `<div class="row-item">
+        <div class="r-ic" style="background:linear-gradient(135deg,${col},${col}cc);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">${p.ini}</div>
+        <div style="flex:1;min-width:0"><b>${cEsc(p.name)}</b><span>${isMicro?'Micro-foncier · case 4BE de la 2042':'Revenus fonciers · 2044 puis report 2042'}</span></div>
+        <div class="fisc-part ${p.amount<0?'neg':''}">${eur(Math.round(p.amount))}</div>
+      </div>`; }).join('')||'<div class="empty">Renseignez les quotes-parts pour répartir.</div>'}
+    </div>
+
+    <div class="fisc-2col">
+      <div class="card">
+        <div class="card-title">Documents à réunir</div>
+        <div class="fisc-check">
+          ${['Avis de taxe foncière '+y,'Factures de travaux et justificatifs',"Tableau d'amortissement du prêt (intérêts)",'Quittances ou relevés de loyers',"Attestation d'assurance (PNO)"].map(d=>`<div class="fisc-check-row">${svgIcon('check',14)}<span>${cEsc(d)}</span></div>`).join('')}
+        </div>
+        <p class="fisc-note">À ranger dans Documents, dossiers « Taxe foncière » et « PV d'Assemblée Générale » selon le cas.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Échéances ${+y+1}</div>
+        <div class="fisc-check">
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Déclaration en ligne: avril à juin ${+y+1}</span></div>
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Avis d'impôt: été ${+y+1}</span></div>
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Taxe foncière: automne ${+y+1}</span></div>
+        </div>
+        <p class="fisc-note">Dates indicatives, le calendrier officiel varie selon le département.</p>
+      </div>
+    </div>
+
+    <p class="fisc-disclaimer">Estimation indicative pour préparer vos démarches. Elle ne remplace pas la déclaration officielle ni l'avis d'un professionnel.</p>`;
+}
 
 /* ── STATUTS & PAIEMENTS DES CHARGES ── */
 const STATUTS = {
