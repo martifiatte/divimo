@@ -133,8 +133,11 @@ const DEFAULT = {
     {name:'Maître Dubois',role:'Notaire',spec:'Indivision & successions',tel:'04 50 12 34 56',email:'dubois@etude-annecy.fr'},
     {name:'Maître Lambert',role:'Avocat',spec:'Droit immobilier & médiation',tel:'04 78 22 11 00',email:'lambert@avocat-lyon.fr'},
   ],
-  loyers:[{id:'loy1', bien:'Appartement — Lyon', montant:1450, jour:5, since:'2026-01'}],
-  loyerStatus:{'loy1|2026-01':{st:'recu'},'loy1|2026-02':{st:'recu'},'loy1|2026-03':{st:'recu'},'loy1|2026-04':{st:'recu'},'loy1|2026-05':{st:'recu'}},
+  loyers:[
+    {id:'loy1', bien:'Appartement — Lyon', montant:1450, jour:5, freq:'mensuel', since:'2026-01'},
+    {id:'loy2', bien:'Maison familiale — Annecy', montant:2400, jour:10, freq:'trimestriel', since:'2026-01'},
+  ],
+  loyerStatus:{'loy1|2026-01':{st:'recu'},'loy1|2026-02':{st:'recu'},'loy1|2026-03':{st:'recu'},'loy1|2026-04':{st:'recu'},'loy1|2026-05':{st:'recu'},'loy2|2026-01':{st:'recu'},'loy2|2026-04':{st:'recu'}},
   estim:[],rdv:[],
   events:[
     {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy',heure:'10:00'},
@@ -199,7 +202,7 @@ const DEFAULT_GROUPE_2 = {
     {name:'Maître Roux',role:'Notaire',spec:'Droit des sociétés & SCI',tel:'04 91 33 44 55',email:'roux@notaire-marseille.fr'},
     {name:'Cabinet Olivetti',role:'Expert-comptable',spec:'Fiscalité immobilière',tel:'04 91 77 88 99',email:'contact@olivetti-expertise.fr'},
   ],
-  loyers:[{id:'loy1', bien:'Villa — Marseille 8e', montant:2600, jour:1, since:'2026-01'}],
+  loyers:[{id:'loy1', bien:'Villa — Marseille 8e', montant:2600, jour:1, freq:'mensuel', since:'2026-01'}],
   loyerStatus:{'loy1|2026-01':{st:'recu'},'loy1|2026-02':{st:'recu'},'loy1|2026-03':{st:'recu'},'loy1|2026-04':{st:'recu'},'loy1|2026-05':{st:'recu'}},
   estim:[], rdv:[],
   events:[
@@ -1285,17 +1288,20 @@ let txFilter = 'all';
 /* ━━━━ LOYERS RÉCURRENTS (encaissement mensuel + suivi par indivisaire) ━━━━ */
 function loyerList(){ if(!Array.isArray(S.loyers)) S.loyers=[]; return S.loyers; }
 function loyerStatusMap(){ if(!S.loyerStatus) S.loyerStatus={}; return S.loyerStatus; }
+const LOYER_FREQ = { mensuel:{step:1,label:'mois',adj:'mensuel'}, trimestriel:{step:3,label:'trimestre',adj:'trimestriel'}, semestriel:{step:6,label:'semestre',adj:'semestriel'}, annuel:{step:12,label:'an',adj:'annuel'} };
+function loyerFreq(l){ return LOYER_FREQ[(l&&l.freq)||'mensuel']||LOYER_FREQ.mensuel; }
 function ymNow(){ return new Date().toISOString().slice(0,7); }
-function ymList(since){
+function ymList(since, step){
+  step=step||1;
   if(!/^\d{4}-\d{2}$/.test(since||'')) since=ymNow();
   const now=ymNow(); const out=[]; let [y,m]=since.split('-').map(Number); let cur=since;
-  while(cur<=now && out.length<240){ out.push(cur); m++; if(m>12){m=1;y++;} cur=y+'-'+String(m).padStart(2,'0'); }
+  while(cur<=now && out.length<400){ out.push(cur); m+=step; while(m>12){m-=12;y++;} cur=y+'-'+String(m).padStart(2,'0'); }
   return out;
 }
 function ymLabel(ym){ const [y,m]=String(ym).split('-'); return new Date(+y,+m-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); }
 function loyerOccurrences(){
   const sm=loyerStatusMap(); const occ=[];
-  loyerList().forEach(l=>ymList(l.since).forEach(ym=>{ const key=l.id+'|'+ym; const s=sm[key]; occ.push({loyer:l, ym, key, st:s?s.st:null, montant:(s&&s.montant!=null)?s.montant:l.montant}); }));
+  loyerList().forEach(l=>ymList(l.since, loyerFreq(l).step).forEach(ym=>{ const key=l.id+'|'+ym; const s=sm[key]; occ.push({loyer:l, ym, key, st:s?s.st:null, montant:(s&&s.montant!=null)?s.montant:l.montant}); }));
   return occ;
 }
 function loyerPending(){ return loyerOccurrences().filter(o=>!o.st).sort((a,b)=>a.ym<b.ym?-1:1); }
@@ -1325,6 +1331,8 @@ function loyerPerPerson(){
 function renderLoyers(){
   const el=document.getElementById('budLoyers'); if(!el) return;
   const recs=loyerList(); const recBtn=`<button class="btn btn-sm" onclick="openLoyerModal()">+ Loyer récurrent</button>`;
+  const badge=document.getElementById('budLoyersBadge');
+  if(badge){ const pc=loyerPending().length; badge.textContent=pc; badge.hidden=!pc; }
   if(!recs.length){
     el.innerHTML=`<div class="card"><div class="card-head"><div><div class="card-title">Loyers récurrents</div><div class="card-sub">Configurez le loyer mensuel d'un bien : l'app vous demandera chaque mois si vous l'avez reçu.</div></div>${recBtn}</div><div class="empty"><div class="empty-ic">${svgIcon('coins',24)}</div>Aucun loyer récurrent. Ajoutez-en un pour suivre les encaissements.</div></div>`;
     return;
@@ -1350,7 +1358,7 @@ function renderLoyers(){
   const config = `
     <div class="card">
       <div class="card-head"><div><div class="card-title">Loyers configurés</div><div class="card-sub">Récurrences mensuelles actives.</div></div>${recBtn}</div>
-      ${recs.map(l=>`<div class="lo-cfg"><div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('home',16)}</div><div style="flex:1;min-width:0"><b>${cEsc(String(l.bien).split('—')[0].trim())}</b><span>${eur(l.montant)} / mois · le ${l.jour} · depuis ${cEsc(ymLabel(l.since))}</span></div><div class="row-act"><span class="mini-link" onclick="openLoyerModal('${l.id}')">Modifier</span><span class="del" onclick="deleteLoyer('${l.id}')" title="Supprimer">${DELSVG}</span></div></div>`).join('')}
+      ${recs.map(l=>`<div class="lo-cfg"><div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('home',16)}</div><div style="flex:1;min-width:0"><b>${cEsc(String(l.bien).split('—')[0].trim())}</b><span>${eur(l.montant)} / ${loyerFreq(l).label} · le ${l.jour} · depuis ${cEsc(ymLabel(l.since))}</span></div><div class="row-act"><span class="mini-link" onclick="openLoyerModal('${l.id}')">Modifier</span><span class="del" onclick="deleteLoyer('${l.id}')" title="Supprimer">${DELSVG}</span></div></div>`).join('')}
     </div>`;
   el.innerHTML=inbox+split+config;
 }
@@ -1363,6 +1371,7 @@ function openLoyerModal(id){
   sel.innerHTML=(S.biens||[]).map(b=>`<option value="${cEsc(b.nom)}"${l&&l.bien===b.nom?' selected':''}>${cEsc(b.nom.split('—')[0].trim())}</option>`).join('')||'<option value="">Aucun bien</option>';
   document.getElementById('loyerMontant').value=l?String(l.montant):'';
   document.getElementById('loyerJour').value=l?l.jour:5;
+  document.getElementById('loyerFreq').value=l?(l.freq||'mensuel'):'mensuel';
   document.getElementById('loyerSince').value=l?l.since:ymNow();
   document.getElementById('loyerModal').classList.add('open');
 }
@@ -1373,9 +1382,10 @@ function saveLoyer(){
   if(!bien){ toast('Ajoutez d\'abord un bien.'); return; }
   if(!montant){ toast('Indiquez le loyer mensuel.'); return; }
   const jour=Math.min(28,Math.max(1,+document.getElementById('loyerJour').value||1));
+  const freq=document.getElementById('loyerFreq').value||'mensuel';
   const since=document.getElementById('loyerSince').value||ymNow();
-  if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bien=bien; l.montant=montant; l.jour=jour; l.since=since; } }
-  else loyerList().push({id:'loy'+Date.now().toString(36), bien, montant, jour, since});
+  if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bien=bien; l.montant=montant; l.jour=jour; l.freq=freq; l.since=since; } }
+  else loyerList().push({id:'loy'+Date.now().toString(36), bien, montant, jour, freq, since});
   closeLoyerModal(); save(); renderLoyers(); toast(loyerEditId?'Loyer mis à jour.':'Loyer récurrent ajouté.');
 }
 function deleteLoyer(id){
@@ -1387,6 +1397,12 @@ function deleteLoyer(id){
   });
 }
 
+let budTab='apercu';
+function setBudTab(t){
+  budTab=t;
+  document.querySelectorAll('#budSubnav .bsub').forEach(b=>b.classList.toggle('sel', b.dataset.bt===t));
+  document.querySelectorAll('#v-budget .bud-panel').forEach(p=>{ p.hidden = p.dataset.bt!==t; });
+}
 function renderBudget(){
   S.payments = S.payments || [];
   renderLoyers();

@@ -208,50 +208,64 @@
         <button class="btn" onclick="openTxModal()">+ Transaction</button>
       </div>
 
-      <!-- Loyers récurrents -->
-      <div id="budLoyers"></div>
+      <!-- Sous-navigation -->
+      <div class="bud-subnav" id="budSubnav">
+        <button class="bsub sel" data-bt="apercu" onclick="setBudTab('apercu')">Vue d'ensemble</button>
+        <button class="bsub" data-bt="loyers" onclick="setBudTab('loyers')">Loyers<span class="lo-badge" id="budLoyersBadge" hidden></span></button>
+        <button class="bsub" data-bt="charges" onclick="setBudTab('charges')">Charges</button>
+        <button class="bsub" data-bt="mouvements" onclick="setBudTab('mouvements')">Mouvements</button>
+      </div>
 
-      <!-- Résumé -->
-      <div class="bud-stats" id="budStats"></div>
+      <!-- Vue d'ensemble -->
+      <div class="bud-panel" data-bt="apercu">
+        <div class="bud-stats" id="budStats"></div>
+      </div>
 
-      <!-- Répartition + catégories -->
-      <div class="bud-cols">
-        <div class="card">
-          <div class="card-title">Qui doit combien ?</div>
-          <div class="card-sub">Répartition des charges communes par co-indivisaire.</div>
-          <div class="split-intro">
-            Total des charges réparti selon les quote-parts de chacun. Exemple : une charge de 1 000 € → 450 € pour une part de 45 %.
+      <!-- Loyers -->
+      <div class="bud-panel" data-bt="loyers" hidden>
+        <div id="budLoyers"></div>
+      </div>
+
+      <!-- Charges -->
+      <div class="bud-panel" data-bt="charges" hidden>
+        <div class="bud-cols">
+          <div class="card">
+            <div class="card-title">Qui doit combien ?</div>
+            <div class="card-sub">Répartition des charges communes par co-indivisaire.</div>
+            <div class="split-intro">
+              Total des charges réparti selon les quote-parts de chacun. Exemple : une charge de 1 000 € → 450 € pour une part de 45 %.
+            </div>
+            <div id="budSplit"></div>
           </div>
-          <div id="budSplit"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Charges par catégorie</div>
-          <div class="card-sub">Où part l'argent.</div>
-          <div id="budCats"></div>
+          <div class="card">
+            <div class="card-title">Charges par catégorie</div>
+            <div class="card-sub">Où part l'argent.</div>
+            <div id="budCats"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Transactions -->
-      <div class="card">
-        <div class="card-head">
-          <div><div class="card-title">Transactions</div><div class="card-sub" id="txCount">—</div></div>
-        </div>
-        <div class="bud-toolbar">
-          <div class="bud-filter" id="txFilter">
-            <span class="bf-chip sel" data-f="all">Tout</span>
-            <span class="bf-chip" data-f="charge">Charges</span>
-            <span class="bf-chip" data-f="revenu">Revenus</span>
+      <!-- Mouvements -->
+      <div class="bud-panel" data-bt="mouvements" hidden>
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Transactions</div><div class="card-sub" id="txCount">—</div></div>
           </div>
+          <div class="bud-toolbar">
+            <div class="bud-filter" id="txFilter">
+              <span class="bf-chip sel" data-f="all">Tout</span>
+              <span class="bf-chip" data-f="charge">Charges</span>
+              <span class="bf-chip" data-f="revenu">Revenus</span>
+            </div>
+          </div>
+          <div id="txList" style="margin-top:8px"></div>
         </div>
-        <div id="txList" style="margin-top:8px"></div>
-      </div>
-
-      <!-- Historique des paiements -->
-      <div class="card">
-        <div class="card-head">
-          <div><div class="card-title">Historique des paiements</div><div class="card-sub" id="payHistSub">—</div></div>
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Historique des paiements</div><div class="card-sub" id="payHistSub">—</div></div>
+          </div>
+          <div id="payHistList" style="margin-top:6px"></div>
         </div>
-        <div id="payHistList" style="margin-top:6px"></div>
       </div>
     </div>
 
@@ -720,9 +734,20 @@
           <input type="number" id="loyerJour" min="1" max="28" value="5">
         </div>
       </div>
-      <div class="modal-field">
-        <label>À partir de</label>
-        <input type="month" id="loyerSince">
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Fréquence</label>
+          <select id="loyerFreq">
+            <option value="mensuel">Tous les mois</option>
+            <option value="trimestriel">Tous les 3 mois</option>
+            <option value="semestriel">Tous les 6 mois</option>
+            <option value="annuel">Une fois par an</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label>À partir de</label>
+          <input type="month" id="loyerSince">
+        </div>
       </div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="closeLoyerModal()">Annuler</button>

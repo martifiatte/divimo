@@ -659,8 +659,16 @@ a { color: inherit; text-decoration: none; }
 .fisc-check-row svg { color: var(--teal); flex-shrink: 0; }
 .fisc-disclaimer { font-size: .74rem; color: var(--texte-doux); line-height: 1.5; margin-top: 16px; text-align: center; }
 
+/* ━━━━ SOUS-NAVIGATION BUDGET ━━━━ */
+.bud-subnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px solid var(--gris-bord); padding-bottom: 0; }
+.bsub { position: relative; background: none; border: none; cursor: pointer; padding: .6rem .9rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .85rem; color: var(--texte-doux); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: .15s; display: inline-flex; align-items: center; }
+.bsub:hover { color: var(--navy); }
+.bsub.sel { color: var(--navy); border-bottom-color: var(--navy); }
+.bud-panel > .bud-stats:first-child, .bud-panel > .bud-cols:first-child { margin-top: 0; }
+
 /* ━━━━ LOYERS RÉCURRENTS ━━━━ */
 .lo-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #C8821E; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; margin-left: 6px; vertical-align: middle; }
+.lo-badge[hidden] { display: none; }
 .lo-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
 .lo-row:first-of-type { border-top: none; }
 .lo-row .r-ic { width: 38px; height: 38px; flex: 0 0 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
