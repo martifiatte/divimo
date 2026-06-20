@@ -1305,6 +1305,7 @@ function loyerOccurrences(){
   return occ;
 }
 function loyerPending(){ return loyerOccurrences().filter(o=>!o.st).sort((a,b)=>a.ym<b.ym?-1:1); }
+function loyerToHandle(){ return loyerOccurrences().filter(o=>o.st===null||o.st==='impaye').sort((a,b)=>a.ym<b.ym?-1:1); }
 function loyerReceived(){ return loyerOccurrences().filter(o=>o.st==='recu'||o.st==='partiel'); }
 function confirmLoyer(key, st){
   const occ=loyerOccurrences().find(o=>o.key===key); if(!occ) return;
@@ -1332,28 +1333,33 @@ function renderLoyers(){
   const el=document.getElementById('budLoyers'); if(!el) return;
   const recs=loyerList(); const recBtn=`<button class="btn btn-sm" onclick="openLoyerModal()">+ Loyer récurrent</button>`;
   const badge=document.getElementById('budLoyersBadge');
-  if(badge){ const pc=loyerPending().length; badge.textContent=pc; badge.hidden=!pc; }
+  if(badge){ const pc=loyerToHandle().length; badge.textContent=pc; badge.hidden=!pc; }
   if(!recs.length){
     el.innerHTML=`<div class="card"><div class="card-head"><div><div class="card-title">Loyers récurrents</div><div class="card-sub">Configurez le loyer mensuel d'un bien : l'app vous demandera chaque mois si vous l'avez reçu.</div></div>${recBtn}</div><div class="empty"><div class="empty-ic">${svgIcon('coins',24)}</div>Aucun loyer récurrent. Ajoutez-en un pour suivre les encaissements.</div></div>`;
     return;
   }
-  const pend=loyerPending(); const now=ymNow(); const pendThis=pend.filter(o=>o.ym===now);
+  const handle=loyerToHandle(); const now=ymNow(); const pendThis=handle.filter(o=>o.st===null && o.ym===now);
   const per=loyerPerPerson(); const totalRecu=loyerReceived().reduce((a,o)=>a+o.montant,0);
-  const impayes=loyerOccurrences().filter(o=>o.st==='impaye').length;
-  const inbox = pend.length ? `
+  const inbox = handle.length ? `
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Loyers à confirmer <span class="lo-badge">${pend.length}</span></div><div class="card-sub">Avez-vous reçu ces loyers ?</div></div>${pendThis.length>1?`<button class="btn btn-ghost btn-sm" onclick="confirmAllThisMonth()">Tout reçu ce mois</button>`:''}</div>
-      ${pend.map(o=>`<div class="lo-row">
-        <div class="r-ic" style="background:rgba(25,169,116,.12);color:#13855B">${svgIcon('coins',18)}</div>
-        <div style="flex:1;min-width:0"><b>Loyer ${cEsc(ymLabel(o.ym))}</b><span>${cEsc(String(o.loyer.bien).split('—')[0].trim())} · ${eur(o.loyer.montant)}</span></div>
-        <div class="lo-acts"><button class="lo-yes" onclick="confirmLoyer('${o.key}','recu')">Oui</button><button class="lo-part" onclick="confirmLoyer('${o.key}','partiel')">Partiel</button><button class="lo-no" onclick="confirmLoyer('${o.key}','impaye')">Non</button></div>
-      </div>`).join('')}
+      <div class="card-head"><div><div class="card-title">Loyers à suivre <span class="lo-badge">${handle.length}</span></div><div class="card-sub">Confirmez les loyers reçus. Les impayés restent ici jusqu'à régularisation.</div></div>${pendThis.length>1?`<button class="btn btn-ghost btn-sm" onclick="confirmAllThisMonth()">Tout reçu ce mois</button>`:''}</div>
+      ${handle.map(o=>{ const bienN=cEsc(String(o.loyer.bien).split('—')[0].trim());
+        if(o.st==='impaye') return `<div class="lo-row impaye">
+          <div class="r-ic" style="background:rgba(192,57,57,.1);color:#C0392B">${svgIcon('alert',18)}</div>
+          <div style="flex:1;min-width:0"><b>Loyer ${cEsc(ymLabel(o.ym))}</b><span>${bienN} · ${eur(o.loyer.montant)} · <span class="lo-tag no">Impayé</span></span></div>
+          <div class="lo-acts"><button class="lo-yes" onclick="confirmLoyer('${o.key}','recu')">Marquer reçu</button><button class="lo-reset" onclick="resetLoyer('${o.key}')">Annuler</button></div>
+        </div>`;
+        return `<div class="lo-row">
+          <div class="r-ic" style="background:rgba(25,169,116,.12);color:#13855B">${svgIcon('coins',18)}</div>
+          <div style="flex:1;min-width:0"><b>Loyer ${cEsc(ymLabel(o.ym))}</b><span>${bienN} · ${eur(o.loyer.montant)}</span></div>
+          <div class="lo-acts"><button class="lo-yes" onclick="confirmLoyer('${o.key}','recu')">Oui</button><button class="lo-part" onclick="confirmLoyer('${o.key}','partiel')">Partiel</button><button class="lo-no" onclick="confirmLoyer('${o.key}','impaye')">Non</button></div>
+        </div>`;
+      }).join('')}
     </div>` : '';
   const split = `
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Encaissé par indivisaire</div><div class="card-sub">Cumul des loyers perçus, réparti selon les quote-parts.</div></div><div class="lo-total">${eur(totalRecu)}</div></div>
+      <div class="card-head"><div><div class="card-title">Encaissé par indivisaire</div><div class="card-sub">Cumul des loyers perçus, réparti selon les quote-parts. Alimente les revenus du budget.</div></div><div class="lo-total">${eur(totalRecu)}</div></div>
       ${per.length?per.map((p,i)=>{const col=PAL[i%PAL.length];const pc=totalRecu?Math.round(p.amount/totalRecu*100):0;const mx=per[0].amount||1;return `<div class="split-row"><div class="split-av" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</div><div class="split-body"><div class="split-top"><span class="split-name">${cEsc(p.name)}<span class="pct">${pc}%</span></span><span class="split-amount">${eur(Math.round(p.amount))}</span></div><div class="split-bar"><div class="split-fill" style="width:${p.amount/mx*100}%;background:${col}"></div></div></div></div>`;}).join(''):'<div class="empty">Aucun loyer encaissé pour l\'instant.</div>'}
-      ${impayes?`<p class="fisc-note">${impayes} loyer(s) marqué(s) impayé(s). Pensez à relancer.</p>`:''}
     </div>`;
   const config = `
     <div class="card">
@@ -1407,7 +1413,9 @@ function renderBudget(){
   S.payments = S.payments || [];
   renderLoyers();
   const txs = S.transactions;
-  const revenus = txs.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
+  const loyersRecu = loyerReceived().reduce((a,o)=>a+o.montant,0);
+  const revenusTx = txs.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
+  const revenus = revenusTx + loyersRecu;
   const chargesAbs = Math.abs(txs.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0));
   const solde = revenus - chargesAbs;
 
@@ -1425,7 +1433,7 @@ function renderBudget(){
       <div class="bs-ico" style="background:rgba(45,106,106,.12)">${svgIcon('trendup',18)}</div>
       <div class="bs-label">Revenus</div>
       <div class="bs-amount">+${eur(revenus)}</div>
-      <div class="bs-sub">${txs.filter(t=>t.montant>0).length} entrée(s)</div>
+      <div class="bs-sub">${txs.filter(t=>t.montant>0).length} entrée(s)${loyersRecu?` · dont loyers ${eur(loyersRecu)}`:''}</div>
     </div>
     <div class="bud-stat chg">
       <div class="bs-ico" style="background:rgba(192,57,57,.1)">${svgIcon('trenddown',18)}</div>
