@@ -133,6 +133,8 @@ const DEFAULT = {
     {name:'Maître Dubois',role:'Notaire',spec:'Indivision & successions',tel:'04 50 12 34 56',email:'dubois@etude-annecy.fr'},
     {name:'Maître Lambert',role:'Avocat',spec:'Droit immobilier & médiation',tel:'04 78 22 11 00',email:'lambert@avocat-lyon.fr'},
   ],
+  loyers:[{id:'loy1', bien:'Appartement — Lyon', montant:1450, jour:5, since:'2026-01'}],
+  loyerStatus:{'loy1|2026-01':{st:'recu'},'loy1|2026-02':{st:'recu'},'loy1|2026-03':{st:'recu'},'loy1|2026-04':{st:'recu'},'loy1|2026-05':{st:'recu'}},
   estim:[],rdv:[],
   events:[
     {titre:'Visite expert immobilier',date:'2026-06-20',type:'visite',lieu:'Maison Annecy',heure:'10:00'},
@@ -197,6 +199,8 @@ const DEFAULT_GROUPE_2 = {
     {name:'Maître Roux',role:'Notaire',spec:'Droit des sociétés & SCI',tel:'04 91 33 44 55',email:'roux@notaire-marseille.fr'},
     {name:'Cabinet Olivetti',role:'Expert-comptable',spec:'Fiscalité immobilière',tel:'04 91 77 88 99',email:'contact@olivetti-expertise.fr'},
   ],
+  loyers:[{id:'loy1', bien:'Villa — Marseille 8e', montant:2600, jour:1, since:'2026-01'}],
+  loyerStatus:{'loy1|2026-01':{st:'recu'},'loy1|2026-02':{st:'recu'},'loy1|2026-03':{st:'recu'},'loy1|2026-04':{st:'recu'},'loy1|2026-05':{st:'recu'}},
   estim:[], rdv:[],
   events:[
     {titre:'AG annuelle SCI',date:'2026-09-30',type:'reunion',lieu:'Marseille',heure:'15:00'},
@@ -282,7 +286,7 @@ function createGroupe(nom){
     nom: nom,
     biens:[], docs:[],
     coi:[{n:((OWNER&&(OWNER.full||OWNER.short))||'Vous')+' (vous)',r:'100% · Administrateur',ini:(OWNER&&OWNER.ini)||'MF',st:'Actif',cls:'pill-ok'}],
-    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[], juridique:[]
+    estim:[], rdv:[], events:[], transactions:[], inventaire:[], incidents:[], sharing:{}, votes:[], messages:[], juridique:[], loyers:[], loyerStatus:{}
   };
   GROUPES[activeId] = S;
   activeId = id; S = GROUPES[id];
@@ -1278,8 +1282,114 @@ function coiParts(){
 
 let txFilter = 'all';
 
+/* ━━━━ LOYERS RÉCURRENTS (encaissement mensuel + suivi par indivisaire) ━━━━ */
+function loyerList(){ if(!Array.isArray(S.loyers)) S.loyers=[]; return S.loyers; }
+function loyerStatusMap(){ if(!S.loyerStatus) S.loyerStatus={}; return S.loyerStatus; }
+function ymNow(){ return new Date().toISOString().slice(0,7); }
+function ymList(since){
+  if(!/^\d{4}-\d{2}$/.test(since||'')) since=ymNow();
+  const now=ymNow(); const out=[]; let [y,m]=since.split('-').map(Number); let cur=since;
+  while(cur<=now && out.length<240){ out.push(cur); m++; if(m>12){m=1;y++;} cur=y+'-'+String(m).padStart(2,'0'); }
+  return out;
+}
+function ymLabel(ym){ const [y,m]=String(ym).split('-'); return new Date(+y,+m-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); }
+function loyerOccurrences(){
+  const sm=loyerStatusMap(); const occ=[];
+  loyerList().forEach(l=>ymList(l.since).forEach(ym=>{ const key=l.id+'|'+ym; const s=sm[key]; occ.push({loyer:l, ym, key, st:s?s.st:null, montant:(s&&s.montant!=null)?s.montant:l.montant}); }));
+  return occ;
+}
+function loyerPending(){ return loyerOccurrences().filter(o=>!o.st).sort((a,b)=>a.ym<b.ym?-1:1); }
+function loyerReceived(){ return loyerOccurrences().filter(o=>o.st==='recu'||o.st==='partiel'); }
+function confirmLoyer(key, st){
+  const occ=loyerOccurrences().find(o=>o.key===key); if(!occ) return;
+  const sm=loyerStatusMap();
+  if(st==='partiel'){ const v=prompt('Montant réellement reçu (€) :', String(occ.loyer.montant)); if(v===null) return; sm[key]={st:'partiel', montant:Math.max(0,Math.round(+v||0))}; }
+  else sm[key]={st};
+  save(); renderLoyers();
+  toast(st==='recu'?'Loyer encaissé.':st==='impaye'?'Loyer marqué impayé.':'Loyer partiel enregistré.');
+}
+function resetLoyer(key){ delete loyerStatusMap()[key]; save(); renderLoyers(); }
+function confirmAllThisMonth(){
+  const now=ymNow(); const sm=loyerStatusMap(); let n=0;
+  loyerPending().filter(o=>o.ym===now).forEach(o=>{ sm[o.key]={st:'recu'}; n++; });
+  if(n){ save(); renderLoyers(); toast(n+' loyer(s) encaissé(s).'); } else toast('Aucun loyer à confirmer ce mois.');
+}
+function loyerPerPerson(){
+  const per={};
+  loyerReceived().forEach(o=>{
+    const bien=S.biens.find(b=>b.nom===o.loyer.bien); const parts=bienParts(bien); const sum=parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
+    parts.forEach(p=>{ if(!per[p.name]) per[p.name]={name:p.name,ini:p.ini,amount:0}; per[p.name].amount+=o.montant*(+p.pct||0)/sum; });
+  });
+  return Object.values(per).sort((a,b)=>b.amount-a.amount);
+}
+function renderLoyers(){
+  const el=document.getElementById('budLoyers'); if(!el) return;
+  const recs=loyerList(); const recBtn=`<button class="btn btn-sm" onclick="openLoyerModal()">+ Loyer récurrent</button>`;
+  if(!recs.length){
+    el.innerHTML=`<div class="card"><div class="card-head"><div><div class="card-title">Loyers récurrents</div><div class="card-sub">Configurez le loyer mensuel d'un bien : l'app vous demandera chaque mois si vous l'avez reçu.</div></div>${recBtn}</div><div class="empty"><div class="empty-ic">${svgIcon('coins',24)}</div>Aucun loyer récurrent. Ajoutez-en un pour suivre les encaissements.</div></div>`;
+    return;
+  }
+  const pend=loyerPending(); const now=ymNow(); const pendThis=pend.filter(o=>o.ym===now);
+  const per=loyerPerPerson(); const totalRecu=loyerReceived().reduce((a,o)=>a+o.montant,0);
+  const impayes=loyerOccurrences().filter(o=>o.st==='impaye').length;
+  const inbox = pend.length ? `
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Loyers à confirmer <span class="lo-badge">${pend.length}</span></div><div class="card-sub">Avez-vous reçu ces loyers ?</div></div>${pendThis.length>1?`<button class="btn btn-ghost btn-sm" onclick="confirmAllThisMonth()">Tout reçu ce mois</button>`:''}</div>
+      ${pend.map(o=>`<div class="lo-row">
+        <div class="r-ic" style="background:rgba(25,169,116,.12);color:#13855B">${svgIcon('coins',18)}</div>
+        <div style="flex:1;min-width:0"><b>Loyer ${cEsc(ymLabel(o.ym))}</b><span>${cEsc(String(o.loyer.bien).split('—')[0].trim())} · ${eur(o.loyer.montant)}</span></div>
+        <div class="lo-acts"><button class="lo-yes" onclick="confirmLoyer('${o.key}','recu')">Oui</button><button class="lo-part" onclick="confirmLoyer('${o.key}','partiel')">Partiel</button><button class="lo-no" onclick="confirmLoyer('${o.key}','impaye')">Non</button></div>
+      </div>`).join('')}
+    </div>` : '';
+  const split = `
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Encaissé par indivisaire</div><div class="card-sub">Cumul des loyers perçus, réparti selon les quote-parts.</div></div><div class="lo-total">${eur(totalRecu)}</div></div>
+      ${per.length?per.map((p,i)=>{const col=PAL[i%PAL.length];const pc=totalRecu?Math.round(p.amount/totalRecu*100):0;const mx=per[0].amount||1;return `<div class="split-row"><div class="split-av" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</div><div class="split-body"><div class="split-top"><span class="split-name">${cEsc(p.name)}<span class="pct">${pc}%</span></span><span class="split-amount">${eur(Math.round(p.amount))}</span></div><div class="split-bar"><div class="split-fill" style="width:${p.amount/mx*100}%;background:${col}"></div></div></div></div>`;}).join(''):'<div class="empty">Aucun loyer encaissé pour l\'instant.</div>'}
+      ${impayes?`<p class="fisc-note">${impayes} loyer(s) marqué(s) impayé(s). Pensez à relancer.</p>`:''}
+    </div>`;
+  const config = `
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Loyers configurés</div><div class="card-sub">Récurrences mensuelles actives.</div></div>${recBtn}</div>
+      ${recs.map(l=>`<div class="lo-cfg"><div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('home',16)}</div><div style="flex:1;min-width:0"><b>${cEsc(String(l.bien).split('—')[0].trim())}</b><span>${eur(l.montant)} / mois · le ${l.jour} · depuis ${cEsc(ymLabel(l.since))}</span></div><div class="row-act"><span class="mini-link" onclick="openLoyerModal('${l.id}')">Modifier</span><span class="del" onclick="deleteLoyer('${l.id}')" title="Supprimer">${DELSVG}</span></div></div>`).join('')}
+    </div>`;
+  el.innerHTML=inbox+split+config;
+}
+let loyerEditId=null;
+function openLoyerModal(id){
+  loyerEditId=id||null;
+  const l=id?loyerList().find(x=>x.id===id):null;
+  document.getElementById('loyerModalTitle').textContent=l?'Modifier le loyer':'Nouveau loyer récurrent';
+  const sel=document.getElementById('loyerBien');
+  sel.innerHTML=(S.biens||[]).map(b=>`<option value="${cEsc(b.nom)}"${l&&l.bien===b.nom?' selected':''}>${cEsc(b.nom.split('—')[0].trim())}</option>`).join('')||'<option value="">Aucun bien</option>';
+  document.getElementById('loyerMontant').value=l?String(l.montant):'';
+  document.getElementById('loyerJour').value=l?l.jour:5;
+  document.getElementById('loyerSince').value=l?l.since:ymNow();
+  document.getElementById('loyerModal').classList.add('open');
+}
+function closeLoyerModal(){ document.getElementById('loyerModal').classList.remove('open'); }
+function saveLoyer(){
+  const bien=document.getElementById('loyerBien').value;
+  const montant=Math.max(0,Math.round(+String(document.getElementById('loyerMontant').value).replace(/[^\d]/g,'')||0));
+  if(!bien){ toast('Ajoutez d\'abord un bien.'); return; }
+  if(!montant){ toast('Indiquez le loyer mensuel.'); return; }
+  const jour=Math.min(28,Math.max(1,+document.getElementById('loyerJour').value||1));
+  const since=document.getElementById('loyerSince').value||ymNow();
+  if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bien=bien; l.montant=montant; l.jour=jour; l.since=since; } }
+  else loyerList().push({id:'loy'+Date.now().toString(36), bien, montant, jour, since});
+  closeLoyerModal(); save(); renderLoyers(); toast(loyerEditId?'Loyer mis à jour.':'Loyer récurrent ajouté.');
+}
+function deleteLoyer(id){
+  const l=loyerList().find(x=>x.id===id); if(!l) return;
+  askDelete('Supprimer ce loyer récurrent et son historique de suivi ?', ()=>{
+    S.loyers=loyerList().filter(x=>x.id!==id);
+    const sm=loyerStatusMap(); Object.keys(sm).forEach(k=>{ if(k.indexOf(id+'|')===0) delete sm[k]; });
+    save(); renderLoyers(); toast('Loyer supprimé.');
+  });
+}
+
 function renderBudget(){
   S.payments = S.payments || [];
+  renderLoyers();
   const txs = S.transactions;
   const revenus = txs.filter(t=>t.montant>0).reduce((a,b)=>a+b.montant,0);
   const chargesAbs = Math.abs(txs.filter(t=>t.montant<0).reduce((a,b)=>a+b.montant,0));

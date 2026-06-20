@@ -204,9 +204,12 @@
     <!-- BUDGET v2 -->
     <div class="view" id="v-budget">
       <div class="page-head">
-        <div><h1>Budget</h1><p>Charges communes réparties automatiquement entre co-indivisaires selon les quote-parts.</p></div>
+        <div><h1>Budget</h1><p>Loyers encaissés et charges réparties automatiquement entre co-indivisaires selon les quote-parts.</p></div>
         <button class="btn" onclick="openTxModal()">+ Transaction</button>
       </div>
+
+      <!-- Loyers récurrents -->
+      <div id="budLoyers"></div>
 
       <!-- Résumé -->
       <div class="bud-stats" id="budStats"></div>
@@ -687,6 +690,43 @@
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="closeInvModal()">Annuler</button>
         <button class="btn" onclick="saveInv()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOYER RÉCURRENT -->
+<div class="modal-overlay" id="loyerModal" onclick="if(event.target===this)closeLoyerModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="loyerModalTitle">Loyer récurrent</h3>
+      <button class="modal-close" onclick="closeLoyerModal()" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Bien loué</label>
+        <select id="loyerBien"></select>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Loyer mensuel</label>
+          <div class="wiz-money">
+            <input type="text" id="loyerMontant" inputmode="numeric" placeholder="1 450" autocomplete="off" oninput="formatBienVal(this)" style="font-size:1rem;padding:.65rem 2rem .65rem .8rem">
+            <span class="wiz-money-cur" style="font-size:1rem">€</span>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>Jour d'encaissement</label>
+          <input type="number" id="loyerJour" min="1" max="28" value="5">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>À partir de</label>
+        <input type="month" id="loyerSince">
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeLoyerModal()">Annuler</button>
+        <button class="btn" onclick="saveLoyer()">Enregistrer</button>
       </div>
     </div>
   </div>

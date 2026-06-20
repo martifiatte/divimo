@@ -658,6 +658,29 @@ a { color: inherit; text-decoration: none; }
 .fisc-check-row { display: flex; align-items: center; gap: 9px; font-size: .85rem; color: var(--texte); }
 .fisc-check-row svg { color: var(--teal); flex-shrink: 0; }
 .fisc-disclaimer { font-size: .74rem; color: var(--texte-doux); line-height: 1.5; margin-top: 16px; text-align: center; }
+
+/* ━━━━ LOYERS RÉCURRENTS ━━━━ */
+.lo-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #C8821E; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; margin-left: 6px; vertical-align: middle; }
+.lo-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.lo-row:first-of-type { border-top: none; }
+.lo-row .r-ic { width: 38px; height: 38px; flex: 0 0 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.lo-row b { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .9rem; color: var(--navy); display: block; line-height: 1.2; }
+.lo-row span { font-size: .8rem; color: var(--texte-doux); }
+.lo-acts { display: flex; gap: 6px; flex-shrink: 0; }
+.lo-acts button { padding: .4rem .8rem; border-radius: 8px; border: 1.5px solid var(--gris-bord); background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .8rem; transition: .15s; }
+.lo-yes { color: #13855B; }
+.lo-yes:hover { background: rgba(25,169,116,.12); border-color: #19A974; }
+.lo-part { color: #9A6010; }
+.lo-part:hover { background: rgba(200,130,30,.12); border-color: #C8821E; }
+.lo-no { color: #C0392B; }
+.lo-no:hover { background: rgba(192,57,57,.1); border-color: #C0392B; }
+.lo-total { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.25rem; color: #13855B; flex-shrink: 0; }
+.lo-cfg { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--gris-bord); }
+.lo-cfg:first-of-type { border-top: none; }
+.lo-cfg .r-ic { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--accent); }
+.lo-cfg b { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .88rem; color: var(--navy); display: block; }
+.lo-cfg span { font-size: .78rem; color: var(--texte-doux); }
+@media(max-width: 560px) { .lo-row { flex-wrap: wrap; } .lo-acts { width: 100%; } .lo-acts button { flex: 1; } }
 @media(max-width: 720px) {
   .fisc-2col { grid-template-columns: 1fr; }
   .fisc-row { grid-template-columns: 1.2fr 1fr 1fr; }
