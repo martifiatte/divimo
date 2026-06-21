@@ -796,3 +796,28 @@ button.del { cursor: pointer; color: var(--gris-mid); transition: .15s; }
 .confirm-cancel:hover { background: var(--gris-clair); }
 .confirm-del { background: #C0392B; color: #fff; }
 .confirm-del:hover { background: #A82F2F; }
+
+/* ━━━━ VISITE GUIDÉE ━━━━ */
+.tour-ov { position: fixed; inset: 0; z-index: 3000; pointer-events: none; opacity: 0; transition: opacity .2s; }
+.tour-ov.show { opacity: 1; pointer-events: auto; }
+.tour-spot { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15,31,61,.62); outline: 2px solid rgba(255,255,255,.92); transition: top .28s cubic-bezier(.2,.7,.2,1), left .28s cubic-bezier(.2,.7,.2,1), width .28s cubic-bezier(.2,.7,.2,1), height .28s cubic-bezier(.2,.7,.2,1); pointer-events: none; }
+.tour-pop { position: fixed; width: 320px; max-width: calc(100vw - 24px); background: #fff; border-radius: 16px; padding: 18px 18px 16px; box-shadow: 0 24px 60px rgba(15,31,61,.4); transition: left .28s cubic-bezier(.2,.7,.2,1), top .28s cubic-bezier(.2,.7,.2,1); }
+.tour-pop.center { left: 50% !important; top: 50% !important; transform: translate(-50%,-50%); width: 410px; }
+.tour-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.tour-step { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.tour-x { background: none; border: none; cursor: pointer; font-size: 1.3rem; line-height: 1; color: var(--texte-doux); padding: 0 5px; border-radius: 6px; }
+.tour-x:hover { background: var(--gris-clair); color: var(--navy); }
+.tour-title { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.55rem; color: var(--navy); margin-bottom: 6px; line-height: 1.15; }
+.tour-text { font-size: .88rem; color: var(--texte-doux); line-height: 1.5; margin-bottom: 14px; }
+.tour-bar { height: 4px; background: var(--gris-clair); border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+.tour-bar-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--accent)); border-radius: 99px; transition: width .28s ease; }
+.tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tour-skip { background: none; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .8rem; color: var(--texte-doux); padding: .4rem .1rem; }
+.tour-skip:hover { color: var(--navy); }
+.tour-right { display: flex; gap: 8px; margin-left: auto; }
+.tour-prev, .tour-next { padding: .5rem .95rem; border-radius: 9px; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .83rem; cursor: pointer; border: 1.5px solid var(--gris-bord); transition: .15s; }
+.tour-prev { background: #fff; color: var(--texte-doux); }
+.tour-prev:hover { border-color: var(--accent-light); color: var(--navy); }
+.tour-next { background: var(--navy); border-color: var(--navy); color: #fff; }
+.tour-next:hover { background: var(--accent); border-color: var(--accent); }
+@media(max-width: 560px) { .tour-pop, .tour-pop.center { width: calc(100vw - 24px); } }
