@@ -59,7 +59,7 @@ function hideAppLoader(){ const l=document.getElementById('appLoader'); if(l){ l
   const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='connexion.html';return;}
   applyUser(session.user);
-  renderAll();
+  if(migrateBienLinks()) save(); else renderAll();
   hideAppLoader();
 })();
 /* Filet de sécurité : ne jamais laisser le loader bloqué */
@@ -282,6 +282,7 @@ function switchGroupe(id){
   GROUPES[activeId] = S;
   activeId = id; S = GROUPES[id];
   ssSet(ACTIVE_KEY, id);
+  migrateBienLinks();
   closeGroupMenu();
   go('dash');
   renderAll(); renderGroupSelector();
@@ -476,6 +477,32 @@ function renderDashChart(){
 function bienParts(b){
   if(b && Array.isArray(b.parts) && b.parts.length) return b.parts;
   return coiParts().map(p=>({ini:p.ini,name:p.name,pct:p.pct}));
+}
+
+/* ── Identifiants stables des biens + résolution des références ──
+   Tout (transactions, loyers, fiscalité) se rattache à un bien par son id.
+   resolveBien() accepte un id, un nom exact, ou un ancien libellé informel
+   (tolérance par mots communs), pour migrer les données existantes. */
+function ensureBienIds(){
+  let changed=false;
+  (S.biens||[]).forEach(b=>{ if(b && !b.id){ b.id='b'+Math.random().toString(36).slice(2,9); changed=true; } });
+  return changed;
+}
+function bienById(id){ return (S.biens||[]).find(b=>b.id===id) || null; }
+function _bienToks(s){ return (String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').match(/[a-z0-9]{4,}/g)||[]); }
+function resolveBien(ref){
+  if(!ref || ref==='__all__' || ref==='Commun') return null;
+  let b=bienById(ref); if(b) return b;
+  b=(S.biens||[]).find(x=>x.nom===ref); if(b) return b;
+  const rt=_bienToks(ref); if(!rt.length) return null;
+  return (S.biens||[]).find(x=>{ const bt=new Set(_bienToks(x.nom)); return rt.some(t=>bt.has(t)); }) || null;
+}
+function bienOfTx(t){ return t ? resolveBien(t.bienId || t.bien) : null; }
+function migrateBienLinks(){
+  let changed=ensureBienIds();
+  (S.transactions||[]).forEach(t=>{ if(t && t.bienId===undefined && t.bien && t.bien!=='__all__' && t.bien!=='Commun'){ const b=resolveBien(t.bien); if(b){ t.bienId=b.id; changed=true; } } });
+  (S.loyers||[]).forEach(l=>{ if(l && l.bienId===undefined && l.bien){ const b=resolveBien(l.bien); if(b){ l.bienId=b.id; changed=true; } } });
+  return changed;
 }
 
 function renderPortfolio(){
@@ -1060,27 +1087,25 @@ function fiscalYears(){
   return [...ys].sort().reverse();
 }
 function fiscalCfg(y){ if(!S.fiscal) S.fiscal={}; if(!S.fiscal[y]) S.fiscal[y]={regime:'auto',ov:{}}; if(!S.fiscal[y].ov) S.fiscal[y].ov={}; return S.fiscal[y]; }
-function txBelongsTo(t,b){
-  if(!t.bien||!b) return false;
-  if(t.bien===b.nom) return true;
-  const toks=s=>(String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').match(/[a-z0-9]{4,}/g)||[]);
-  const bt=new Set(toks(b.nom));
-  return toks(t.bien).some(x=>bt.has(x));
-}
 function fiscalRows(y){
   const txs=(S.transactions||[]).filter(t=>String(t.date||'').slice(0,4)===String(y));
   const biens=(S.biens||[]);
-  const assign=txs.map(t=>biens.findIndex(b=>txBelongsTo(t,b)));
+  const assign=txs.map(t=>{ const b=bienOfTx(t); return b?biens.indexOf(b):-1; });
+  /* Loyers récurrents encaissés cette année, rattachés au bon bien (revenus fonciers) */
+  const loy=(typeof loyerReceived==='function'?loyerReceived():[]).filter(o=>String(o.ym).slice(0,4)===String(y));
+  const loyByBien={};
+  loy.forEach(o=>{ const b=resolveBien(o.loyer.bienId||o.loyer.bien); const k=b?b.id:'__commun__'; loyByBien[k]=(loyByBien[k]||0)+o.montant; });
   const cfg=fiscalCfg(y);
-  const mk=(nom,key,parts,bi)=>{
+  const mk=(nom,key,parts,bi,loyExtra)=>{
     let rev=0,chg=0;
     txs.forEach((t,ti)=>{ if(assign[ti]!==bi) return; if(t.montant>0) rev+=t.montant; else if(FISC_DEDUCT.has(t.cat)) chg+=Math.abs(t.montant); });
+    rev+=(loyExtra||0);
     const ov=cfg.ov[key]||{};
     return { nom, key, parts, revAuto:Math.round(rev), chgAuto:Math.round(chg),
       rev:(ov.rev!=null?ov.rev:Math.round(rev)), chg:(ov.chg!=null?ov.chg:Math.round(chg)) };
   };
-  const rows=biens.map((b,bi)=>mk(b.nom,b.nom,bienParts(b),bi));
-  const commun=mk("Commun à l'indivision",'__commun__',coiParts(),-1);
+  const rows=biens.map((b,bi)=>mk(b.nom,b.id,bienParts(b),bi, loyByBien[b.id]||0));
+  const commun=mk("Commun à l'indivision",'__commun__',coiParts(),-1, loyByBien['__commun__']||0);
   if(commun.revAuto||commun.chgAuto||(cfg.ov['__commun__'])) rows.push(commun);
   return rows;
 }
@@ -1177,7 +1202,7 @@ function statutChip(st){
 }
 /* Répartition d'une charge entre co-indivisaires (selon les parts du bien) + état payé */
 function chargeShares(t){
-  const bien = S.biens.find(b=>b.nom===t.bien);
+  const bien = bienOfTx(t);
   const parts = bienParts(bien);
   const sum = parts.reduce((a,p)=>a+(+p.pct||0),0) || 100;
   const paid = t.paid || {};
@@ -1219,7 +1244,7 @@ function renderPayModal(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
         <div style="min-width:0">
           <div class="pay-amount">${eur(total)}</div>
-          <div class="pay-meta">${t.desc}${t.bien?(' · '+svgIcon('pin',12)+' '+t.bien):''}${dateStr?(' · '+dateStr):''}</div>
+          <div class="pay-meta">${t.desc}${(t.bien&&t.bien!=='__all__')?(' · '+svgIcon('pin',12)+' '+cEsc(String(t.bien).split('—')[0].trim())):''}${dateStr?(' · '+dateStr):''}</div>
         </div>
         ${statutChip(st)}
       </div>
@@ -1328,7 +1353,7 @@ function confirmAllThisMonth(){
 function loyerPerPerson(){
   const per={};
   loyerReceived().forEach(o=>{
-    const bien=S.biens.find(b=>b.nom===o.loyer.bien); const parts=bienParts(bien); const sum=parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
+    const bien=resolveBien(o.loyer.bienId||o.loyer.bien); const parts=bienParts(bien); const sum=parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
     parts.forEach(p=>{ if(!per[p.name]) per[p.name]={name:p.name,ini:p.ini,amount:0}; per[p.name].amount+=o.montant*(+p.pct||0)/sum; });
   });
   return Object.values(per).sort((a,b)=>b.amount-a.amount);
@@ -1378,7 +1403,8 @@ function openLoyerModal(id){
   const l=id?loyerList().find(x=>x.id===id):null;
   document.getElementById('loyerModalTitle').textContent=l?'Modifier le loyer':'Nouveau loyer récurrent';
   const sel=document.getElementById('loyerBien');
-  sel.innerHTML=(S.biens||[]).map(b=>`<option value="${cEsc(b.nom)}"${l&&l.bien===b.nom?' selected':''}>${cEsc(b.nom.split('—')[0].trim())}</option>`).join('')||'<option value="">Aucun bien</option>';
+  const curBien=l?resolveBien(l.bienId||l.bien):null;
+  sel.innerHTML=(S.biens||[]).map(b=>`<option value="${b.id}"${curBien&&curBien.id===b.id?' selected':''}>${cEsc(b.nom.split('—')[0].trim())}</option>`).join('')||'<option value="">Aucun bien</option>';
   document.getElementById('loyerMontant').value=l?String(l.montant):'';
   document.getElementById('loyerJour').value=l?l.jour:5;
   document.getElementById('loyerFreq').value=l?(l.freq||'mensuel'):'mensuel';
@@ -1387,15 +1413,16 @@ function openLoyerModal(id){
 }
 function closeLoyerModal(){ document.getElementById('loyerModal').classList.remove('open'); }
 function saveLoyer(){
-  const bien=document.getElementById('loyerBien').value;
+  const selBien=resolveBien(document.getElementById('loyerBien').value);
   const montant=Math.max(0,Math.round(+String(document.getElementById('loyerMontant').value).replace(/[^\d]/g,'')||0));
-  if(!bien){ toast('Ajoutez d\'abord un bien.'); return; }
+  if(!selBien){ toast('Ajoutez d\'abord un bien.'); return; }
   if(!montant){ toast('Indiquez le loyer mensuel.'); return; }
+  const bienId=selBien.id, bien=selBien.nom;
   const jour=Math.min(28,Math.max(1,+document.getElementById('loyerJour').value||1));
   const freq=document.getElementById('loyerFreq').value||'mensuel';
   const since=document.getElementById('loyerSince').value||ymNow();
-  if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bien=bien; l.montant=montant; l.jour=jour; l.freq=freq; l.since=since; } }
-  else loyerList().push({id:'loy'+Date.now().toString(36), bien, montant, jour, freq, since});
+  if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bienId=bienId; l.bien=bien; l.montant=montant; l.jour=jour; l.freq=freq; l.since=since; } }
+  else loyerList().push({id:'loy'+Date.now().toString(36), bienId, bien, montant, jour, freq, since});
   closeLoyerModal(); save(); renderLoyers(); toast(loyerEditId?'Loyer mis à jour.':'Loyer récurrent ajouté.');
 }
 function deleteLoyer(id){
@@ -1464,7 +1491,7 @@ function renderBudget(){
   const agg = {}; // name -> {name, ini, amount}
   let colorIdx = {};
   txs.filter(t=>t.montant<0).forEach(t=>{
-    const bien = S.biens.find(b=>b.nom===t.bien);
+    const bien = bienOfTx(t);
     const parts = bienParts(bien); // parts du bien, ou globales si commun/inconnu
     const sumP = parts.reduce((a,p)=>a+(+p.pct||0),0) || 100;
     parts.forEach(p=>{
@@ -1541,7 +1568,7 @@ function renderBudget(){
         <div class="tx-desc">${t.desc}</div>
         <div class="tx-meta">
           <span class="tx-tag">${ci.label}</span>
-          ${t.bien?`<span>${svgIcon('pin',12)} ${t.bien}</span>`:''}
+          <span>${svgIcon('pin',12)} ${cEsc((t.bien&&t.bien!=='__all__')?String(t.bien).split('—')[0].trim():'Commun')}</span>
           ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR')}</span>`:''}
         </div>
         ${statusLine}
@@ -1587,7 +1614,7 @@ function openTxModal(){
   buildTxCats();
   /* Sélecteur de bien */
   const sel=document.getElementById('txBien');
-  sel.innerHTML=S.biens.map(b=>`<option value="${b.nom.replace(/"/g,'&quot;')}">${b.nom}</option>`).join('')+'<option value="Commun">Tous les biens</option>';
+  sel.innerHTML=S.biens.map(b=>`<option value="${b.id}">${cEsc(b.nom)}</option>`).join('')+'<option value="__all__">Commun à l\'indivision</option>';
   updateTxSplitInfo();
   document.getElementById('txModal').classList.add('open');
   setTimeout(()=>document.getElementById('txDesc').focus(),60);
@@ -1613,8 +1640,7 @@ function updateTxSplitInfo(){
     return;
   }
   if(!m){ info.innerHTML='La charge sera répartie automatiquement selon les quote-parts du bien sélectionné.'; return; }
-  const bienNom = document.getElementById('txBien').value;
-  const bien = S.biens.find(b=>b.nom===bienNom);
+  const bien = resolveBien(document.getElementById('txBien').value);
   const parts = bienParts(bien);
   const tot = parts.reduce((a,b)=>a+(+b.pct||0),0)||100;
   const src = (bien && bien.parts) ? bien.nom.split('—')[0].trim() : 'parts globales';
@@ -1626,9 +1652,11 @@ function saveTx(){
   if(!desc){ toast('Indiquez une description.'); document.getElementById('txDesc').focus(); return; }
   if(!m||m<=0){ toast('Indiquez un montant valide.'); document.getElementById('txMontant').focus(); return; }
   const date=document.getElementById('txDate').value||_todayISO;
-  const bien=document.getElementById('txBien').value||'—';
+  const selBien=resolveBien(document.getElementById('txBien').value);
+  const bienId = selBien ? selBien.id : null;
+  const bien = selBien ? selBien.nom : '__all__';
   const montant = txEditType==='revenu' ? Math.abs(m) : -Math.abs(m);
-  S.transactions.unshift({desc, cat:txEditCat, bien, montant, date});
+  S.transactions.unshift({desc, cat:txEditCat, bienId, bien, montant, date});
   closeTxModal(); save(); toast('Transaction ajoutée.');
 }
 /* Type picker du modal transaction */
@@ -1983,7 +2011,7 @@ function saveBien(){
   const digits=(wizData.val||'').replace(/[^\d]/g,'');
   const val = digits ? (Number(digits).toLocaleString('fr-FR').replace(/\s/g,' ')+' €') : '—';
   const parts = wizParts.map(p=>({ ini:(p.ini&&p.ini!=='?')?p.ini:((p.name||'').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'), name:(p.name||'').trim(), pct:+p.pct||0 }));
-  S.biens.push({ nom:wizData.nom, info, val, type:wizData.type, surface:wizData.surface, photos:wizData.photos, parts, lat, lng });
+  S.biens.push({ id:'b'+Math.random().toString(36).slice(2,9), nom:wizData.nom, info, val, type:wizData.type, surface:wizData.surface, photos:wizData.photos, parts, lat, lng });
   save(); closeBienModal(); toast('Bien ajouté ✓'); go('portfolio');
 }
 /* Éditeur d'indivisaires du wizard d'ajout de bien */
