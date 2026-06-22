@@ -54,12 +54,16 @@ function applyUser(user){
   }
 }
 
+function hideAppLoader(){ const l=document.getElementById('appLoader'); if(l){ l.classList.add('hide'); setTimeout(()=>{ if(l&&l.parentNode) l.parentNode.removeChild(l); }, 450); } }
 (async()=>{
   const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='connexion.html';return;}
   applyUser(session.user);
   renderAll();
+  hideAppLoader();
 })();
+/* Filet de sécurité : ne jamais laisser le loader bloqué */
+window.addEventListener('load', ()=>setTimeout(hideAppLoader, 4000));
 
 /* ━━━━ TOAST ━━━━ */
 let _tt;
