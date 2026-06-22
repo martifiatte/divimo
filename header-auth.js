@@ -66,8 +66,7 @@
         <a href="services-juridiques.html"  class="${isActive('services-juridiques')}"  data-label="Juridique">${ICONS.law}   Juridique</a>
       </nav>`;
 
-    const seeSite = onEspace ? `
-        <a href="index.html" class="app-see-site" title="Voir le site public">${ICONS.external}<span class="app-see-site-label">Voir le site</span></a>` : '';
+    const seeSite = '';
     const brandAttr = onEspace ? ` onclick="if(window.go){go('dash');return false}"` : '';
     const chipAttr  = onEspace ? ` onclick="if(window.go){go('profil');return false}"` : '';
     const chipTitle = onEspace ? 'Profil &amp; compte' : 'Mon espace';
