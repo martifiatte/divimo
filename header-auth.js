@@ -34,6 +34,7 @@
     logout: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>`,
     menu:   `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>`,
     logo:   `<svg width="30" height="30" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>`,
+    external: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>`,
   };
 
   /* ── Applique le header applicatif ── */
@@ -51,24 +52,34 @@
     const header = document.querySelector('.site-header');
     if (!header) return;
 
-    /* Remplacer le contenu intérieur */
-    header.querySelector('.site-header-inner').innerHTML = `
-      <!-- Logo → Dashboard (pas la landing) -->
-      <a href="espace.html" class="brand-logo" style="gap:.5rem">
-        ${ICONS.logo} Divimo
-      </a>
+    /* Sur l'espace connecté : header épuré, centré sur l'app. La navigation
+       des modules se fait par la sidebar, donc le header ne reprend PAS les
+       liens publics (Documents/Juridique = pages de démonstration) qui
+       prêtaient à confusion. */
+    const onEspace = page().startsWith('espace');
 
-      <!-- Nav applicative -->
+    const navHTML = onEspace ? '' : `
       <nav class="main-nav app-nav" id="appNav">
         <a href="espace.html"               class="${isActive('espace')}"               data-label="Mon espace">${ICONS.grid}  Mon espace</a>
         <a href="simulateurs.html"          class="${isActive('simulateurs')}"          data-label="Simulateurs">${ICONS.chart} Simulateurs</a>
         <a href="documents.html"            class="${isActive('documents')}"            data-label="Documents">${ICONS.folder} Documents</a>
         <a href="services-juridiques.html"  class="${isActive('services-juridiques')}"  data-label="Juridique">${ICONS.law}   Juridique</a>
-      </nav>
+      </nav>`;
 
-      <!-- Actions utilisateur -->
+    const seeSite = onEspace ? `
+        <a href="index.html" class="app-see-site" title="Voir le site public">${ICONS.external}<span class="app-see-site-label">Voir le site</span></a>` : '';
+    const brandAttr = onEspace ? ` onclick="if(window.go){go('dash');return false}"` : '';
+    const chipAttr  = onEspace ? ` onclick="if(window.go){go('profil');return false}"` : '';
+    const chipTitle = onEspace ? 'Profil &amp; compte' : 'Mon espace';
+
+    header.querySelector('.site-header-inner').innerHTML = `
+      <a href="espace.html" class="brand-logo" style="gap:.5rem"${brandAttr}>
+        ${ICONS.logo} Divimo
+      </a>
+      ${navHTML}
       <div class="header-actions" id="appActions">
-        <a href="espace.html" class="app-user-chip" title="Mon espace">
+        ${seeSite}
+        <a href="espace.html" class="app-user-chip" title="${chipTitle}"${chipAttr}>
           <span class="app-avatar" style="background:${avatarGradient}">${initials}</span>
           <span class="app-username">${name}${isAdmin ? ' 👑' : ''}</span>
         </a>
@@ -80,22 +91,17 @@
           <span class="app-logout-label">Déconnexion</span>
         </button>
       </div>
-
-      <!-- Toggle mobile -->
-      <button class="nav-toggle" id="appMobileToggle" aria-label="Menu">
-        ${ICONS.menu}
-      </button>
+      ${onEspace ? '' : `<button class="nav-toggle" id="appMobileToggle" aria-label="Menu">${ICONS.menu}</button>`}
     `;
 
-    /* Mobile toggle */
-    document.getElementById('appMobileToggle')?.addEventListener('click', () => {
-      header.classList.toggle('open');
-    });
-
-    /* Fermer le menu mobile au clic sur un lien */
-    document.querySelectorAll('.app-nav a').forEach(a =>
-      a.addEventListener('click', () => header.classList.remove('open'))
-    );
+    if (!onEspace) {
+      document.getElementById('appMobileToggle')?.addEventListener('click', () => {
+        header.classList.toggle('open');
+      });
+      document.querySelectorAll('.app-nav a').forEach(a =>
+        a.addEventListener('click', () => header.classList.remove('open'))
+      );
+    }
   }
 
   /* ── Styles spécifiques au header app (injectés une seule fois) ── */
@@ -166,6 +172,18 @@
         transition: .15s;
       }
       .app-logout-btn:hover { background: rgba(192,57,57,.08); color: #C03939; }
+
+      /* Lien « Voir le site » (espace) */
+      .app-see-site {
+        display: inline-flex; align-items: center; gap: .4rem;
+        font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem;
+        color: var(--texte-doux); text-decoration: none;
+        padding: .45rem .75rem; border-radius: 999px; border: 1.5px solid var(--gris-bord);
+        background: #fff; transition: .15s;
+      }
+      .app-see-site:hover { border-color: var(--accent-light); color: var(--navy); }
+      .app-see-site svg { opacity: .7; }
+      @media (max-width: 720px) { .app-see-site-label { display: none; } .app-see-site { padding: .45rem .55rem; } }
 
       /* Mobile app nav */
       @media (max-width: 900px) {

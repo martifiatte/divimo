@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page introuvable — Divimo</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="premium.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;color:var(--texte);background:#FAFBFE;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw,1180px);margin:0 auto;padding:0 24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:'Montserrat',sans-serif;font-weight:600;font-size:.95rem;padding:.85rem 1.5rem;border-radius:11px;cursor:pointer;border:1.5px solid transparent;transition:transform .2s cubic-bezier(.3,.7,.3,1),box-shadow .25s,background .2s,border-color .2s}
+.btn-primary{background:var(--navy);color:#fff;box-shadow:0 10px 26px -8px rgba(15,31,61,.5)}
+.btn-primary:hover{background:var(--accent);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--navy);border-color:var(--gris-bord)}
+.btn-ghost:hover{border-color:var(--accent-light);transform:translateY(-2px)}
+
+.nf{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:64px 0}
+.nf-inner{max-width:560px}
+.nf-code{font-family:'Montserrat',sans-serif;font-weight:800;font-size:clamp(5rem,18vw,9rem);line-height:1;letter-spacing:-.04em;background:linear-gradient(135deg,var(--navy),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.nf-eyebrow{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.nf h1{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:clamp(1.8rem,4.5vw,2.6rem);color:var(--navy);letter-spacing:-.01em;margin-bottom:14px}
+.nf p{color:var(--texte-doux);font-size:1.02rem;margin-bottom:30px}
+.nf-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+@media(max-width:480px){.nf-actions .btn{width:100%}}
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand-logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
+      Divimo
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="simulateurs.html">Simulateurs</a>
+      <a href="apropos.html">À propos</a>
+      <a href="offres.html">Nos offres</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="connexion.html" class="hbtn hbtn-ghost">Se connecter</a>
+      <a href="creer-compte.html" class="hbtn hbtn-primary">Créer mon compte</a>
+    </div>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" onclick="this.closest('.site-header').classList.toggle('open')">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="nf">
+  <div class="wrap">
+    <div class="nf-inner">
+      <div class="nf-code">404</div>
+      <div class="nf-eyebrow">Page introuvable</div>
+      <h1>Cette page n'existe pas ou n'est plus disponible</h1>
+      <p>Le lien que vous avez suivi est peut-être incorrect, ou la page a été déplacée. Pas d'inquiétude, voici comment repartir du bon pied.</p>
+      <div class="nf-actions">
+        <a href="index.html" class="btn btn-primary">Retour à l'accueil</a>
+        <a href="espace.html" class="btn btn-ghost">Mon espace</a>
+        <a href="contact.html" class="btn btn-ghost">Contacter le support</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="index.html" class="logo"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#fff" stroke-width="3"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#A5C4BD"/><circle cx="17" cy="17" r="4.5" fill="#fff"/></svg> Divimo</a>
+        <p>La plateforme qui simplifie, sécurise et apaise la gestion d'un bien immobilier en indivision.</p>
+      </div>
+      <div class="foot-col"><h4>Produit</h4><a href="simulateurs.html">Simulateurs</a><a href="offres.html">Nos offres</a><a href="espace.html">Mon espace</a></div>
+      <div class="foot-col"><h4>Entreprise</h4><a href="apropos.html">À propos</a><a href="contact.html">Contact</a></div>
+      <div class="foot-col"><h4>Légal</h4><a href="mentions-legales.html">Mentions légales</a><a href="politique-confidentialite.html">Confidentialité</a></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 Divimo. Tous droits réservés.</span><span>contact@divimo.com · Hébergé en France</span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="header-auth.js"></script>
+</body>
+</html>

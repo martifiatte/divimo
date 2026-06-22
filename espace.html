@@ -17,29 +17,24 @@
 </head>
 <body>
 
+<div id="appLoader" class="app-loader">
+  <div class="al-card">
+    <div class="al-logo"><svg width="46" height="46" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg></div>
+    <div class="al-name">Divimo</div>
+    <div class="al-bar"><div class="al-bar-fill"></div></div>
+    <div class="al-text">Chargement de votre espace…</div>
+  </div>
+</div>
+
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
-    <a href="index.html" class="brand-logo">
+    <a href="espace.html" class="brand-logo">
       <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#0F1F3D" stroke-width="2.5"/><path d="M17 2 A15 15 0 0 1 30 24 L17 17 Z" fill="#4A7FB5"/><circle cx="17" cy="17" r="4.5" fill="#0F1F3D"/></svg>
       Divimo
     </a>
-    <nav class="main-nav">
-      <a href="index.html">Accueil</a>
-      <a href="simulateurs.html">Simulateurs</a>
-      <a href="documents.html">Documents</a>
-      <a href="services-juridiques.html">Juridique</a>
-      <a href="espace.html" class="active">Mon espace</a>
-    </nav>
     <div class="header-actions">
       <span class="user-chip"><span class="av" id="chipAv">—</span><span id="chipName">—</span></span>
-      <button class="logout-btn" onclick="logout()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        Déconnexion
-      </button>
     </div>
-    <button class="nav-toggle" onclick="this.closest('.site-header').classList.toggle('open')">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
   </div>
 </header>
 
