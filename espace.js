@@ -1485,6 +1485,48 @@ function renderBudget(){
       <div class="bs-sub">${pctPaid}% des charges réglées</div>
     </div>`;
 
+  /* ── Situation par bien (Vue d'ensemble) ── */
+  const perBienMap={};
+  (S.biens||[]).forEach(b=>{ perBienMap[b.id]={nom:b.nom, rev:0, chg:0}; });
+  const pbBucket=b=>{ const k=b?b.id:'__c'; if(!perBienMap[k]) perBienMap[k]={nom:b?b.nom:"Commun à l'indivision", rev:0, chg:0}; return perBienMap[k]; };
+  txs.forEach(t=>{ const bk=pbBucket(bienOfTx(t)); if(t.montant>0) bk.rev+=t.montant; else bk.chg+=Math.abs(t.montant); });
+  loyerReceived().forEach(o=>{ pbBucket(resolveBien(o.loyer.bienId||o.loyer.bien)).rev+=o.montant; });
+  const perBienList=Object.values(perBienMap).filter(x=>x.rev||x.chg);
+  const bbMax=Math.max(1,...perBienList.map(x=>x.rev+x.chg));
+  const bbEl=document.getElementById('budByBien');
+  if(bbEl) bbEl.innerHTML = perBienList.length ? perBienList.map(x=>{
+    const net=x.rev-x.chg;
+    return `<div class="bb-row">
+      <div class="bb-head"><span class="bb-name">${cEsc(String(x.nom).split('—')[0].trim())}</span><span class="bb-net ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${eur(Math.abs(net))}</span></div>
+      <div class="bb-bar" style="width:${Math.max(8,(x.rev+x.chg)/bbMax*100)}%">${x.rev?`<span class="seg rev" style="flex:${x.rev}"></span>`:''}${x.chg?`<span class="seg chg" style="flex:${x.chg}"></span>`:''}</div>
+      <div class="bb-legend"><span><i class="d rev"></i>Revenus ${eur(x.rev)}</span><span><i class="d chg"></i>Charges ${eur(x.chg)}</span></div>
+    </div>`;
+  }).join('') : '<div class="empty">Aucun mouvement enregistré.</div>';
+
+  /* ── Situation par indivisaire (perçu / dû / payé / solde) ── */
+  const ledger={};
+  const lg=(name,ini)=>{ if(!ledger[name]) ledger[name]={name,ini,percu:0,du:0,paye:0}; return ledger[name]; };
+  txs.filter(t=>t.montant<0).forEach(t=>{ chargeShares(t).forEach(s=>{ const g=lg(s.name,s.ini); g.du+=s.due; if(s.paid) g.paye+=s.due; }); });
+  loyerReceived().forEach(o=>{ const parts=bienParts(resolveBien(o.loyer.bienId||o.loyer.bien)); const sum=parts.reduce((a,p)=>a+(+p.pct||0),0)||100; parts.forEach(p=>{ lg(p.name,p.ini).percu+=o.montant*(+p.pct||0)/sum; }); });
+  const ledgerList=Object.values(ledger).sort((a,b)=>(b.percu-b.du)-(a.percu-a.du));
+  const plEl=document.getElementById('budByPerson');
+  if(plEl) plEl.innerHTML = ledgerList.length ? ledgerList.map((p,i)=>{
+    const col=PAL[i%PAL.length]; const net=p.percu-p.du; const reste=Math.max(0,p.du-p.paye); const payPct=p.du?Math.round(p.paye/p.du*100):100;
+    return `<div class="pl-row">
+      <div class="split-av" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</div>
+      <div class="pl-body">
+        <div class="pl-top"><span class="pl-name">${cEsc(p.name)}</span><span class="pl-net ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${eur(Math.abs(net))} <small>solde</small></span></div>
+        <div class="pl-cells">
+          <span class="pl-cell"><i>Perçu</i><b class="pos">+${eur(p.percu)}</b></span>
+          <span class="pl-cell"><i>Dû</i><b class="neg">−${eur(p.du)}</b></span>
+          <span class="pl-cell"><i>Payé</i><b>${eur(p.paye)}</b></span>
+          <span class="pl-cell"><i>Reste</i><b>${eur(reste)}</b></span>
+        </div>
+        <div class="pl-prog" title="${payPct}% des charges réglées"><div class="pl-prog-fill" style="width:${payPct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">Renseignez des charges ou des loyers pour voir la répartition.</div>';
+
   /* ── Répartition par co-indivisaire (selon les parts de CHAQUE bien) ── */
   /* Chaque charge est répartie selon les quote-parts du bien concerné,
      puis on agrège par personne. */
