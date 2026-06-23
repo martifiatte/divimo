@@ -659,6 +659,74 @@ a { color: inherit; text-decoration: none; }
 .fisc-check-row svg { color: var(--teal); flex-shrink: 0; }
 .fisc-disclaimer { font-size: .74rem; color: var(--texte-doux); line-height: 1.5; margin-top: 16px; text-align: center; }
 
+/* ━━━━ FISCAL v2 : parcours guidé ━━━━ */
+.fisc-hero { background: linear-gradient(160deg, #fff, #F4F7FC); }
+.fisc-hero-big { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: clamp(1.4rem, 3.5vw, 1.9rem); color: var(--navy); line-height: 1.25; margin: 6px 0 8px; }
+.fisc-hero-big b { font-weight: 700; }
+.fisc-hero-sub { font-size: .92rem; color: var(--texte-doux); line-height: 1.55; }
+.fisc-hero-sub b { color: var(--navy); }
+.fisc-help { display: inline-block; position: relative; }
+.fisc-q { width: 17px; height: 17px; border-radius: 50%; border: none; background: var(--gris-bord); color: var(--navy); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .68rem; cursor: pointer; line-height: 1; vertical-align: middle; margin-left: 3px; transition: .15s; }
+.fisc-q:hover { background: var(--accent-light); color: #fff; }
+.fisc-tip { display: block; margin-top: 8px; background: var(--gris-clair); border-radius: 9px; padding: 9px 11px; font-size: .8rem; line-height: 1.5; color: var(--texte); }
+.fisc-people { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-top: 10px; }
+.fisc-person { border: 1.5px solid var(--gris-bord); border-radius: 14px; padding: 14px; transition: .15s; }
+.fisc-person.me { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(44,82,130,.08); }
+.fisc-person-top { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.fisc-pav { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; }
+.fisc-pname { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .9rem; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+.fisc-you { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--accent); color: #fff; padding: .1rem .4rem; border-radius: 99px; }
+.fisc-pamt { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--navy); line-height: 1; }
+.fisc-pamt.neg { color: #13855B; }
+.fisc-pcase { font-size: .76rem; color: var(--texte-doux); margin: 4px 0 12px; }
+/* Régime par personne */
+.fisc-regline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.fisc-reg-badge { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .64rem; text-transform: uppercase; letter-spacing: .03em; padding: .18rem .55rem; border-radius: 99px; }
+.fisc-reg-badge.micro { background: rgba(44,82,130,.12); color: var(--accent); }
+.fisc-reg-badge.reel { background: rgba(45,106,106,.14); color: var(--teal); }
+.fisc-regtog { display: inline-flex; border: 1.5px solid var(--gris-bord); border-radius: 8px; overflow: hidden; }
+.fisc-regtog button { border: none; background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .72rem; padding: .25rem .55rem; color: var(--texte-doux); }
+.fisc-regtog button.sel { background: var(--navy); color: #fff; }
+.fisc-reg-note { font-size: .68rem; color: var(--texte-doux); }
+/* Déficit foncier */
+.fisc-defbreak { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.fisc-defbreak > div { display: flex; justify-content: space-between; gap: 10px; font-size: .76rem; color: var(--texte-doux); }
+.fisc-defbreak b { font-family: 'Montserrat', sans-serif; color: var(--navy); font-variant-numeric: tabular-nums; }
+/* Section explicative */
+.fisc-explain .fisc-ex h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .88rem; color: var(--navy); margin: 14px 0 4px; }
+.fisc-explain .fisc-ex h4:first-child { margin-top: 0; }
+.fisc-explain .fisc-ex p { font-size: .86rem; color: var(--texte-doux); line-height: 1.6; }
+.fisc-explain .fisc-ex-src { font-size: .74rem; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--gris-bord); font-style: italic; }
+.fisc-copy { width: 100%; padding: .5rem; border: 1.5px solid var(--gris-bord); border-radius: 9px; background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .8rem; color: var(--navy); transition: .15s; }
+.fisc-copy:hover { border-color: var(--accent-light); background: var(--gris-clair); }
+.fisc-steps2 { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.fisc-step2 { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; padding: 11px 13px; border: 1.5px solid var(--gris-bord); border-radius: 11px; background: #fff; cursor: pointer; font-family: 'Open Sans', sans-serif; font-size: .88rem; color: var(--navy); transition: .15s; }
+.fisc-step2:hover { border-color: var(--accent-light); }
+.fisc-step2-n { width: 24px; height: 24px; flex: 0 0 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--gris-clair); color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .8rem; }
+.fisc-step2.done { border-color: rgba(25,169,116,.4); background: rgba(25,169,116,.06); }
+.fisc-step2.done .fisc-step2-n { background: #19A974; color: #fff; }
+.fisc-step2.done span:last-child { color: var(--texte-doux); }
+.fisc-check-row.miss { color: var(--texte-doux); }
+.fisc-check-row.miss svg { color: #C8821E; }
+.fisc-doc-tag { margin-left: auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .64rem; text-transform: uppercase; letter-spacing: .03em; padding: .12rem .5rem; border-radius: 99px; background: var(--gris-clair); color: var(--texte-doux); }
+.fisc-doc-tag.ok { background: rgba(25,169,116,.14); color: #13855B; }
+.fisc-details { margin-top: 12px; }
+.fisc-details > summary { cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .92rem; color: var(--navy); padding: 15px 16px; list-style: none; display: flex; align-items: center; gap: 11px; background: linear-gradient(180deg,#fff,#F4F7FC); border: 1.5px solid var(--accent-light); border-radius: 12px; box-shadow: 0 3px 12px rgba(15,31,61,.07); transition: .15s; }
+.fisc-details > summary:hover { border-color: var(--accent); box-shadow: 0 6px 18px rgba(15,31,61,.12); }
+.fisc-details > summary::-webkit-details-marker { display: none; }
+.fisc-details > summary::before { content: ''; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 8px; background: var(--navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/15px no-repeat; transition: transform .2s; }
+.fisc-details[open] > summary::before { transform: rotate(180deg); }
+.fisc-details > summary::after { content: 'Afficher'; margin-left: auto; font-weight: 700; font-size: .76rem; letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.fisc-details[open] > summary::after { content: 'Masquer'; }
+.fisc-details[open] > summary { border-color: var(--accent); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+@media print {
+  body.printing-fiscal * { visibility: hidden !important; }
+  body.printing-fiscal #v-fiscal, body.printing-fiscal #v-fiscal * { visibility: visible !important; }
+  body.printing-fiscal #v-fiscal { position: absolute; inset: 0; padding: 0; }
+  body.printing-fiscal .fisc-years, body.printing-fiscal .fisc-copy, body.printing-fiscal .fisc-q, body.printing-fiscal .fisc-details > summary, body.printing-fiscal .btn { display: none !important; }
+  body.printing-fiscal .fisc-details { display: block; }
+}
+
 /* ━━━━ BUDGET v2 : situation par bien / par indivisaire ━━━━ */
 .bb-row { padding: 11px 0; border-top: 1px solid var(--gris-bord); }
 .bb-row:first-child { border-top: none; }
@@ -759,11 +827,12 @@ a { color: inherit; text-decoration: none; }
   .bud-subnav { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .bsub { white-space: nowrap; flex: 0 0 auto; }
 }
+.fisc-table-5 .fisc-row { grid-template-columns: 1.2fr 1fr 1fr 1fr .9fr; gap: 8px; }
 @media(max-width: 720px) {
   .fisc-2col { grid-template-columns: 1fr; }
-  .fisc-row { grid-template-columns: 1.2fr 1fr 1fr; }
-  .fisc-row span:nth-child(4), .fisc-row.fisc-head span:nth-child(4) { display: none; }
   .fisc-seg { flex-direction: column; }
+  .fisc-table-5 .fisc-row { grid-template-columns: 1.1fr 1fr 1fr 1fr; }
+  .fisc-table-5 .fisc-row span:nth-child(5), .fisc-table-5 .fisc-row.fisc-head span:nth-child(5) { display: none; }
 }
 .doc-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--gris-bord)}
 .doc-toolbar label{font-family:'Montserrat',sans-serif;font-weight:600;font-size:.8rem;color:var(--navy)}
