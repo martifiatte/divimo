@@ -1578,13 +1578,7 @@ function renderBudget(){
   const txRowHTML = t => {
     const ci = catInfo(t.cat);
     const pos = t.montant>=0;
-    let statusLine='';
-    if(!pos){
-      const shares=chargeShares(t), tot=Math.abs(t.montant);
-      const paidAmt=shares.filter(s=>s.paid).reduce((a,s)=>a+s.due,0);
-      const pp = tot ? Math.round(paidAmt/tot*100) : 0;
-      statusLine=`<div class="tx-status-line">${statutChip(chargeStatut(t))}<div class="tx-prog"><div class="tx-prog-fill" style="width:${pp}%"></div></div></div>`;
-    }
+    const chip = pos ? '' : statutChip(chargeStatut(t));
     return `<div class="tx-row ${pos?'':'payable'}" ${pos?'':`onclick="openPayModal(${t.i})"`}>
       <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?svgIcon('coins',18):svgIcon(ci.ic,18)}</div>
       <div class="tx-body">
@@ -1593,8 +1587,8 @@ function renderBudget(){
           <span class="tx-tag">${ci.label}</span>
           <span>${svgIcon('pin',12)} ${cEsc((t.bien&&t.bien!=='__all__')?String(t.bien).split('—')[0].trim():'Commun')}</span>
           ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</span>`:''}
+          ${chip}
         </div>
-        ${statusLine}
       </div>
       <div class="tx-right">
         <span class="tx-amount ${pos?'pos':'neg'}">${pos?'+':'−'}${eur(Math.abs(t.montant))}</span>
@@ -1613,21 +1607,6 @@ function renderBudget(){
     return `<div class="tx-month"><span class="tx-month-lbl">${label}</span><span class="tx-month-net ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${eur(Math.abs(net))}</span></div>`
       + list.map(txRowHTML).join('');
   }).join('') : '<div class="empty">Aucune opération.</div>';
-
-  /* ── Historique des paiements ── */
-  const pays = S.payments || [];
-  const phSub = document.getElementById('payHistSub');
-  if(phSub) phSub.textContent = pays.length ? `${pays.length} paiement(s) enregistré(s)` : 'Aucun paiement pour le moment';
-  const ph = document.getElementById('payHistList');
-  if(ph) ph.innerHTML = pays.slice(0,30).map(p=>`
-    <div class="payhist-row">
-      <div class="payhist-ico">✓</div>
-      <div class="payhist-body">
-        <div class="payhist-main"><b>${p.name}</b> a réglé sa part · <span style="color:var(--texte-doux)">${p.desc}</span></div>
-        <div class="payhist-meta">${p.bien?(svgIcon('pin',12)+' '+p.bien+' · '):''}${new Date(p.ts).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
-      </div>
-      <div class="payhist-amt">${eur(p.amount)}</div>
-    </div>`).join('') || '<div class="empty">Les paiements réglés apparaîtront ici.</div>';
 }
 
 /* Filtre */
