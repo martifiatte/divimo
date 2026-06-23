@@ -1079,7 +1079,7 @@ function catInfo(key){ return TX_CATS[key] || {label:key||'Autre', ic:'receipt',
 
 /* ━━━━ DÉCLARATION FISCALE (revenus fonciers, privé au groupe) ━━━━ */
 const FISC_DEDUCT = new Set(['taxe','travaux','copro','assurance']); /* charges déductibles des revenus fonciers */
-let fiscalYear = null;
+let fiscalYear = null, fiscDetailOpen = false;
 function fiscalYears(){
   const ys=new Set();
   (S.transactions||[]).forEach(t=>{ const y=String(t.date||'').slice(0,4); if(/^\d{4}$/.test(y)) ys.add(y); });
@@ -1133,62 +1133,108 @@ function renderFiscal(){
     r.parts.forEach(p=>{ const k=p.name; if(!perPers[k]) perPers[k]={name:p.name,ini:p.ini,amount:0}; perPers[k].amount+=net*(+p.pct||0)/sumP; });
   });
   const persList=Object.values(perPers).sort((a,b)=>b.amount-a.amount);
+  const myIni=(typeof OWNER!=='undefined'&&OWNER)?OWNER.ini:null;
+  const caseLbl = isMicro ? 'dans la case 4BE de la déclaration 2042' : 'via le formulaire 2044, reporté sur la 2042';
+  const q=t=>`<span class="fisc-help"><button class="fisc-q" type="button" onclick="fiscQ(this)" aria-label="Aide">?</button><span class="fisc-tip" hidden>${t}</span></span>`;
+  const docs=S.docs||[];
+  const hasDoc=(re,dossier)=>docs.some(d=> (dossier&&d.dossier===dossier) || re.test(d.name||'') );
+  const docChecks=[
+    {lbl:'Avis de taxe foncière '+y, ok:hasDoc(/taxe.?fonci/i,'Taxe foncière')},
+    {lbl:'Justificatifs de travaux et factures', ok:hasDoc(/travaux|facture/i)},
+    {lbl:'Quittances ou relevés de loyers', ok:hasDoc(/loyer|quittance|relev/i)},
+    {lbl:"Attestation d'assurance (PNO)", ok:hasDoc(/assur/i)},
+  ];
+  const missingDocs=docChecks.filter(d=>!d.ok).length;
+  const cfgSteps=cfg.steps||{};
+  const stepDefs=['Vérifiez vos revenus et vos charges','Choisissez votre régime (micro ou réel)','Réunissez vos documents fiscaux','Reportez votre part sur votre déclaration'];
   el.innerHTML=`
     <div class="fisc-years">${years.map(yy=>`<button class="bf-chip ${yy===y?'sel':''}" onclick="fiscalYearSel('${yy}')">${yy}</button>`).join('')}</div>
 
+    <div class="card fisc-hero">
+      <div class="res-label">Déclaration ${y}</div>
+      ${revBrut>0 ? `<div class="fisc-hero-big">Vos biens ont rapporté <b>${eur(revBrut)}</b> de loyers en ${y}.</div>
+      <div class="fisc-hero-sub">Régime conseillé : <b>${isMicro?'micro-foncier':'réel'}</b>${isMicro?' (un abattement de 30 % est appliqué automatiquement)':' (vous déduisez vos charges réelles)'}.${q(isMicro?'Le micro-foncier s’applique quand vos loyers bruts sont sous 15 000 € par an : l’administration retire 30 % d’office, vous n’avez aucun calcul de charges à faire.':'Au régime réel, vous déduisez vos charges réelles (taxe foncière, travaux, assurance, intérêts d’emprunt). Plus intéressant quand vos charges dépassent 30 % des loyers.')}</div>`
+      : `<div class="fisc-hero-big">Aucun loyer enregistré pour ${y}.</div>
+      <div class="fisc-hero-sub">Vous n’avez probablement rien à déclarer en revenus fonciers cette année. Ajoutez vos loyers dans le Budget pour préparer la déclaration.</div>`}
+    </div>
+
+    ${revBrut>0 ? `
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Régime d'imposition ${y}</div><div class="card-sub">${microEligible?'Revenus fonciers bruts sous 15 000 €: le micro-foncier (abattement de 30 %) est possible.':'Revenus fonciers bruts au-dessus de 15 000 €: régime réel applicable.'}</div></div></div>
-      <div class="fisc-seg">
-        <button class="fisc-seg-btn ${isMicro?'sel':''}" ${microEligible?'':'disabled'} onclick="fiscalRegime('${y}','micro')">Micro-foncier<span>abattement 30 %</span></button>
-        <button class="fisc-seg-btn ${!isMicro?'sel':''}" onclick="fiscalRegime('${y}','reel')">Réel<span>charges déduites</span></button>
+      <div class="card-title">Ce que chacun doit déclarer</div>
+      <div class="card-sub">La part du résultat foncier de chaque indivisaire, prête à recopier sur sa déclaration.</div>
+      <div class="fisc-people">
+        ${persList.map((p,i)=>{ const col=PAL[i%PAL.length]; const me=myIni&&p.ini===myIni; const amt=Math.round(p.amount); return `<div class="fisc-person${me?' me':''}">
+          <div class="fisc-person-top"><span class="fisc-pav" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</span><span class="fisc-pname">${cEsc(p.name)}${me?'<span class="fisc-you">Vous</span>':''}</span></div>
+          <div class="fisc-pamt ${amt<0?'neg':''}">${eur(amt)}</div>
+          <div class="fisc-pcase">à reporter ${caseLbl}</div>
+          <button class="fisc-copy" type="button" onclick="fiscCopy(${amt})">Copier le montant</button>
+        </div>`; }).join('')||'<div class="empty">Renseignez les quotes-parts pour répartir.</div>'}
+      </div>
+      <p class="fisc-note">${isMicro?'Ce montant correspond à 70 % de votre part des loyers (l’abattement de 30 % est déjà déduit).':'Ce montant correspond à votre part des loyers moins votre part des charges déductibles.'} S’y ajoutent l’impôt sur le revenu selon votre tranche et les prélèvements sociaux de 17,2 %.${q('Les prélèvements sociaux (CSG/CRDS) s’élèvent à 17,2 % et s’appliquent en plus de l’impôt sur le revenu, sur vos revenus fonciers nets.')}</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Vos étapes</div>
+      <div class="card-sub">Cochez au fur et à mesure : vous saurez toujours où vous en êtes.</div>
+      <div class="fisc-steps2">
+        ${stepDefs.map((s,i)=>`<button class="fisc-step2${cfgSteps[i]?' done':''}" type="button" onclick="fiscalStep('${y}',${i})"><span class="fisc-step2-n">${cfgSteps[i]?svgIcon('check',14):(i+1)}</span><span>${s}</span></button>`).join('')}
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Revenus et charges par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Ajustez chaque montant si besoin.</div></div></div>
-      <div class="fisc-table">
-        <div class="fisc-row fisc-head"><span>Bien</span><span>Revenus fonciers</span><span>Charges déductibles</span><span>Résultat net</span></div>
-        ${rows.map(r=>{ const net=isMicro?Math.round(r.rev*0.7):(r.rev-r.chg); return `<div class="fisc-row">
-          <span class="fisc-bien">${cEsc(String(r.nom).split('—')[0].trim())}</span>
-          <span class="fisc-num"><input type="number" min="0" value="${r.rev}" onchange="fiscalSet('${y}','${escJs(r.key)}','rev',this.value)"><i>€</i></span>
-          <span class="fisc-num"><input type="number" min="0" value="${r.chg}" ${isMicro?'disabled':''} onchange="fiscalSet('${y}','${escJs(r.key)}','chg',this.value)"><i>€</i></span>
-          <span class="fisc-net ${net<0?'neg':''}">${eur(net)}</span>
-        </div>`; }).join('')||'<div class="empty">Aucun bien dans cette indivision.</div>'}
-        <div class="fisc-row fisc-total"><span>Total ${y}</span><span>${eur(revBrut)}</span><span>${isMicro?'—':eur(chgTot)}</span><span class="${netImposable<0?'neg':''}">${eur(netImposable)}</span></div>
+      <div class="card-head"><div><div class="card-title">Vos documents fiscaux</div><div class="card-sub">${missingDocs?('Il vous manque '+missingDocs+' justificatif(s).'):'Tous vos justificatifs semblent présents.'}</div></div><button class="btn btn-sm" onclick="go('docs')">Ouvrir mes documents</button></div>
+      <div class="fisc-check">
+        ${docChecks.map(d=>`<div class="fisc-check-row ${d.ok?'ok':'miss'}">${d.ok?svgIcon('check',14):svgIcon('clock',14)}<span>${cEsc(d.lbl)}</span><span class="fisc-doc-tag${d.ok?' ok':''}">${d.ok?'Présent':'À ajouter'}</span></div>`).join('')}
       </div>
-      <p class="fisc-note">${isMicro?'Micro-foncier: le résultat imposable correspond à 70 % des revenus bruts (abattement forfaitaire de 30 %). Les charges réelles ne sont pas déduites.':'Régime réel: résultat imposable = revenus fonciers moins charges déductibles (taxe foncière, travaux, charges de copropriété non récupérables, assurance). Un résultat négatif est un déficit foncier.'}</p>
-    </div>
+    </div>` : ''}
 
-    <div class="card">
-      <div class="card-head"><div><div class="card-title">Part de chaque indivisaire</div><div class="card-sub">Résultat foncier réparti au prorata des quotes-parts. Chacun reporte sa part sur sa propre déclaration.</div></div></div>
-      ${persList.map((p,i)=>{ const col=PAL[i%PAL.length]; return `<div class="row-item">
-        <div class="r-ic" style="background:linear-gradient(135deg,${col},${col}cc);color:#fff;font-family:'Montserrat';font-weight:700;font-size:.78rem">${p.ini}</div>
-        <div style="flex:1;min-width:0"><b>${cEsc(p.name)}</b><span>${isMicro?'Micro-foncier · case 4BE de la 2042':'Revenus fonciers · 2044 puis report 2042'}</span></div>
-        <div class="fisc-part ${p.amount<0?'neg':''}">${eur(Math.round(p.amount))}</div>
-      </div>`; }).join('')||'<div class="empty">Renseignez les quotes-parts pour répartir.</div>'}
-    </div>
+    <details class="fisc-details" ${(fiscDetailOpen||revBrut<=0)?'open':''} ontoggle="fiscDetailOpen=this.open">
+      <summary>Voir et ajuster le détail des chiffres</summary>
+      <div class="card" style="margin-top:12px">
+        <div class="card-head"><div><div class="card-title">Régime d'imposition ${y}</div><div class="card-sub">${microEligible?'Loyers bruts sous 15 000 € : le micro-foncier est possible.':'Loyers bruts au-dessus de 15 000 € : régime réel.'}</div></div></div>
+        <div class="fisc-seg">
+          <button class="fisc-seg-btn ${isMicro?'sel':''}" ${microEligible?'':'disabled'} onclick="fiscalRegime('${y}','micro')">Micro-foncier<span>abattement 30 %</span></button>
+          <button class="fisc-seg-btn ${!isMicro?'sel':''}" onclick="fiscalRegime('${y}','reel')">Réel<span>charges déduites</span></button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Revenus et charges par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Ajustez si besoin.</div></div></div>
+        <div class="fisc-table">
+          <div class="fisc-row fisc-head"><span>Bien</span><span>Revenus fonciers</span><span>Charges déductibles</span><span>Résultat net</span></div>
+          ${rows.map(r=>{ const net=isMicro?Math.round(r.rev*0.7):(r.rev-r.chg); return `<div class="fisc-row">
+            <span class="fisc-bien">${cEsc(String(r.nom).split('—')[0].trim())}</span>
+            <span class="fisc-num"><input type="number" min="0" value="${r.rev}" onchange="fiscalSet('${y}','${escJs(r.key)}','rev',this.value)"><i>€</i></span>
+            <span class="fisc-num"><input type="number" min="0" value="${r.chg}" ${isMicro?'disabled':''} onchange="fiscalSet('${y}','${escJs(r.key)}','chg',this.value)"><i>€</i></span>
+            <span class="fisc-net ${net<0?'neg':''}">${eur(net)}</span>
+          </div>`; }).join('')||'<div class="empty">Aucun bien dans cette indivision.</div>'}
+          <div class="fisc-row fisc-total"><span>Total ${y}</span><span>${eur(revBrut)}</span><span>${isMicro?'—':eur(chgTot)}</span><span class="${netImposable<0?'neg':''}">${eur(netImposable)}</span></div>
+        </div>
+        <p class="fisc-note">${isMicro?'Micro-foncier : résultat imposable = 70 % des loyers bruts.':'Réel : résultat imposable = loyers moins charges déductibles (taxe foncière, travaux, charges de copropriété non récupérables, assurance). Un résultat négatif est un déficit foncier.'}</p>
+      </div>
+    </details>
 
     <div class="fisc-2col">
       <div class="card">
-        <div class="card-title">Documents à réunir</div>
-        <div class="fisc-check">
-          ${['Avis de taxe foncière '+y,'Factures de travaux et justificatifs',"Tableau d'amortissement du prêt (intérêts)",'Quittances ou relevés de loyers',"Attestation d'assurance (PNO)"].map(d=>`<div class="fisc-check-row">${svgIcon('check',14)}<span>${cEsc(d)}</span></div>`).join('')}
-        </div>
-        <p class="fisc-note">À ranger dans Documents, dossiers « Taxe foncière » et « PV d'Assemblée Générale » selon le cas.</p>
-      </div>
-      <div class="card">
         <div class="card-title">Échéances ${+y+1}</div>
         <div class="fisc-check">
-          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Déclaration en ligne: avril à juin ${+y+1}</span></div>
-          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Avis d'impôt: été ${+y+1}</span></div>
-          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Taxe foncière: automne ${+y+1}</span></div>
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Déclaration en ligne : avril à juin ${+y+1}</span></div>
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Avis d’impôt : été ${+y+1}</span></div>
+          <div class="fisc-check-row">${svgIcon('clock',14)}<span>Taxe foncière : automne ${+y+1}</span></div>
         </div>
-        <p class="fisc-note">Dates indicatives, le calendrier officiel varie selon le département.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Garder une trace</div>
+        <div class="card-sub">Un récapitulatif à imprimer ou enregistrer en PDF, à garder ou à remettre à votre comptable.</div>
+        <button class="btn" onclick="fiscPrint()" style="margin-top:12px;background:var(--navy);color:#fff">${svgIcon('file',15)} Imprimer / enregistrer en PDF</button>
       </div>
     </div>
 
-    <p class="fisc-disclaimer">Estimation indicative pour préparer vos démarches. Elle ne remplace pas la déclaration officielle ni l'avis d'un professionnel.</p>`;
+    <p class="fisc-disclaimer">Estimation indicative pour préparer vos démarches. Elle ne remplace pas la déclaration officielle ni l’avis d’un professionnel.</p>`;
 }
+function fiscQ(b){ const t=b.parentNode.querySelector('.fisc-tip'); if(t) t.hidden=!t.hidden; }
+function fiscCopy(amount){ const v=String(amount); try{ navigator.clipboard.writeText(v); toast('Montant copié : '+eur(amount)); }catch(e){ toast('Montant : '+eur(amount)); } }
+function fiscalStep(y,i){ const cfg=fiscalCfg(y); if(!cfg.steps) cfg.steps={}; cfg.steps[i]=!cfg.steps[i]; save(); }
+function fiscPrint(){ document.body.classList.add('printing-fiscal'); window.print(); setTimeout(()=>document.body.classList.remove('printing-fiscal'),500); }
 
 /* ── STATUTS & PAIEMENTS DES CHARGES ── */
 const STATUTS = {
