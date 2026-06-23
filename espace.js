@@ -1102,15 +1102,16 @@ function fiscalRows(y){
     rev+=(loyExtra||0);
     const ov=cfg.ov[key]||{};
     return { nom, key, parts, revAuto:Math.round(rev), chgAuto:Math.round(chg),
-      rev:(ov.rev!=null?ov.rev:Math.round(rev)), chg:(ov.chg!=null?ov.chg:Math.round(chg)) };
+      rev:(ov.rev!=null?ov.rev:Math.round(rev)), chg:(ov.chg!=null?ov.chg:Math.round(chg)),
+      int:(ov.interets!=null?ov.interets:0) };
   };
   const rows=biens.map((b,bi)=>mk(b.nom,b.id,bienParts(b),bi, loyByBien[b.id]||0));
   const commun=mk("Commun à l'indivision",'__commun__',coiParts(),-1, loyByBien['__commun__']||0);
   if(commun.revAuto||commun.chgAuto||(cfg.ov['__commun__'])) rows.push(commun);
   return rows;
 }
-function fiscalSet(y,key,field,val){ const cfg=fiscalCfg(y); if(!cfg.ov[key]) cfg.ov[key]={}; cfg.ov[key][field]=Math.max(0,Math.round(+val||0)); save(); renderFiscal(); }
-function fiscalRegime(y,r){ fiscalCfg(y).regime=r; save(); renderFiscal(); }
+function fiscalSet(y,key,field,val){ const cfg=fiscalCfg(y); if(!cfg.ov[key]) cfg.ov[key]={}; cfg.ov[key][field]=Math.max(0,Math.round(+val||0)); save(); }
+function fiscalPersonRegime(y,ini,r){ const cfg=fiscalCfg(y); if(!cfg.personRegime) cfg.personRegime={}; cfg.personRegime[ini]=r; save(); }
 function fiscalYearSel(y){ fiscalYear=y; renderFiscal(); }
 function renderFiscal(){
   const el=document.getElementById('fiscalBody'); if(!el) return;
@@ -1121,56 +1122,114 @@ function renderFiscal(){
   const rows=fiscalRows(y);
   const revBrut=rows.reduce((a,r)=>a+r.rev,0);
   const chgTot=rows.reduce((a,r)=>a+r.chg,0);
+  const intTot=rows.reduce((a,r)=>a+(r.int||0),0);
   const cfg=fiscalCfg(y);
-  const microEligible=revBrut>0 && revBrut<15000;
-  let regime=cfg.regime; if(regime==='auto') regime=microEligible?'micro':'reel';
-  const isMicro=regime==='micro';
-  const netImposable=isMicro?Math.round(revBrut*0.7):(revBrut-chgTot);
-  const perPers={};
-  rows.forEach(r=>{
-    const net=isMicro?r.rev*0.7:(r.rev-r.chg);
-    const sumP=r.parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
-    r.parts.forEach(p=>{ const k=p.name; if(!perPers[k]) perPers[k]={name:p.name,ini:p.ini,amount:0}; perPers[k].amount+=net*(+p.pct||0)/sumP; });
-  });
-  const persList=Object.values(perPers).sort((a,b)=>b.amount-a.amount);
   const myIni=(typeof OWNER!=='undefined'&&OWNER)?OWNER.ini:null;
-  const caseLbl = isMicro ? 'dans la case 4BE de la déclaration 2042' : 'via le formulaire 2044, reporté sur la 2042';
   const q=t=>`<span class="fisc-help"><button class="fisc-q" type="button" onclick="fiscQ(this)" aria-label="Aide">?</button><span class="fisc-tip" hidden>${t}</span></span>`;
+
+  /* Agrégation par indivisaire : sa part de loyers, charges, intérêts */
+  const pers={};
+  rows.forEach(r=>{
+    const sumP=r.parts.reduce((a,p)=>a+(+p.pct||0),0)||100;
+    r.parts.forEach(p=>{ const k=p.ini; if(!pers[k]) pers[k]={name:p.name,ini:p.ini,rev:0,chg:0,int:0}; const w=(+p.pct||0)/sumP; pers[k].rev+=r.rev*w; pers[k].chg+=r.chg*w; pers[k].int+=(r.int||0)*w; });
+  });
+  const persList=Object.values(pers).sort((a,b)=>b.rev-a.rev);
+  /* Régime (par personne) + montant à déclarer, selon les règles vérifiées */
+  persList.forEach(p=>{
+    p.microEligible = p.rev>0 && p.rev<=15000;
+    let reg=(cfg.personRegime&&cfg.personRegime[p.ini])||'auto';
+    if(reg==='auto') reg=p.microEligible?'micro':'reel';
+    if(!p.microEligible) reg='reel';
+    p.regime=reg;
+    if(reg==='micro'){ p.kind='micro'; p.declare=Math.round(p.rev*0.7); p.case='4BE'; }
+    else {
+      const net=p.rev-p.chg-p.int;
+      if(net>=0){ p.kind='pos'; p.declare=Math.round(net); p.case='4BA'; }
+      else {
+        const defInt=Math.max(0,p.int-p.rev);            /* déficit dû aux intérêts → revenus fonciers uniquement */
+        const defAutres=p.chg-Math.max(0,p.rev-p.int);   /* déficit dû aux autres charges → revenu global plafonné */
+        const dGlobal=Math.min(Math.max(0,defAutres),10700);
+        const dReport=Math.max(0,defAutres-dGlobal)+Math.max(0,defInt);
+        p.kind='deficit'; p.deficit=Math.round(-net); p.dGlobal=Math.round(dGlobal); p.dReport=Math.round(dReport);
+      }
+    }
+  });
+  const me=myIni?persList.find(p=>p.ini===myIni):null;
+
   const docs=S.docs||[];
   const hasDoc=(re,dossier)=>docs.some(d=> (dossier&&d.dossier===dossier) || re.test(d.name||'') );
   const docChecks=[
     {lbl:'Avis de taxe foncière '+y, ok:hasDoc(/taxe.?fonci/i,'Taxe foncière')},
     {lbl:'Justificatifs de travaux et factures', ok:hasDoc(/travaux|facture/i)},
+    {lbl:"Tableau d'amortissement du prêt (intérêts)", ok:hasDoc(/amortiss|prêt|pret|emprunt/i)},
     {lbl:'Quittances ou relevés de loyers', ok:hasDoc(/loyer|quittance|relev/i)},
     {lbl:"Attestation d'assurance (PNO)", ok:hasDoc(/assur/i)},
   ];
   const missingDocs=docChecks.filter(d=>!d.ok).length;
   const cfgSteps=cfg.steps||{};
-  const stepDefs=['Vérifiez vos revenus et vos charges','Choisissez votre régime (micro ou réel)','Réunissez vos documents fiscaux','Reportez votre part sur votre déclaration'];
+  const stepDefs=['Vérifiez vos revenus, charges et intérêts','Choisissez votre régime (micro ou réel)','Réunissez vos documents fiscaux','Reportez votre part sur votre déclaration'];
+
+  /* Verdict personnalisé */
+  let heroHTML;
+  if(revBrut<=0){
+    heroHTML=`<div class="fisc-hero-big">Aucun loyer enregistré pour ${y}.</div>
+      <div class="fisc-hero-sub">Vous n’avez probablement rien à déclarer en revenus fonciers cette année. Ajoutez vos loyers dans le Budget pour préparer la déclaration.</div>`;
+  } else if(me){
+    let line;
+    if(me.kind==='micro') line=`vous avez <b>${eur(me.declare)}</b> à déclarer en case 4BE`;
+    else if(me.kind==='pos') line=`vous avez <b>${eur(me.declare)}</b> à déclarer (régime réel, case 4BA)`;
+    else line=`vous êtes en <b>déficit foncier de ${eur(me.deficit)}</b>, rien à déclarer en positif cette année`;
+    heroHTML=`<div class="fisc-hero-big">Cette année, ${line}.</div>
+      <div class="fisc-hero-sub">Votre régime : <b>${me.regime==='micro'?'micro-foncier':'réel'}</b>. ${me.regime==='micro'?'Un abattement de 30 % est appliqué automatiquement.':'Vous déduisez vos charges réelles, intérêts d’emprunt compris.'}${q(me.regime==='micro'?'Le micro-foncier s’applique quand votre part de loyers bruts est sous 15 000 € par an. L’administration retire 30 % d’office.':'Le régime réel : vous déduisez vos charges réelles. Un résultat négatif crée un déficit foncier, imputable sur votre revenu global jusqu’à 10 700 € par an.')}</div>`;
+  } else {
+    heroHTML=`<div class="fisc-hero-big">Vos biens ont rapporté <b>${eur(revBrut)}</b> de loyers en ${y}.</div>
+      <div class="fisc-hero-sub">Chaque indivisaire déclare sa part selon son <b>propre régime</b> (micro ou réel), apprécié sur sa quote-part.${q('Le seuil de 15 000 € du micro-foncier s’apprécie au niveau du foyer fiscal de chaque indivisaire, et non au niveau de l’indivision. Deux indivisaires peuvent donc ne pas être au même régime.')}</div>`;
+  }
+
+  const personCard=(p,i)=>{
+    const col=PAL[i%PAL.length]; const isMe=myIni&&p.ini===myIni;
+    const reg=`<div class="fisc-regline"><span class="fisc-reg-badge ${p.regime}">${p.regime==='micro'?'Micro-foncier':'Régime réel'}</span>${
+      p.microEligible
+        ? `<span class="fisc-regtog"><button class="${p.regime==='micro'?'sel':''}" onclick="fiscalPersonRegime('${y}','${p.ini}','micro')">Micro</button><button class="${p.regime==='reel'?'sel':''}" onclick="fiscalPersonRegime('${y}','${p.ini}','reel')">Réel</button></span>`
+        : `<span class="fisc-reg-note">réel obligatoire (plus de 15 000 €)</span>`
+    }</div>`;
+    let body;
+    if(p.kind==='deficit'){
+      body=`<div class="fisc-pamt neg">${eur(p.deficit)}</div>
+        <div class="fisc-pcase">déficit foncier, rien à payer cette année</div>
+        <div class="fisc-defbreak">
+          <div><span>Imputable sur le revenu global</span><b>${eur(p.dGlobal)}</b></div>
+          <div><span>Reportable 10 ans (foncier)</span><b>${eur(p.dReport)}</b></div>
+        </div>`;
+    } else {
+      const caseTxt = p.kind==='micro' ? 'à reporter case 4BE de la 2042' : 'à reporter case 4BA de la 2042 (résultat calculé sur la 2044)';
+      body=`<div class="fisc-pamt">${eur(p.declare)}</div>
+        <div class="fisc-pcase">${caseTxt}</div>
+        <button class="fisc-copy" type="button" onclick="fiscCopy(${p.declare})">Copier le montant</button>`;
+    }
+    return `<div class="fisc-person${isMe?' me':''}">
+      <div class="fisc-person-top"><span class="fisc-pav" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</span><span class="fisc-pname">${cEsc(p.name)}${isMe?'<span class="fisc-you">Vous</span>':''}</span></div>
+      ${reg}
+      ${body}
+    </div>`;
+  };
+
   el.innerHTML=`
     <div class="fisc-years">${years.map(yy=>`<button class="bf-chip ${yy===y?'sel':''}" onclick="fiscalYearSel('${yy}')">${yy}</button>`).join('')}</div>
 
     <div class="card fisc-hero">
       <div class="res-label">Déclaration ${y}</div>
-      ${revBrut>0 ? `<div class="fisc-hero-big">Vos biens ont rapporté <b>${eur(revBrut)}</b> de loyers en ${y}.</div>
-      <div class="fisc-hero-sub">Régime conseillé : <b>${isMicro?'micro-foncier':'réel'}</b>${isMicro?' (un abattement de 30 % est appliqué automatiquement)':' (vous déduisez vos charges réelles)'}.${q(isMicro?'Le micro-foncier s’applique quand vos loyers bruts sont sous 15 000 € par an : l’administration retire 30 % d’office, vous n’avez aucun calcul de charges à faire.':'Au régime réel, vous déduisez vos charges réelles (taxe foncière, travaux, assurance, intérêts d’emprunt). Plus intéressant quand vos charges dépassent 30 % des loyers.')}</div>`
-      : `<div class="fisc-hero-big">Aucun loyer enregistré pour ${y}.</div>
-      <div class="fisc-hero-sub">Vous n’avez probablement rien à déclarer en revenus fonciers cette année. Ajoutez vos loyers dans le Budget pour préparer la déclaration.</div>`}
+      ${heroHTML}
     </div>
 
     ${revBrut>0 ? `
     <div class="card">
       <div class="card-title">Ce que chacun doit déclarer</div>
-      <div class="card-sub">La part du résultat foncier de chaque indivisaire, prête à recopier sur sa déclaration.</div>
+      <div class="card-sub">La part de chaque indivisaire, selon son régime, prête à recopier sur sa déclaration.</div>
       <div class="fisc-people">
-        ${persList.map((p,i)=>{ const col=PAL[i%PAL.length]; const me=myIni&&p.ini===myIni; const amt=Math.round(p.amount); return `<div class="fisc-person${me?' me':''}">
-          <div class="fisc-person-top"><span class="fisc-pav" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</span><span class="fisc-pname">${cEsc(p.name)}${me?'<span class="fisc-you">Vous</span>':''}</span></div>
-          <div class="fisc-pamt ${amt<0?'neg':''}">${eur(amt)}</div>
-          <div class="fisc-pcase">à reporter ${caseLbl}</div>
-          <button class="fisc-copy" type="button" onclick="fiscCopy(${amt})">Copier le montant</button>
-        </div>`; }).join('')||'<div class="empty">Renseignez les quotes-parts pour répartir.</div>'}
+        ${persList.map(personCard).join('')||'<div class="empty">Renseignez les quotes-parts pour répartir.</div>'}
       </div>
-      <p class="fisc-note">${isMicro?'Ce montant correspond à 70 % de votre part des loyers (l’abattement de 30 % est déjà déduit).':'Ce montant correspond à votre part des loyers moins votre part des charges déductibles.'} S’y ajoutent l’impôt sur le revenu selon votre tranche et les prélèvements sociaux de 17,2 %.${q('Les prélèvements sociaux (CSG/CRDS) s’élèvent à 17,2 % et s’appliquent en plus de l’impôt sur le revenu, sur vos revenus fonciers nets.')}</p>
+      <p class="fisc-note">S’ajoutent à ces montants l’impôt sur le revenu (selon votre tranche) et les prélèvements sociaux de 17,2 %.${q('Les prélèvements sociaux (CSG, CRDS, prélèvement de solidarité) s’élèvent à 17,2 % et s’appliquent sur le revenu foncier net, en plus de l’impôt sur le revenu.')}</p>
     </div>
 
     <div class="card">
@@ -1189,27 +1248,40 @@ function renderFiscal(){
     </div>` : ''}
 
     <details class="fisc-details" ${(fiscDetailOpen||revBrut<=0)?'open':''} ontoggle="fiscDetailOpen=this.open">
-      <summary>Voir et ajuster le détail des chiffres</summary>
+      <summary>Voir et ajuster le détail par bien</summary>
       <div class="card" style="margin-top:12px">
-        <div class="card-head"><div><div class="card-title">Régime d'imposition ${y}</div><div class="card-sub">${microEligible?'Loyers bruts sous 15 000 € : le micro-foncier est possible.':'Loyers bruts au-dessus de 15 000 € : régime réel.'}</div></div></div>
-        <div class="fisc-seg">
-          <button class="fisc-seg-btn ${isMicro?'sel':''}" ${microEligible?'':'disabled'} onclick="fiscalRegime('${y}','micro')">Micro-foncier<span>abattement 30 %</span></button>
-          <button class="fisc-seg-btn ${!isMicro?'sel':''}" onclick="fiscalRegime('${y}','reel')">Réel<span>charges déduites</span></button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div><div class="card-title">Revenus et charges par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Ajustez si besoin.</div></div></div>
-        <div class="fisc-table">
-          <div class="fisc-row fisc-head"><span>Bien</span><span>Revenus fonciers</span><span>Charges déductibles</span><span>Résultat net</span></div>
-          ${rows.map(r=>{ const net=isMicro?Math.round(r.rev*0.7):(r.rev-r.chg); return `<div class="fisc-row">
+        <div class="card-head"><div><div class="card-title">Revenus, charges et intérêts par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Les intérêts d’emprunt se saisissent à la main (non suivis dans le budget).</div></div></div>
+        <div class="fisc-table fisc-table-5">
+          <div class="fisc-row fisc-head"><span>Bien</span><span>Loyers</span><span>Charges</span><span>Intérêts</span><span>Résultat</span></div>
+          ${rows.map(r=>{ const net=r.rev-r.chg-(r.int||0); return `<div class="fisc-row">
             <span class="fisc-bien">${cEsc(String(r.nom).split('—')[0].trim())}</span>
             <span class="fisc-num"><input type="number" min="0" value="${r.rev}" onchange="fiscalSet('${y}','${escJs(r.key)}','rev',this.value)"><i>€</i></span>
-            <span class="fisc-num"><input type="number" min="0" value="${r.chg}" ${isMicro?'disabled':''} onchange="fiscalSet('${y}','${escJs(r.key)}','chg',this.value)"><i>€</i></span>
+            <span class="fisc-num"><input type="number" min="0" value="${r.chg}" onchange="fiscalSet('${y}','${escJs(r.key)}','chg',this.value)"><i>€</i></span>
+            <span class="fisc-num"><input type="number" min="0" value="${r.int||0}" onchange="fiscalSet('${y}','${escJs(r.key)}','interets',this.value)"><i>€</i></span>
             <span class="fisc-net ${net<0?'neg':''}">${eur(net)}</span>
           </div>`; }).join('')||'<div class="empty">Aucun bien dans cette indivision.</div>'}
-          <div class="fisc-row fisc-total"><span>Total ${y}</span><span>${eur(revBrut)}</span><span>${isMicro?'—':eur(chgTot)}</span><span class="${netImposable<0?'neg':''}">${eur(netImposable)}</span></div>
+          <div class="fisc-row fisc-total"><span>Total ${y}</span><span>${eur(revBrut)}</span><span>${eur(chgTot)}</span><span>${eur(intTot)}</span><span class="${(revBrut-chgTot-intTot)<0?'neg':''}">${eur(revBrut-chgTot-intTot)}</span></div>
         </div>
-        <p class="fisc-note">${isMicro?'Micro-foncier : résultat imposable = 70 % des loyers bruts.':'Réel : résultat imposable = loyers moins charges déductibles (taxe foncière, travaux, charges de copropriété non récupérables, assurance). Un résultat négatif est un déficit foncier.'}</p>
+        <p class="fisc-note">Au réel, résultat = loyers − charges déductibles − intérêts d’emprunt. En micro-foncier, les charges sont ignorées (abattement de 30 %). Attention : les travaux de <b>construction, agrandissement ou reconstruction</b> ne sont pas déductibles, ajustez la colonne Charges le cas échéant.</p>
+      </div>
+    </details>
+
+    <details class="fisc-details fisc-explain">
+      <summary>Comprendre ma fiscalité en indivision</summary>
+      <div class="card" style="margin-top:12px">
+        <div class="fisc-ex">
+          <h4>L’indivision, comment ça marche ?</h4>
+          <p>En indivision, il n’y a pas de déclaration commune : <b>chaque indivisaire déclare sa propre quote-part</b> des revenus et des charges, au prorata de ses droits. La taxe foncière, elle, est établie au nom des indivisaires.</p>
+          <h4>Micro-foncier ou régime réel ?</h4>
+          <p>Le <b>micro-foncier</b> s’applique si votre part de loyers bruts ne dépasse pas <b>15 000 € par an</b> : l’administration applique un abattement forfaitaire de <b>30 %</b>, sans aucune charge à justifier (case 4BE). Ce seuil s’apprécie <b>par indivisaire</b>, pas pour l’indivision entière. Au-delà, ou sur option (3 ans), c’est le <b>régime réel</b> : vous déduisez vos charges réelles (formulaire 2044).</p>
+          <h4>Charges déductibles au réel</h4>
+          <p>Taxe foncière, primes d’assurance, frais de gestion, dépenses de réparation, d’entretien et d’amélioration, provisions de charges de copropriété, et <b>intérêts d’emprunt</b>. Les <b>travaux de construction ou d’agrandissement ne sont pas déductibles</b>.</p>
+          <h4>Le déficit foncier</h4>
+          <p>Si vos charges dépassent vos loyers, vous êtes en déficit. La part <b>hors intérêts</b> s’impute sur votre <b>revenu global jusqu’à 10 700 € par an</b> ; le reste et la part liée aux <b>intérêts</b> se reportent sur vos <b>revenus fonciers des 10 années suivantes</b>.</p>
+          <h4>Et l’impôt au final ?</h4>
+          <p>Votre revenu foncier net s’ajoute à vos autres revenus et est imposé selon votre <b>tranche marginale</b>, plus les <b>prélèvements sociaux de 17,2 %</b>.</p>
+          <p class="fisc-ex-src">Informations établies à partir des règles publiques (impots.gouv.fr, service-public.gouv.fr, BOFiP). Elles restent une aide à la préparation et ne remplacent pas l’avis d’un notaire ou d’un expert-comptable.</p>
+        </div>
       </div>
     </details>
 
@@ -1229,7 +1301,7 @@ function renderFiscal(){
       </div>
     </div>
 
-    <p class="fisc-disclaimer">Estimation indicative pour préparer vos démarches. Elle ne remplace pas la déclaration officielle ni l’avis d’un professionnel.</p>`;
+    <p class="fisc-disclaimer">Estimation indicative pour préparer vos démarches, fondée sur les règles fiscales publiques. Elle ne remplace pas la déclaration officielle ni l’avis d’un professionnel.</p>`;
 }
 function fiscQ(b){ const t=b.parentNode.querySelector('.fisc-tip'); if(t) t.hidden=!t.hidden; }
 function fiscCopy(amount){ const v=String(amount); try{ navigator.clipboard.writeText(v); toast('Montant copié : '+eur(amount)); }catch(e){ toast('Montant : '+eur(amount)); } }
