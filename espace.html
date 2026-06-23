@@ -207,13 +207,29 @@
       <div class="bud-subnav" id="budSubnav">
         <button class="bsub sel" data-bt="apercu" onclick="setBudTab('apercu')">Vue d'ensemble</button>
         <button class="bsub" data-bt="loyers" onclick="setBudTab('loyers')">Loyers<span class="lo-badge" id="budLoyersBadge" hidden></span></button>
-        <button class="bsub" data-bt="charges" onclick="setBudTab('charges')">Charges</button>
         <button class="bsub" data-bt="mouvements" onclick="setBudTab('mouvements')">Mouvements</button>
       </div>
 
       <!-- Vue d'ensemble -->
       <div class="bud-panel" data-bt="apercu">
         <div class="bud-stats" id="budStats"></div>
+        <div class="bud-cols">
+          <div class="card">
+            <div class="card-title">Situation par bien</div>
+            <div class="card-sub">Revenus, charges et solde de chaque bien.</div>
+            <div id="budByBien" style="margin-top:6px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Situation par indivisaire</div>
+            <div class="card-sub">Ce que chacun a perçu, doit, a payé, et son solde net.</div>
+            <div id="budByPerson" style="margin-top:6px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Charges par catégorie</div>
+          <div class="card-sub">Où part l'argent, par type de dépense.</div>
+          <div id="budCats" style="margin-top:6px"></div>
+        </div>
       </div>
 
       <!-- Loyers -->
@@ -221,45 +237,21 @@
         <div id="budLoyers"></div>
       </div>
 
-      <!-- Charges -->
-      <div class="bud-panel" data-bt="charges" hidden>
-        <div class="bud-cols">
-          <div class="card">
-            <div class="card-title">Qui doit combien ?</div>
-            <div class="card-sub">Répartition des charges communes par co-indivisaire.</div>
-            <div class="split-intro">
-              Total des charges réparti selon les quote-parts de chacun. Exemple : une charge de 1 000 € → 450 € pour une part de 45 %.
-            </div>
-            <div id="budSplit"></div>
-          </div>
-          <div class="card">
-            <div class="card-title">Charges par catégorie</div>
-            <div class="card-sub">Où part l'argent.</div>
-            <div id="budCats"></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Mouvements -->
       <div class="bud-panel" data-bt="mouvements" hidden>
         <div class="card">
           <div class="card-head">
-            <div><div class="card-title">Transactions</div><div class="card-sub" id="txCount">—</div></div>
+            <div><div class="card-title">Mouvements</div><div class="card-sub" id="txCount">—</div></div>
           </div>
+          <div class="mvt-summary" id="txSummary"></div>
           <div class="bud-toolbar">
             <div class="bud-filter" id="txFilter">
               <span class="bf-chip sel" data-f="all">Tout</span>
-              <span class="bf-chip" data-f="charge">Charges</span>
               <span class="bf-chip" data-f="revenu">Revenus</span>
+              <span class="bf-chip" data-f="charge">Charges</span>
             </div>
           </div>
           <div id="txList" style="margin-top:8px"></div>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <div><div class="card-title">Historique des paiements</div><div class="card-sub" id="payHistSub">—</div></div>
-          </div>
-          <div id="payHistList" style="margin-top:6px"></div>
         </div>
       </div>
     </div>
@@ -738,19 +730,17 @@
           <input type="number" id="loyerJour" min="1" max="28" value="5">
         </div>
       </div>
-      <div class="modal-row">
-        <div class="modal-field">
-          <label>Fréquence</label>
-          <select id="loyerFreq">
-            <option value="mensuel">Tous les mois</option>
-            <option value="trimestriel">Tous les 3 mois</option>
-            <option value="semestriel">Tous les 6 mois</option>
-            <option value="annuel">Une fois par an</option>
-          </select>
-        </div>
-        <div class="modal-field">
-          <label>À partir de</label>
-          <input type="month" id="loyerSince">
+      <div class="modal-field">
+        <label>À partir de</label>
+        <input type="month" id="loyerSince">
+      </div>
+      <div class="modal-field">
+        <label>Fréquence</label>
+        <div class="freq-seg" id="loyerFreqSeg">
+          <button type="button" data-f="mensuel" onclick="setLoyerFreq('mensuel')">Tous les mois</button>
+          <button type="button" data-f="trimestriel" onclick="setLoyerFreq('trimestriel')">Tous les 3 mois</button>
+          <button type="button" data-f="semestriel" onclick="setLoyerFreq('semestriel')">Tous les 6 mois</button>
+          <button type="button" data-f="annuel" onclick="setLoyerFreq('annuel')">Par an</button>
         </div>
       </div>
       <div class="modal-foot">

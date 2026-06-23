@@ -659,12 +659,69 @@ a { color: inherit; text-decoration: none; }
 .fisc-check-row svg { color: var(--teal); flex-shrink: 0; }
 .fisc-disclaimer { font-size: .74rem; color: var(--texte-doux); line-height: 1.5; margin-top: 16px; text-align: center; }
 
+/* ━━━━ BUDGET v2 : situation par bien / par indivisaire ━━━━ */
+.bb-row { padding: 11px 0; border-top: 1px solid var(--gris-bord); }
+.bb-row:first-child { border-top: none; }
+.bb-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+.bb-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .9rem; color: var(--navy); }
+.bb-net { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .95rem; }
+.bb-net.pos { color: #13855B; } .bb-net.neg { color: #C0392B; }
+.bb-bar { display: flex; height: 9px; border-radius: 6px; overflow: hidden; background: var(--gris-clair); min-width: 8%; }
+.bb-bar .seg { height: 100%; }
+.bb-bar .seg.rev { background: #19A974; } .bb-bar .seg.chg { background: #D9637A; }
+.bb-legend { display: flex; gap: 16px; margin-top: 6px; font-size: .76rem; color: var(--texte-doux); }
+.bb-legend i.d { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.bb-legend i.d.rev { background: #19A974; } .bb-legend i.d.chg { background: #D9637A; }
+
+.pl-row { display: flex; gap: 11px; padding: 12px 0; border-top: 1px solid var(--gris-bord); }
+.pl-row:first-child { border-top: none; }
+.pl-row .split-av { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .75rem; }
+.pl-body { flex: 1; min-width: 0; }
+.pl-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.pl-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .9rem; color: var(--navy); }
+.pl-net { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1rem; }
+.pl-net small { font-family: 'Open Sans', sans-serif; font-weight: 400; font-size: .66rem; color: var(--texte-doux); margin-left: 3px; }
+.pl-net.pos { color: #13855B; } .pl-net.neg { color: #C0392B; }
+.pl-cells { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 9px; }
+.pl-cell { display: flex; flex-direction: column; gap: 1px; }
+.pl-cell i { font-style: normal; font-size: .68rem; color: var(--texte-doux); text-transform: uppercase; letter-spacing: .03em; }
+.pl-cell b { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .82rem; color: var(--navy); font-variant-numeric: tabular-nums; }
+.pl-cell b.pos { color: #13855B; } .pl-cell b.neg { color: #C0392B; }
+.pl-prog { height: 5px; border-radius: 99px; background: var(--gris-clair); overflow: hidden; }
+.pl-prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), var(--accent)); }
+@media(max-width:520px){ .pl-cells { grid-template-columns: 1fr 1fr; } }
+
 /* ━━━━ SOUS-NAVIGATION BUDGET ━━━━ */
 .bud-subnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px solid var(--gris-bord); padding-bottom: 0; }
 .bsub { position: relative; background: none; border: none; cursor: pointer; padding: .6rem .9rem; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .85rem; color: var(--texte-doux); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: .15s; display: inline-flex; align-items: center; }
 .bsub:hover { color: var(--navy); }
 .bsub.sel { color: var(--navy); border-bottom-color: var(--navy); }
 .bud-panel > .bud-stats:first-child, .bud-panel > .bud-cols:first-child { margin-top: 0; }
+
+/* ━━━━ MOUVEMENTS v2 : résumé + regroupement par mois ━━━━ */
+.mvt-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 4px 0 14px; }
+.mvt-kpi { display: flex; flex-direction: column; gap: 2px; background: var(--gris-clair); border-radius: 11px; padding: 11px 13px; }
+.mvt-k-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 700; }
+.mvt-k-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--navy); font-variant-numeric: tabular-nums; }
+.mvt-k-val.pos { color: #13855B; } .mvt-k-val.neg { color: #C0392B; }
+.tx-month { display: flex; justify-content: space-between; align-items: baseline; margin: 16px 0 4px; padding-bottom: 5px; border-bottom: 1px solid var(--gris-clair); }
+.tx-month:first-child { margin-top: 2px; }
+.tx-month-lbl { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--texte-leger, #8896A7); }
+.tx-month-net { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.tx-month-net.pos { color: #13855B; } .tx-month-net.neg { color: #C0392B; }
+@media(max-width:520px){ .mvt-summary { grid-template-columns: 1fr; } }
+
+/* ━━━━ LOYERS : indicateurs + fréquence segmentée ━━━━ */
+.lo-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.lo-kpi { display: flex; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--gris-bord); border-radius: 12px; padding: 12px 14px; }
+.lo-k-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texte-doux); font-family: 'Montserrat', sans-serif; font-weight: 700; }
+.lo-k-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--navy); font-variant-numeric: tabular-nums; }
+.lo-k-val.pos { color: #13855B; } .lo-k-val.neg { color: #C0392B; } .lo-k-val.warn { color: #C8821E; }
+@media(max-width:640px){ .lo-kpis { grid-template-columns: 1fr 1fr; } }
+.freq-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.freq-seg button { padding: .6rem .7rem; border: 1.5px solid var(--gris-bord); border-radius: 10px; background: #fff; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: .82rem; color: var(--texte-doux); transition: .15s; }
+.freq-seg button:hover { border-color: var(--accent-light); color: var(--navy); }
+.freq-seg button.sel { background: var(--navy); border-color: var(--navy); color: #fff; }
 
 /* ━━━━ LOYERS RÉCURRENTS ━━━━ */
 .lo-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #C8821E; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .72rem; margin-left: 6px; vertical-align: middle; }
