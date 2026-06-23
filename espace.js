@@ -1369,6 +1369,13 @@ function renderLoyers(){
   }
   const handle=loyerToHandle(); const now=ymNow(); const pendThis=handle.filter(o=>o.st===null && o.ym===now);
   const per=loyerPerPerson(); const totalRecu=loyerReceived().reduce((a,o)=>a+o.montant,0);
+  const pendN=loyerPending().length, impayesN=loyerOccurrences().filter(o=>o.st==='impaye').length;
+  const kpi = `<div class="lo-kpis">
+    <div class="lo-kpi"><span class="lo-k-lbl">Encaissé</span><span class="lo-k-val pos">${eur(totalRecu)}</span></div>
+    <div class="lo-kpi"><span class="lo-k-lbl">À confirmer</span><span class="lo-k-val${pendN?' warn':''}">${pendN}</span></div>
+    <div class="lo-kpi"><span class="lo-k-lbl">Impayés</span><span class="lo-k-val${impayesN?' neg':''}">${impayesN}</span></div>
+    <div class="lo-kpi"><span class="lo-k-lbl">Loyers actifs</span><span class="lo-k-val">${recs.length}</span></div>
+  </div>`;
   const inbox = handle.length ? `
     <div class="card">
       <div class="card-head"><div><div class="card-title">Loyers à suivre <span class="lo-badge">${handle.length}</span></div><div class="card-sub">Confirmez les loyers reçus. Les impayés restent ici jusqu'à régularisation.</div></div>${pendThis.length>1?`<button class="btn btn-ghost btn-sm" onclick="confirmAllThisMonth()">Tout reçu ce mois</button>`:''}</div>
@@ -1392,12 +1399,13 @@ function renderLoyers(){
     </div>`;
   const config = `
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Loyers configurés</div><div class="card-sub">Récurrences mensuelles actives.</div></div>${recBtn}</div>
+      <div class="card-head"><div><div class="card-title">Loyers configurés</div><div class="card-sub">Vos récurrences actives.</div></div>${recBtn}</div>
       ${recs.map(l=>`<div class="lo-cfg"><div class="r-ic" style="background:rgba(44,82,130,.08)">${svgIcon('home',16)}</div><div style="flex:1;min-width:0"><b>${cEsc(String(l.bien).split('—')[0].trim())}</b><span>${eur(l.montant)} / ${loyerFreq(l).label} · le ${l.jour} · depuis ${cEsc(ymLabel(l.since))}</span></div><div class="row-act"><span class="mini-link" onclick="openLoyerModal('${l.id}')">Modifier</span><span class="del" onclick="deleteLoyer('${l.id}')" title="Supprimer">${DELSVG}</span></div></div>`).join('')}
     </div>`;
-  el.innerHTML=inbox+split+config;
+  el.innerHTML=kpi+inbox+split+config;
 }
-let loyerEditId=null;
+let loyerEditId=null, loyerFreqSel='mensuel';
+function setLoyerFreq(f){ loyerFreqSel=f; document.querySelectorAll('#loyerFreqSeg button').forEach(b=>b.classList.toggle('sel', b.dataset.f===f)); }
 function openLoyerModal(id){
   loyerEditId=id||null;
   const l=id?loyerList().find(x=>x.id===id):null;
@@ -1407,7 +1415,7 @@ function openLoyerModal(id){
   sel.innerHTML=(S.biens||[]).map(b=>`<option value="${b.id}"${curBien&&curBien.id===b.id?' selected':''}>${cEsc(b.nom.split('—')[0].trim())}</option>`).join('')||'<option value="">Aucun bien</option>';
   document.getElementById('loyerMontant').value=l?String(l.montant):'';
   document.getElementById('loyerJour').value=l?l.jour:5;
-  document.getElementById('loyerFreq').value=l?(l.freq||'mensuel'):'mensuel';
+  setLoyerFreq(l?(l.freq||'mensuel'):'mensuel');
   document.getElementById('loyerSince').value=l?l.since:ymNow();
   document.getElementById('loyerModal').classList.add('open');
 }
@@ -1419,7 +1427,7 @@ function saveLoyer(){
   if(!montant){ toast('Indiquez le loyer mensuel.'); return; }
   const bienId=selBien.id, bien=selBien.nom;
   const jour=Math.min(28,Math.max(1,+document.getElementById('loyerJour').value||1));
-  const freq=document.getElementById('loyerFreq').value||'mensuel';
+  const freq=loyerFreqSel||'mensuel';
   const since=document.getElementById('loyerSince').value||ymNow();
   if(loyerEditId){ const l=loyerList().find(x=>x.id===loyerEditId); if(l){ l.bienId=bienId; l.bien=bien; l.montant=montant; l.jour=jour; l.freq=freq; l.since=since; } }
   else loyerList().push({id:'loy'+Date.now().toString(36), bienId, bien, montant, jour, freq, since});
@@ -1527,39 +1535,6 @@ function renderBudget(){
     </div>`;
   }).join('') : '<div class="empty">Renseignez des charges ou des loyers pour voir la répartition.</div>';
 
-  /* ── Répartition par co-indivisaire (selon les parts de CHAQUE bien) ── */
-  /* Chaque charge est répartie selon les quote-parts du bien concerné,
-     puis on agrège par personne. */
-  const agg = {}; // name -> {name, ini, amount}
-  let colorIdx = {};
-  txs.filter(t=>t.montant<0).forEach(t=>{
-    const bien = bienOfTx(t);
-    const parts = bienParts(bien); // parts du bien, ou globales si commun/inconnu
-    const sumP = parts.reduce((a,p)=>a+(+p.pct||0),0) || 100;
-    parts.forEach(p=>{
-      const key = p.name;
-      if(!agg[key]) agg[key] = {name:p.name, ini:p.ini, amount:0};
-      agg[key].amount += Math.abs(t.montant) * (+p.pct||0) / sumP;
-    });
-  });
-  const aggList = Object.values(agg).sort((a,b)=>b.amount-a.amount);
-  const maxAmt = aggList.length ? aggList[0].amount : 1;
-  const sp = document.getElementById('budSplit');
-  if(sp) sp.innerHTML = aggList.map((p,i)=>{
-    const col = PAL[i%PAL.length];
-    const pctOfTotal = chargesAbs ? Math.round(p.amount/chargesAbs*100) : 0;
-    return `<div class="split-row">
-      <div class="split-av" style="background:linear-gradient(135deg,${col},${col}cc)">${p.ini}</div>
-      <div class="split-body">
-        <div class="split-top">
-          <span class="split-name">${p.name}<span class="pct">${pctOfTotal}% des charges</span></span>
-          <span class="split-amount">${eur(p.amount)}</span>
-        </div>
-        <div class="split-bar"><div class="split-fill" style="width:${maxAmt?p.amount/maxAmt*100:0}%;background:${col}"></div></div>
-      </div>
-    </div>`;
-  }).join('') || '<div class="empty">Aucune charge à répartir.</div>';
-
   /* ── Charges par catégorie (donut) ── */
   const byCat = {};
   txs.filter(t=>t.montant<0).forEach(t=>{ const k=t.cat||'autre'; byCat[k]=(byCat[k]||0)+Math.abs(t.montant); });
@@ -1585,16 +1560,22 @@ function renderBudget(){
     }
   }
 
-  /* ── Liste des transactions (filtrée) ── */
+  /* ── Mouvements : résumé + regroupement par mois ── */
   const filtered = txs.map((t,i)=>({...t,i})).filter(t=>{
     if(txFilter==='charge') return t.montant<0;
     if(txFilter==='revenu') return t.montant>0;
     return true;
   });
+  const fRev = filtered.filter(t=>t.montant>0).reduce((a,t)=>a+t.montant,0);
+  const fChg = Math.abs(filtered.filter(t=>t.montant<0).reduce((a,t)=>a+t.montant,0));
   const cnt = document.getElementById('txCount');
-  if(cnt) cnt.textContent = `${txs.length} transaction(s) · ${eur(revenus)} de revenus, ${eur(chargesAbs)} de charges`;
-  const tl = document.getElementById('txList');
-  if(tl) tl.innerHTML = filtered.map(t=>{
+  if(cnt) cnt.textContent = `${filtered.length} opération(s)`;
+  const sumEl = document.getElementById('txSummary');
+  if(sumEl) sumEl.innerHTML = `
+    <div class="mvt-kpi"><span class="mvt-k-lbl">Entrées</span><span class="mvt-k-val pos">+${eur(fRev)}</span></div>
+    <div class="mvt-kpi"><span class="mvt-k-lbl">Sorties</span><span class="mvt-k-val neg">−${eur(fChg)}</span></div>
+    <div class="mvt-kpi"><span class="mvt-k-lbl">Solde</span><span class="mvt-k-val ${fRev-fChg>=0?'pos':'neg'}">${fRev-fChg>=0?'+':'−'}${eur(Math.abs(fRev-fChg))}</span></div>`;
+  const txRowHTML = t => {
     const ci = catInfo(t.cat);
     const pos = t.montant>=0;
     let statusLine='';
@@ -1607,11 +1588,11 @@ function renderBudget(){
     return `<div class="tx-row ${pos?'':'payable'}" ${pos?'':`onclick="openPayModal(${t.i})"`}>
       <div class="tx-ico" style="background:${pos?'rgba(45,106,106,.1)':ci.color+'1f'}">${pos?svgIcon('coins',18):svgIcon(ci.ic,18)}</div>
       <div class="tx-body">
-        <div class="tx-desc">${t.desc}</div>
+        <div class="tx-desc">${cEsc(t.desc)}</div>
         <div class="tx-meta">
           <span class="tx-tag">${ci.label}</span>
           <span>${svgIcon('pin',12)} ${cEsc((t.bien&&t.bien!=='__all__')?String(t.bien).split('—')[0].trim():'Commun')}</span>
-          ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR')}</span>`:''}
+          ${t.date?`<span>${new Date(t.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</span>`:''}
         </div>
         ${statusLine}
       </div>
@@ -1620,7 +1601,18 @@ function renderBudget(){
         <span class="del" onclick="event.stopPropagation();askDelete('Supprimer cette opération ?', ()=>{ S.transactions.splice(${t.i},1); save(); })" title="Supprimer">${DELSVG}</span>
       </div>
     </div>`;
-  }).join('') || '<div class="empty">Aucune transaction.</div>';
+  };
+  const groups={};
+  filtered.forEach(t=>{ const ym=String(t.date||'').slice(0,7); (groups[ym]=groups[ym]||[]).push(t); });
+  const ymKeys=Object.keys(groups).sort().reverse();
+  const tl = document.getElementById('txList');
+  if(tl) tl.innerHTML = ymKeys.length ? ymKeys.map(ym=>{
+    const list=groups[ym].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    const net=list.reduce((a,t)=>a+t.montant,0);
+    const label = /^\d{4}-\d{2}$/.test(ym) ? new Date(+ym.slice(0,4),+ym.slice(5,7)-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}) : 'Sans date';
+    return `<div class="tx-month"><span class="tx-month-lbl">${label}</span><span class="tx-month-net ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${eur(Math.abs(net))}</span></div>`
+      + list.map(txRowHTML).join('');
+  }).join('') : '<div class="empty">Aucune opération.</div>';
 
   /* ── Historique des paiements ── */
   const pays = S.payments || [];
