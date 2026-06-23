@@ -1245,10 +1245,11 @@ function renderFiscal(){
       <div class="fisc-check">
         ${docChecks.map(d=>`<div class="fisc-check-row ${d.ok?'ok':'miss'}">${d.ok?svgIcon('check',14):svgIcon('clock',14)}<span>${cEsc(d.lbl)}</span><span class="fisc-doc-tag${d.ok?' ok':''}">${d.ok?'Présent':'À ajouter'}</span></div>`).join('')}
       </div>
+      <p class="fisc-note">Détection automatique d’après le <b>nom et le dossier</b> des fichiers que vous avez déposés dans l’onglet Documents. « Présent » signifie qu’un document correspondant a été trouvé, pas qu’il est le bon : vérifiez, et déposez ce qui manque via « Ouvrir mes documents ».</p>
     </div>` : ''}
 
     <details class="fisc-details" ${(fiscDetailOpen||revBrut<=0)?'open':''} ontoggle="fiscDetailOpen=this.open">
-      <summary>Voir et ajuster le détail par bien</summary>
+      <summary>${svgIcon('clipboard',16)} Voir et ajuster le détail par bien</summary>
       <div class="card" style="margin-top:12px">
         <div class="card-head"><div><div class="card-title">Revenus, charges et intérêts par bien</div><div class="card-sub">Pré-rempli depuis votre budget ${y}. Les intérêts d’emprunt se saisissent à la main (non suivis dans le budget).</div></div></div>
         <div class="fisc-table fisc-table-5">
@@ -1267,7 +1268,7 @@ function renderFiscal(){
     </details>
 
     <details class="fisc-details fisc-explain">
-      <summary>Comprendre ma fiscalité en indivision</summary>
+      <summary>${svgIcon('scale',16)} Comprendre ma fiscalité en indivision</summary>
       <div class="card" style="margin-top:12px">
         <div class="fisc-ex">
           <h4>L’indivision, comment ça marche ?</h4>
